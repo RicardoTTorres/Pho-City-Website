@@ -7,9 +7,12 @@ The website will provide a central hub where customers can easily access the men
 -nothing for now
 ## Installation Instructions
 #Clone the repository:
-#mkdir FolderName # Replace the "FolderName" with your desired name.
-#cd FolderName
-#git clone https://github.com/RicardoTTorres/Pho-City-Website.git
+
+mkdir FolderName # Replace the "FolderName" with your desired name.
+
+cd FolderName
+
+git clone https://github.com/RicardoTTorres/Pho-City-Website.git
 
 PAT KEY: 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
 
