@@ -8,7 +8,7 @@ The website will provide a central hub where customers can easily access the men
 ## Installation Instructions
 Clone the repository:
 
-mkdir FolderName # Replace the "FolderName" with your desired name.
+mkdir FolderName  --Replace the "FolderName" with your desired name.
 
 cd FolderName
 
