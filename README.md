@@ -6,7 +6,7 @@ The website will provide a central hub where customers can easily access the men
 ## Before Cloning:
 -nothing for now
 ## Installation Instructions
-#Clone the repository:
+Clone the repository:
 
 mkdir FolderName # Replace the "FolderName" with your desired name.
 
