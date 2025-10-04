@@ -14,8 +14,6 @@ cd FolderName
 
 git clone https://github.com/RicardoTTorres/Pho-City-Website.git
 
-PAT KEY: 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
-
 ## Folder Descriptions
 Design Folder - Figma Website Design is located here.
 
