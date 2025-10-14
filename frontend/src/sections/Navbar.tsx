@@ -1,68 +1,130 @@
-import React from "react";
+// src/sections/Navbar.tsx
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useContent } from "@/context/ContentContext";
 
+export function Navbar(): JSX.Element {
+  const { content } = useContent();
+  const [open, setOpen] = useState(false);
 
-export default function Navbar() {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setOpen(false);
   };
 
   return (
-    <header className="bg-accent-cream shadow-sm border-b-2 border-red-600 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-24">
-          {/* Logo */}
-          <div className="flex items-center">  
-              alt="Pho City Vietnamese Cuisine Logo"
-              className="h-24 w-auto object-contain"
+    <header className="sticky top-0 z-50 bg-accent-cream/95 border-b-2 border-red-600 backdrop-blur supports-[backdrop-filter]:bg-accent-cream/80">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Desktop */}
+        <div className="hidden md:flex justify-between items-center h-20">
+          {/* Left: Logo */}
+          <div
+            className="text-3xl font-extrabold text-red-700 tracking-tight leading-none cursor-pointer"
+            onClick={() => scrollTo("hero")}
+          >
+            Pho City
           </div>
-          
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Button 
-              variant="ghost" 
-              onClick={() => scrollToSection('menu')}
-              className="text-gray-700 hover:text-red-600 hover:bg-red-50"
+
+          {/* Right: Navigation */}
+          <nav className="flex items-center space-x-8">
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("about")}
+            >
+              About
+            </button>
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("menu")}
             >
               Menu
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => scrollToSection('about')}
-              className="text-gray-700 hover:text-red-600 hover:bg-red-50"
+            </button>
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("contact")}
             >
-              About Us
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => scrollToSection('contact')}
-              className="text-gray-700 hover:text-red-600 hover:bg-red-50"
+              Contact
+            </button>
+            <Button
+              size="sm"
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={() => window.open(content.onlineOrder.pickupUrl, "_blank")}
             >
-              Contact Us
+              Order Online
             </Button>
-            <Button 
-              className="bg-red-600 hover:bg-red-700 text-white"
-              onClick={() => scrollToSection('online-order')}
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-600 text-red-600 hover:bg-red-50"
+              onClick={() => window.open(content.onlineOrder.deliveryUrl, "_blank")}
             >
-              Online Order
+              Delivery
             </Button>
           </nav>
+        </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-red-600"
+        {/* Mobile */}
+        <div className="md:hidden flex h-16 items-center justify-between">
+          <div
+            className="text-2xl font-bold text-red-700 leading-none cursor-pointer"
+            onClick={() => scrollTo("hero")}
+          >
+            Pho City
+          </div>
+          <button
+            className="text-gray-700 hover:text-red-600"
+            aria-label="Toggle menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <svg
+              className="h-7 w-7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              {open ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile dropdown */}
+      {open && (
+        <div className="md:hidden bg-accent-cream border-t border-red-100 shadow-lg">
+          <div className="flex flex-col items-start px-6 py-4 space-y-4">
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("about")}
+            >
+              About
+            </button>
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("menu")}
             >
               Menu
+            </button>
+            <button
+              className="text-lg font-medium text-gray-800 hover:text-red-600"
+              onClick={() => scrollTo("contact")}
+            >
+              Contact
+            </button>
+            <Button
+              size="sm"
+              className="w-full bg-red-600 text-white hover:bg-red-700"
+              onClick={() => window.open(content.onlineOrder.pickupUrl, "_blank")}
+            >
+              Order Online
             </Button>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 }
