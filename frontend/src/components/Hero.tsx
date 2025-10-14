@@ -1,27 +1,56 @@
+import { Button } from "./ui/button";
+import { useContent } from "./ContentContext";
 
 
-export default function Hero() {
+export function Hero() {
+  const { content } = useContent();
+  
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="top" className="mx-auto max-w-7xl px-6 py-20 grid gap-8 md:grid-cols-2 items-center">
-      <div>
-        <h1 className="text-4xl md:text-6xl font-bold text-red-600 mb-4 leading-none">
-          Authentic Vietnamese Flavor
-        </h1>
-        <p className="text-lg text-gray-700 mb-8 max-w-3xl">
-          From rich, aromatic pho broth to crispy egg rolls—each dish is crafted fresh daily with care.
-        </p>
-        <div className="flex items-center gap-4">
-          <a href="#" className="inline-flex items-center justify-center rounded-lg bg-red-600 text-white px-6 py-3 text-base font-semibold shadow-lg transition-colors hover:bg-red-700">
-            Order Now
-          </a>
-          <a href="#about" className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-6 py-3 text-base font-medium text-gray-800 transition-colors hover:bg-gray-100">
-            Learn More
-          </a>
+    <section className="bg-gradient-to-r from-red-600 to-red-700 text-white py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Content */}
+          <div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              {content.hero.title}
+            </h1>
+            <p className="text-xl mb-8 text-red-100">
+              {content.hero.subtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                size="lg"
+                className="bg-white text-red-600 hover:bg-gray-100"
+                onClick={() => scrollToSection('menu')}
+              >
+                {content.hero.ctaText}
+              </Button>
+              <Button 
+                size="lg"
+                className="bg-white text-red-600"
+                onClick={() => window.open('tel:+19167542143', '_self')}
+              >
+                Order Online
+              </Button>
+            </div>
+          </div>
+          
+          {/* Image */}
+          <div className="relative">
+            <div className="rounded-full bg-white p-2 shadow-2xl">
+              <div className="rounded-full overflow-hidden">
+               
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="h-64 md:h-96 rounded-xl overflow-hidden shadow-2xl bg-gray-100 grid place-items-center">
-        <span className="text-gray-500">Hero Image Placeholder</span>
       </div>
     </section>
   );
