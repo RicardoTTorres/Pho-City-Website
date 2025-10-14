@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#fd160d",    // Pho City red
+        primary: "#fd160d",    // red
         secondary: "#d4af37",  // gold
         cream: "#fff8e7",      // warm cream
       },
