@@ -9,22 +9,27 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
 
   return (
     <footer className="bg-accent-cream border-t-2 border-red-600 text-[var(--foreground)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Top row: logo | nav | instagram + contact */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
-          {/* Left: Logo + name */}
-          <div className="flex flex-col items-center md:items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {/* Top row: logo | nav | instagram+contact */}
+        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center gap-6 md:gap-8">
+          {/* Left: Logo */}
+          <div className="flex flex-col items-center">
             {brand.logo ? (
               <a href="#home" aria-label="Home">
-                <img src={brand.logo} alt="" className="h-50 w-50 object-contain mb-2" />
+                <div className="h-10 md:h-12 w-full flex items-center justify-center">
+                  <img
+                    src={brand.logo}
+                    alt=""
+                    className="h-50 w-50 object-contain shrink-0"
+                  />
+                </div>
               </a>
             ) : null}
-            
           </div>
 
           {/* Center: Nav */}
-          <nav aria-label="Footer navigation">
-            <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-base font-medium">
+          <nav aria-label="Footer navigation" className="flex justify-center">
+            <ul className="flex flex-wrap justify-center gap-x-3 md:gap-x-5 gap-y-2 text-sm md:text-base font-medium">
               {navLinks.map((link) => {
                 if ("href" in link) {
                   return (
@@ -51,14 +56,14 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
             </ul>
           </nav>
 
-          {/* Right: Instagram + address/phone */}
+          {/* Instagram + Address/Phone */}
           <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
             <a
               href={instagram.href}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Pho City Instagram"
-              className="text-base font-medium text-red-700 hover:underline underline-offset-4"
+              className="text-sm md:text-base font-medium text-red-700 hover:underline underline-offset-4"
             >
               Follow us on Instagram
             </a>
@@ -71,7 +76,7 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
         </div>
 
         {/* Bottom line */}
-        <div className="mt-8 text-center text-xs text-[var(--muted-foreground)]">
+        <div className="mt-6 text-center text-xs text-[var(--muted-foreground)]">
           © {year} {brand.name}. All rights reserved.
         </div>
       </div>
