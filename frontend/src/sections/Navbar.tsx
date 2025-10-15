@@ -18,46 +18,52 @@ export function Navbar(): ReactElement {
     <header className="sticky top-0 z-50 bg-accent-cream/95 border-b-2 border-red-600 backdrop-blur supports-[backdrop-filter]:bg-accent-cream/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Desktop */}
-        <div className="hidden md:flex justify-between items-center h-20">
+        <div className="hidden md:flex items-center justify-between h-16 lg:h-20">
           {/* Left: Logo */}
           <div
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center h-full cursor-pointer"
             onClick={() => scrollTo("hero")}
           >
             {navConfig.brand.logo ? (
-              <img src={navConfig.brand.logo} alt="" className="h-50 w-50 object-contain" />
+              <img
+                src={navConfig.brand.logo}
+                alt=""
+                className="h-50 w-auto object-contain shrink-0"
+              />
             ) : null}
-            <div >
-            </div>
           </div>
 
-          {/* Right: Navigation */}
-          <nav className="flex items-center space-x-8">
-            {navConfig.nav.map((item) => (
-              <button
-                key={item.label}
-                className="text-lg font-medium text-gray-800 hover:text-red-600"
-                onClick={() => item.id && scrollTo(item.id)}
+          {/* Right: Nav + Actions */}
+          <div className="flex items-center gap-4 lg:gap-6">
+            <nav className="flex items-center gap-4 lg:gap-6">
+              {navConfig.nav.map((item) => (
+                <button
+                  key={item.label}
+                  className="text-base lg:text-lg font-medium text-gray-800 hover:text-red-600"
+                  onClick={() => item.id && scrollTo(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+            <div className="flex items-center gap-2 lg:gap-3">
+              <Button
+                size="sm"
+                className="bg-red-600 text-white hover:bg-red-700"
+                onClick={() => window.open(content.onlineOrder.pickupUrl, "_blank")}
               >
-                {item.label}
-              </button>
-            ))}
-            <Button
-              size="sm"
-              className="bg-red-600 text-white hover:bg-red-700"
-              onClick={() => window.open(content.onlineOrder.pickupUrl, "_blank")}
-            >
-              Order Online
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-red-600 text-red-600 hover:bg-red-50"
-              onClick={() => window.open(content.onlineOrder.deliveryUrl, "_blank")}
-            >
-              Delivery
-            </Button>
-          </nav>
+                Order Online
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-red-600 text-red-600 hover:bg-red-50"
+                onClick={() => window.open(content.onlineOrder.deliveryUrl, "_blank")}
+              >
+                Delivery
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Mobile */}
