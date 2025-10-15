@@ -1,12 +1,8 @@
-
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import React from "react"
-import ReactDOM from "react-dom/client"
-import { ContentProvider } from "./components/ContentContext"
-import './styles/global.css'
-
-
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import { ContentProvider } from "@/context/ContentContext";
+import "./styles/global.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -15,6 +11,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </ContentProvider>
   </React.StrictMode>
 );
-
-
-//createRoot(document.getElementById("root")!).render(<App />);
