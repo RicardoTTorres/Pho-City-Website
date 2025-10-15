@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useContent } from "@/context/ContentContext";
+import { navConfig } from "@/config/nav.config";
 
 export function Navbar(): JSX.Element {
   const { content } = useContent();
@@ -22,29 +23,20 @@ export function Navbar(): JSX.Element {
             className="text-3xl font-extrabold text-red-700 tracking-tight leading-none cursor-pointer"
             onClick={() => scrollTo("hero")}
           >
-            Pho City
+            {navConfig.brand.name}
           </div>
 
           {/* Right: Navigation */}
           <nav className="flex items-center space-x-8">
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("about")}
-            >
-              About
-            </button>
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("menu")}
-            >
-              Menu
-            </button>
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("contact")}
-            >
-              Contact
-            </button>
+            {navConfig.nav.map((item) => (
+              <button
+                key={item.label}
+                className="text-lg font-medium text-gray-800 hover:text-red-600"
+                onClick={() => item.id && scrollTo(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
             <Button
               size="sm"
               className="bg-red-600 text-white hover:bg-red-700"
@@ -69,7 +61,7 @@ export function Navbar(): JSX.Element {
             className="text-2xl font-bold text-red-700 leading-none cursor-pointer"
             onClick={() => scrollTo("hero")}
           >
-            Pho City
+            {navConfig.brand.name}
           </div>
           <button
             className="text-gray-700 hover:text-red-600"
@@ -97,24 +89,15 @@ export function Navbar(): JSX.Element {
       {open && (
         <div className="md:hidden bg-accent-cream border-t border-red-100 shadow-lg">
           <div className="flex flex-col items-start px-6 py-4 space-y-4">
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("about")}
-            >
-              About
-            </button>
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("menu")}
-            >
-              Menu
-            </button>
-            <button
-              className="text-lg font-medium text-gray-800 hover:text-red-600"
-              onClick={() => scrollTo("contact")}
-            >
-              Contact
-            </button>
+            {navConfig.nav.map((item) => (
+              <button
+                key={item.label}
+                className="text-lg font-medium text-gray-800 hover:text-red-600"
+                onClick={() => item.id && scrollTo(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
             <Button
               size="sm"
               className="w-full bg-red-600 text-white hover:bg-red-700"
