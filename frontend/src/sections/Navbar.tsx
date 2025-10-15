@@ -21,10 +21,14 @@ export function Navbar(): ReactElement {
         <div className="hidden md:flex justify-between items-center h-20">
           {/* Left: Logo */}
           <div
-            className="text-3xl font-extrabold text-red-700 tracking-tight leading-none cursor-pointer"
+            className="flex items-center space-x-3 cursor-pointer"
             onClick={() => scrollTo("hero")}
           >
-            {navConfig.brand.name}
+            {navConfig.brand.logo ? (
+              <img src={navConfig.brand.logo} alt="" className="h-50 w-50 object-contain" />
+            ) : null}
+            <div >
+            </div>
           </div>
 
           {/* Right: Navigation */}
@@ -59,10 +63,13 @@ export function Navbar(): ReactElement {
         {/* Mobile */}
         <div className="md:hidden flex h-16 items-center justify-between">
           <div
-            className="text-2xl font-bold text-red-700 leading-none cursor-pointer"
+            className="flex items-center space-x-2 cursor-pointer"
             onClick={() => scrollTo("hero")}
           >
-            {navConfig.brand.name}
+            {navConfig.brand.logo ? (
+              <img src={navConfig.brand.logo} alt="" className="h-10 w-10 object-contain" />
+            ) : null}
+            <div> </div>
           </div>
           <button
             className="text-gray-700 hover:text-red-600"

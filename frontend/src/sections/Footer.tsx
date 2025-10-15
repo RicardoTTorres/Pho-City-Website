@@ -14,8 +14,12 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
           {/* Left: Logo + name */}
           <div className="flex flex-col items-center md:items-start">
+            {brand.logo ? (
+              <a href="#home" aria-label="Home">
+                <img src={brand.logo} alt="" className="h-50 w-50 object-contain mb-2" />
+              </a>
+            ) : null}
             
-            <h3 className="text-xl font-bold text-red-700 tracking-tight">{brand.name}</h3>
           </div>
 
           {/* Center: Nav */}
@@ -36,7 +40,6 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
                   );
                 }
 
-                // otherwise treat as an in-page nav item (id)
                 return (
                   <li key={link.label}>
                     <a href={`#${(link as any).id}`} className="hover:text-red-700 transition">
