@@ -6,6 +6,7 @@
 
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
+  "types": ["vite/client", "react", "react-dom"],
 
     "strict": true,
     "noImplicitOverride": true,
@@ -14,8 +15,7 @@
     "useUnknownInCatchVariables": true,
     "noFallthroughCasesInSwitch": true,
 
-    "verbatimModuleSyntax": true,
-    "preserveValueImports": true,
+  "verbatimModuleSyntax": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
 
@@ -30,6 +30,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }

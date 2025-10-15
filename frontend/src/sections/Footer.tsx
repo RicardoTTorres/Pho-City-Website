@@ -1,10 +1,11 @@
 // src/sections/Footer.tsx
 import React, { memo } from "react";
+import type { ReactElement } from "react";
 import { footerConfig } from "@/config/footer.config";
 
-export const Footer = memo(function Footer(): JSX.Element {
+export const Footer = memo(function Footer({ config = footerConfig }: { config?: typeof footerConfig }): ReactElement {
   const year = new Date().getFullYear();
-  const { brand, navLinks, instagram, contact } = footerConfig;
+  const { brand, navLinks, instagram, contact } = config;
 
   return (
     <footer className="bg-accent-cream border-t-2 border-red-600 text-[var(--foreground)]">
@@ -20,26 +21,30 @@ export const Footer = memo(function Footer(): JSX.Element {
           {/* Center: Nav */}
           <nav aria-label="Footer navigation">
             <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-base font-medium">
-              {navLinks.map((link) =>
-                link.external ? (
+              {navLinks.map((link) => {
+                if ("href" in link) {
+                  return (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        {...(('external' in link && link.external) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        className="hover:text-red-700 transition"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  );
+                }
+
+                // otherwise treat as an in-page nav item (id)
+                return (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-red-700 transition"
-                    >
+                    <a href={`#${(link as any).id}`} className="hover:text-red-700 transition">
                       {link.label}
                     </a>
                   </li>
-                ) : (
-                  <li key={link.label}>
-                    <a href={link.href} className="hover:text-red-700 transition">
-                      {link.label}
-                    </a>
-                  </li>
-                )
-              )}
+                );
+              })}
             </ul>
           </nav>
 
