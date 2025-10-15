@@ -28,3 +28,14 @@ build/
 .env
 .env.*
 
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Vite cache / build artifacts
+.vite/
+dist/
+
+# Misc
+tsconfig.tsbuildinfo
+
