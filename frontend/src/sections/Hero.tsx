@@ -1,7 +1,8 @@
 import { useContent } from "@/context/ContentContext";
 import { Button } from "@/components/ui/button";
+import type { ReactElement } from "react";
 
-export function Hero(): JSX.Element {
+export function Hero(): ReactElement {
   const { content } = useContent();
   const hero = content.hero;
 
@@ -14,7 +15,7 @@ export function Hero(): JSX.Element {
       id="hero"
       className="
         bg-gradient-to-r from-red-600 to-red-700 text-white
-        pt-16 md:pt-20            /* space under header, inside hero */
+        pt-16 md:pt-20            
         scroll-mt-16 md:scroll-mt-20
         min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]
         flex items-center

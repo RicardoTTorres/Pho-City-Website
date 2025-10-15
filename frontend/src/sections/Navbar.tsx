@@ -1,10 +1,11 @@
 // src/sections/Navbar.tsx
 import React, { useState } from "react";
+import type { ReactElement } from "react";
 import { Button } from "@/components/ui/button";
 import { useContent } from "@/context/ContentContext";
 import { navConfig } from "@/config/nav.config";
 
-export function Navbar(): JSX.Element {
+export function Navbar(): ReactElement {
   const { content } = useContent();
   const [open, setOpen] = useState(false);
 
