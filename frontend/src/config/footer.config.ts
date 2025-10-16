@@ -4,7 +4,7 @@ import { navConfig } from "./nav.config";
 export const footerConfig = {
   brand: {
     name: "Pho City",
-    logo: "/src/assets/logo.svg",
+    logo: "/src/assets/logo.png"
   },
   // reuse the shared nav items (if footer needs additional links, extend here)
   navLinks: [
