@@ -9,9 +9,9 @@ export const footerConfig = {
   // reuse the shared nav items (if footer needs additional links, extend here)
   navLinks: [
     // include a Home link plus the shared nav items
-    { label: "Home", href: "#home" },
+    { label: "Home", path: "/" },
     ...navConfig.nav,
-    { label: "Order", href: "https://toasttab.com/your-store", external: true },
+    { label: "Order", path: "https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200", external: true },
   ],
   instagram: { href: "https://instagram.com/" },
   contact: {

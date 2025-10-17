@@ -1,6 +1,7 @@
 // src/sections/Footer.tsx
 import React, { memo } from "react";
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 import { footerConfig } from "@/config/footer.config";
 
 export const Footer = memo(function Footer({ config = footerConfig }: { config?: typeof footerConfig }): ReactElement {
@@ -15,7 +16,7 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
           {/* Left: Logo */}
           <div className="flex flex-col items-center">
             {brand.logo ? (
-              <a href="#home" aria-label="Home">
+              <Link to="/" aria-label="Home">
                 <div className="h-10 md:h-12 w-full flex items-center justify-center">
                   <img
                     src={brand.logo}
@@ -23,38 +24,33 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
                     className="h-50 w-50 object-contain shrink-0"
                   />
                 </div>
-              </a>
+              </Link>
             ) : null}
           </div>
 
           {/* Center: Nav */}
           <nav aria-label="Footer navigation" className="flex justify-center">
             <ul className="flex flex-wrap justify-center gap-x-3 md:gap-x-5 gap-y-2 text-sm md:text-base font-medium">
-              {navLinks.map((link) => {
-                if ("href" in link) {
-                  return (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        {...(('external' in link && link.external) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                        className="hover:text-red-700 transition"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  );
-                }
-
-                return (
-                  <li key={link.label}>
-                    <a href={`#${(link as any).id}`} className="hover:text-red-700 transition">
+              {navLinks.map((link) => (
+                <li key={link.label}>
+                  {"external" in link && link.external ? (
+                    <a
+                      href={link.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-red-700 transition"
+                    >
                       {link.label}
                     </a>
-                  </li>
-                );
-              })}
+                  ) : (
+                    <Link to={link.path} className="hover:text-red-700 transition">
+                      {link.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
             </ul>
-          </nav>
+          </nav>  
 
           {/* Instagram + Address/Phone */}
           <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
