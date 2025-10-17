@@ -4,14 +4,25 @@ import type { ReactElement } from "react";
 import { Button } from "@/components/ui/button";
 import { useContent } from "@/context/ContentContext";
 import { navConfig } from "@/config/nav.config";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export function Navbar(): ReactElement {
   const { content } = useContent();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      scrollTo("hero");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -22,7 +33,7 @@ export function Navbar(): ReactElement {
           {/* Left: Logo */}
           <div
             className="flex items-center h-full cursor-pointer"
-            onClick={() => scrollTo("hero")}
+            onClick={handleLogoClick}
           >
             {navConfig.brand.logo ? (
               <img
@@ -37,13 +48,14 @@ export function Navbar(): ReactElement {
           <div className="flex items-center gap-4 lg:gap-6">
             <nav className="flex items-center gap-4 lg:gap-6">
               {navConfig.nav.map((item) => (
-                <button
+                <Link
                   key={item.label}
+                  to={item.path}
                   className="text-base lg:text-lg font-medium text-gray-800 hover:text-red-600"
-                  onClick={() => item.id && scrollTo(item.id)}
+                  onClick={() => setOpen(false)}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
             </nav>
             <div className="flex items-center gap-2 lg:gap-3">
@@ -104,13 +116,14 @@ export function Navbar(): ReactElement {
         <div className="md:hidden bg-accent-cream border-t border-red-100 shadow-lg">
           <div className="flex flex-col items-start px-6 py-4 space-y-4">
             {navConfig.nav.map((item) => (
-              <button
+              <Link
                 key={item.label}
+                to={item.path}
                 className="text-lg font-medium text-gray-800 hover:text-red-600"
-                onClick={() => item.id && scrollTo(item.id)}
+                onClick={() => setOpen(false)}
               >
                 {item.label}
-              </button>
+              </Link>
             ))}
             <Button
               size="sm"

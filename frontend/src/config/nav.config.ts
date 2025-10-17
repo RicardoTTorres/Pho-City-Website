@@ -1,9 +1,9 @@
 export const navConfig = {
   brand: { name: "Pho City", logo: "/src/assets/logo.png" },
   nav: [
-    { label: "About", id: "about" },
-    { label: "Menu", id: "menu" },
-    { label: "Contact", id: "contact" },
+    { label: "About", path: "about" },
+    { label: "Menu", path: "menu" },
+    { label: "Contact", path: "contact" },
   ] as const,
 } as const;
 
