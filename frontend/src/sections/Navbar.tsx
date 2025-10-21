@@ -26,11 +26,11 @@ export function Navbar(): ReactElement {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-accent-cream/95 border-b-2 border-red-600 backdrop-blur supports-[backdrop-filter]:bg-accent-cream/80">
+    <header className="sticky top-0 z-50 bg-[#fef8f4]/90 border-b border-red-100 backdrop-blur-md supports-[backdrop-filter]:bg-[#fef8f4]/80 transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Desktop */}
+        {/*Desktop navbar*/}
         <div className="hidden md:flex items-center justify-between h-16 lg:h-20">
-          {/* Left: Logo */}
+          {/*Left: Logo*/}
           <div
             className="flex items-center h-full cursor-pointer"
             onClick={handleLogoClick}
@@ -44,50 +44,30 @@ export function Navbar(): ReactElement {
             ) : null}
           </div>
 
-          {/* Right: Nav + Actions */}
-          <div className="flex items-center gap-4 lg:gap-6">
-            <nav className="flex items-center gap-4 lg:gap-6">
-              {navConfig.nav.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="text-base lg:text-lg font-medium text-gray-800 hover:text-red-600"
-                  onClick={() => setOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="flex items-center gap-2 lg:gap-3">
-              <Button
-                size="sm"
-                className="bg-red-600 text-white hover:bg-red-700"
-                onClick={() => window.open(content.onlineOrder.pickupUrl, "_blank")}
-              >
-                Order Online
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-red-600 text-red-600 hover:bg-red-50"
-                onClick={() => window.open(content.onlineOrder.deliveryUrl, "_blank")}
-              >
-                Delivery
-              </Button>
-            </div>
+           {/*Center: Links*/}
+          <nav className="flex items-center gap-8 text-gray-800 font-medium">
+            <a href="about" className="hover:text-red-600 transition-colors">About</a>
+            <a href="contact" className="hover:text-red-600 transition-colors">Contact</a>
+            <a href="menu" className="hover:text-red-600 transition-colors">Menu</a>
+          </nav>
+
+          {/*Right: CTA*/}
+          <div className="flex items-center gap-3">
+            <a href="/order" className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition">
+              Order Online
+            </a>
+            <a href="/delivery" className="border border-red-600 text-red-600 px-4 py-2 rounded-full hover:bg-red-50 transition">
+              Delivery
+            </a>
           </div>
         </div>
 
-        {/* Mobile */}
+        {/*Mobile navbar*/}
         <div className="md:hidden flex h-16 items-center justify-between">
-          <div
-            className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => scrollTo("hero")}
-          >
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => scrollTo("hero")}>
             {navConfig.brand.logo ? (
-              <img src={navConfig.brand.logo} alt="" className="h-10 w-10 object-contain" />
+              <img src={navConfig.brand.logo} alt="Pho City logo" className="h-10 w-10 object-contain" />
             ) : null}
-            <div> </div>
           </div>
           <button
             className="text-gray-700 hover:text-red-600"
@@ -111,9 +91,9 @@ export function Navbar(): ReactElement {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/*Mobile dropdown*/}
       {open && (
-        <div className="md:hidden bg-accent-cream border-t border-red-100 shadow-lg">
+        <div className="md:hidden bg-[#fef8f4] border-t border-red-100 shadow-lg">
           <div className="flex flex-col items-start px-6 py-4 space-y-4">
             {navConfig.nav.map((item) => (
               <Link

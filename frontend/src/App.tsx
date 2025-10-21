@@ -12,16 +12,16 @@ import Menu from "./pages/Menu";
 
 export default function App() {
   return (
-    <ContentProvider>
+    <>
       <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />}/>
-          <Route path="/about" element={<About />}/>
-          <Route path="/menu" element={<Menu />}/>
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/adminlogin" element={<AdminLogin />} />
-        </Routes>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
+      </Routes>
       <Footer config={footerConfig} />
-    </ContentProvider>
+    </>
   );
 }
