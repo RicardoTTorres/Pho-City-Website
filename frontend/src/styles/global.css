@@ -1,22 +1,37 @@
 @import "tailwindcss";
-
+@theme {
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-hover: var(--brand-red-hover);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-hover: var(--brand-gold-hover);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-charcoal: var(--brand-charcoal);
+}
 /* Custom dark variant: when any ancestor has .dark, target the current element */
 @custom-variant dark (&:is(.dark &));
 
 /* ---- Design tokens ---- */
 :root {
+  --brand-red: hsl(356 72% 40%);
+  --brand-red-hover: hsl(356 72% 33%);
+  --brand-gold: hsl(42 86% 54%);
+  --brand-gold-hover: hsl(42 86% 45%);
+  --brand-cream: hsl(35 100% 97%);
+  --brand-charcoal: hsl(12 12% 12%);
   --font-size: 16px;
-  --background: #fff8e7;
-  --foreground: #2c2c2c;
+  --background: var(--brand-cream);
+  --foreground: var(--brand-charcoal);
   --card: #ffffff;
   --card-foreground: #2c2c2c;
   --popover: #ffffff;
   --popover-foreground: #2c2c2c;
-  --primary: #fd160d;
+  --primary: var(--brand-red);
   --primary-foreground: #ffffff;
-  --secondary: #d4af37;
+  --secondary: var(--brand-gold);
   --secondary-foreground: #2c2c2c;
-  --muted: #f5f1e8;
+  --secondary: #ffffff;
+  --secondary-foreground: hsl(356 72% 40%);
+  --muted: var(--brand-cream);
   --muted-foreground: #6b6b6b;
   --accent: #d4af37;
   --accent-foreground: #2c2c2c;
@@ -36,20 +51,20 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
 
-  --sidebar: #fff8e7;
-  --sidebar-foreground: #2c2c2c;
-  --sidebar-primary: #fd160d;
+  --sidebar: var(--brand-cream);
+  --sidebar-foreground: var(--brand-charcoal);
+  --sidebar-primary: var(--brand-red);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f1e8;
-  --sidebar-accent-foreground: #2c2c2c;
+  --sidebar-accent: var(--brand-cream);
+  --sidebar-accent-foreground: var(--brand-charcoal);
   --sidebar-border: rgba(212, 175, 55, 0.2);
-  --sidebar-ring: #d4af37;
+  --sidebar-ring: var(--brand-gold);
 
   /* Brand palettes */
-  --primary-red: #fd160d;
-  --secondary-gold: #d4af37;
-  --accent-cream: #fff8e7;
-  --text-charcoal: #2c2c2c;
+  --primary-red: var(--brand-red);
+  --secondary-gold: var(--brand-gold);
+  --accent-cream: var(--brand-cream);
+  --text-charcoal: var(--brand-charcoal);
   --warm-cream: #f5f1e8;
 
   /* Reds */

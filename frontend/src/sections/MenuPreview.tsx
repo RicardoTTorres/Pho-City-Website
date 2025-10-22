@@ -42,13 +42,14 @@ export default function MenuPreview(): JSX.Element {
             </svg>
           </a>
         </div>
-
+        
         {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {featured.map((dish) => (
             <li key={dish.code}>
               <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100">
                 {/*Image*/}
+                  
                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center">
                   {dish.image ? (
                     <img
