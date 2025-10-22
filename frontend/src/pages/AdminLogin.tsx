@@ -19,19 +19,19 @@ export default function AdminLogin() {
       <div className="w-full max-w-sm bg-white rounded-xl shadow-lg overflow-hidden"> {/*Sizing for the Login*/}
         
         {/*Red Header for CMS Login*/}
-        <div className="p-6 flex flex-col items-center bg-gradient-to-b from-[#FD160D] to-[#D60C04]">
+  <div className="p-6 flex flex-col items-center bg-gradient-to-b from-brand-red to-brand-redHover">
           <div className="bg-white/20 rounded-full p-2 mb-2 flex items-center justify-center">
             <img src={ChefIcon} alt="Chef Icon" className="w-5 h-5" />
           </div>
           <h1 className="text-white text-xl font-semibold">Pho City Admin</h1>
-          <p className="text-[#FEE2E1] text-[10px] mt-1 text-center opacity-90">Content Management System</p>
+          <p className="text-brand-cream text-[10px] mt-1 text-center opacity-90">Content Management System</p>
         </div>
 
 {/*--------------Split for Red Header and Secure Access Section------------------*/}
 
         {/*Secure Access Section*/}
         <div className="p-6 flex flex-col items-center">
-          <div className="bg-gradient-to-b from-[#D4AF37] to-[#C19B28] rounded-full p-3 mb-4 flex items-center justify-center">
+          <div className="bg-gradient-to-b from-brand-gold to-brand-goldHover rounded-full p-3 mb-4 flex items-center justify-center">
             <img src={SecurityIcon} alt="Security Icon" className="h-6 w-6" /> {/*Icon(Chef Hat) Found in Assets*/}
           </div>
 
@@ -55,7 +55,7 @@ export default function AdminLogin() {
               onChange={(e) => setPassword(e.target.value)}
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
-              className="w-full rounded-lg pl-10 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 bg-[#F5F1E8] border-2 border-[#E0D8C7] text-[#6B6B6B] text-xs"
+              className="w-full rounded-lg pl-10 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-brand-red bg-brand-cream border-2 border-brand-gold text-brand-charcoal text-xs"
             />
 
             {/*(Right side Password-Input) eye icon - clickable, toggles visibility*/}
@@ -68,16 +68,16 @@ export default function AdminLogin() {
           </div>
 
           {/*Access button*/} {/*Will implement a login authentication*/}
-          <button className="w-full bg-gradient-to-b from-[#FD160D] to-[#D60C04] text-white text-xs py-2 rounded-lg hover:bg-red-700 transition" 
+          <button className="w-full bg-gradient-to-b from-brand-red to-brand-redHover text-white text-xs py-2 rounded-lg hover:bg-brand-redHover transition" 
            onClick={() => { alert("Login Authentication implemented at a later time");}}>
             Access Admin Dashboard
           </button>
 
           {/*Demo Credentials*/}
-          <div className="mt-6 p-3 text-center text-sm text-[#2C2C2C] w-full rounded-[10px] bg-gradient-to-r from-[rgba(212,175,55,0.10)] to-[rgba(212,175,55,0.10)]">
+          <div className="mt-6 p-3 text-center text-sm text-brand-charcoal w-full rounded-[10px] bg-gradient-to-r from-brand-gold/10 to-brand-gold/10">
             <p className="mb-1 font-semibold text-xs">Demo Credentials</p>
             <p className="mb-1 text-xs">Password: 123ForDemoUse</p>
-            <a href="/" className="text-[#D4AF37] hover:underline text-xs inline-block mt-1">← Return to Restaurant Website</a>
+            <a href="/" className="text-brand-gold hover:underline text-xs inline-block mt-1">← Return to Restaurant Website</a>
           </div>
         </div>
       </div>
