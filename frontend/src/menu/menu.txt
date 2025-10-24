@@ -1,0 +1,321 @@
+
+Vietnamese Sandwiches
+Grilled Pork Sandwich - Banh Mi Thit Nuong
+Grilled Pork Sandwich crafted with Butter, Pate, Pickled Carrots, Pickled Cuccumbers, Cilantro & Jalapenos
+$9.00
+Grilled Chicken Sandwich - Banh Mi Ga Nuong
+Grilled Chicken Sandwich crafted with Butter, Pate, Pickled Carrots, Pickled Cuccumbers, Cilantro & Jalapenos
+$9.00
+Grilled Beef Sandwich - Banh Mi Bo Nuong
+Grilled Beef Sandwich crafted with Butter, Pate, Pickled Carrots, Pickled Cuccumbers, Cilantro & Jalapenos
+$9.00
+Vietnamese Ham Sandwich - Banh Mi Cha Lua
+Vietnamese Ham Sandwich crafted with Butter, Pate, Pickled Carrots, Pickled Cuccumbers, Cilantro & Jalapenos
+$9.00
+Beef Stew with French Bread Loaf - Banh Mi Bo Kho
+Stewed Flank Steak in a Sweet and Savory Thickened Beef Broth with Carrots, Onions, and Cilantro
+$15.00
+
+Pho
+[Pho DB] Dac Biet Special
+Our Special Beef Noodle Soup with Rare Steak, Beef Meatball, Brisket, Flank, Tendon & Tripe. The original noodles for this Soup is "Rice Noodles".
+$15.00
+[C.N.G.G.S] Flank, Skirt Flank, Brisket, Tendon, & Tripe
+Beef Noodle Soup with Flank, Skirt Flank, Brisket, Tendon & Tripe
+$15.00
+[T.G.G.S] Rare Steak, Brisket, Tendon, & Tripe
+Beef Noodle Soup with Rare Steak, Brisket, Tendon & Tripe
+$15.00
+[T.N.G.S] Rare Steak, Flank, Tendon & Tripe
+Beef Noodle Soup with Rare Steak, Flank, Tendon & Tripe
+$15.00
+[T.N.Gan] Rare Steak, Flank, Tendon
+Beef Noodle Soup with Rare Steak & Flank
+$15.00
+[T.N.S] Rare Steak, Flank & Tripe
+Beef Noodle Soup with Rare Steak, Flank, & Tripe
+$15.00
+[NVD] Skirt Flank
+Beef Noodle Soup with Skirt Flank
+$15.00
+[T.NVD] Rare Steak & Skirt Flank
+Beef Noodle Soup with Rare Steak & Skirt Flank
+$15.00
+[T.Gau] Rare Steak & Brisket
+Beef Noodle Soup with Rare Steak & Brisket
+$15.00
+[T.N] Rare Steak & Flank
+Beef Noodle Soup with Rare Steak & Flank
+$15.00
+[T.BV] Rare Steak & Beef Meatball
+Beef Noodle Soup with Rare Steak & Beef Meatball
+$15.00
+[T.S] Rare Steak & Tripe
+Beef Noodle Soup with Rare Steak & Tripe
+$15.00
+[Pho Tai] Rare Steak
+Beef Noodle Soup with Rare Steak
+$15.00
+[Pho BV] Beef Meatball
+Beef Noodle Soup with Beef Meatball
+$15.00
+[Pho Bo Kho] Beef Stew
+Beef Stew Noodle Soup with cuts of Braised Flank Steak, Bak Choy, and Carrots
+$15.00
+[Pho Ga] Chicken
+Chicken Noodle Soup
+$15.00
+[Pho Gau] Brisket
+Beef Noodle Soup with Brisket
+$15.00
+[T.N.Gau] Rare Steak, Flank, & Brisket
+Beef Noodle Soup with Rare Steak, Flank, & Brisket
+$15.00
+
+Appetizers
+[Goi Cuon] Pork & Shrimp Spring Rolls (2)
+Rice Paper Rolls filled with Boiled Pork Belly, Shrimp, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Goi CuonTomTN] Grilled Pork & Shrimp Spring Rolls (2)
+Rice Paper Rolls filled with Grilled Pork , Shrimp, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Cha Gio] Egg Rolls (3)
+Made with Ground Pork, Carrot, and Mushrooms
+$9.00
+[Tom Chien] Fried Prawns (8)
+$13.00
+[Tom Chien Dua] Fried Coconut Shrimp (8)
+$13.00
+[Muc Chien] Fried Calamari
+Fried Calamari with Sweet & Sour Dipping Sauce
+$15.00
+[Muc Rang Muoi] Salt and Pepper Fried Calamari
+Lightly Breaded Calamari Fried and tossed with Onions, Bell Peppers & Jalapenos
+$15.00
+[Chem Chep] Grilled Mussels
+Grilled Mussels Topped with Green Onion and Crushed Peanuts (10)
+$19.00
+[Canh Ga Chien] Fried Chicken Wings (8)
+Fried Chicken Wings with Sweet & Sour Dipping Sacue
+$13.00
+[Canh Ga Rang Muoi] Salt and Pepper Fried Chicken Wings (8)
+Lightly Breaded Chicken Wings Fried and tossed with Onions, Bell Peppers & Jalapenos
+$13.00
+[So Diep] Grilled Scallops (10)
+Grilled Scallops Topped with Green Onions and Peanuts (10)
+$19.00
+[Goi Cuon Thit Heo] Pork Spring Rolls (2)
+Rice Paper Rolls filled with Boiled Pork, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Goi Cuon Tom] Shrimp Spring Rolls (2)
+Rice Paper Rolls filled with Boiled Shrimp, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Goi Cuon Thit Nuong] Grilled Pork Spring Rolls (2)
+Rice Paper Rolls filled with Grilled Pork, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Goi Cuon Ga Nuong] Grilled Chicken Spring Rolls (2)
+Rice Paper Rolls filled with Grilled Chicken, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Goi Cuon Chay] Tofu Spring Rolls (2)
+Rice Paper Rolls filled with Fried Tofu, Vermicelli Noodles & Green Leaf Vegetables
+$9.00
+[Quay] Chinese Doughnut
+Light, airy and pleasantly chewy
+$4.50
+[Dau Hu Chien] Fried Tofu
+$13.00
+[Dau Hu Rang Muoi] Salt and Pepper Fried Tofu
+$13.00
+
+Porridge
+[Chao CA TBT] Fish & Pidan Egg Porridge
+$15.00
+[Chao Heo TBT] Pork & Pidan Egg Porridge
+$15.00
+[Chao Bo] Beef Porridge
+$15.00
+[Chao Ga] Chicken Porridge
+$15.00
+[Chao Long] Innard Porridge
+$15.00
+[Chao Huyet] Pork Blood Porridge
+
+Bun Rieu
+Bun Rieu
+Vietnamese Crab Based Noodle Soup
+$15.00
+
+Spicy Beef Noodle Soup
+[BBH] Spicy Beef Noodle Soup
+Noodle Soup with a Rich Spicy Broth with Slices of Beef and Pork
+$15.00
+
+Rice Noodle/Egg Noodle Soup
+[HTDB] Combination Meat and Seafood Noodle Soup
+Choice of Rice Noodle, Fresh Rice Noodle, Clear Noodle, or Egg Noodle
+$16.00
+[Mi Tom] Shrimp Noodle Soup
+Choice of Rice Noodle, Fresh Rice Noodle, Clear Noodle, or Egg Noodle
+$16.00
+[Mi Xa Xiu] BBQ Pork Noodle Soup
+Choice of Rice Noodle, Fresh Rice Noodle, Clear Noodle, or Egg Noodle
+$16.00
+[Mi HT XX] BBQ Pork w/Wonton Egg Noodle Soup
+Choice of Rice Noodle, Fresh Rice Noodle, Clear Noodle, or Egg Noodle
+$16.00
+[Xup HT TC] Combination Wor Wonton Soup
+Does Not Come with Noodles. If Noodles are desired, please select Add Noodles (+$2.00) Otherwise, select "No Noodle"
+$16.00
+[Xup HT XX] BBQ Pork Wonton Soup
+Does Not Come with Noodles. If Noodles are desired, please select Add Noodles (+$2.00) Otherwise, select "No Noodle"
+$16.00
+[Mi Rau Cai]. Vegetable Noodle Soup
+Choice of Rice Noodle, Fresh Rice Noodle, Clear Noodle, or Egg Noodle
+$16.00
+[Xup HT] Wonton Soup
+Does Not Come with Noodles. If Noodles are desired, please select Add Noodles (+$2.00) Otherwise, select "No Noodle"
+$16.00
+
+
+Rice Plates
+[Com SN] Grilled Pork Chop with Rice
+$16.00
+[Com T, CG, SN] Grilled Pork Chop, Shrimp, and Egg Roll with Rice
+$18.00
+[Com Bi, Cha, SN] Grilled Pork Chop, Shredded Skin Pork and Egg Foo Young with Rice
+$18.00
+[Com TN] Grilled Pork with Rice
+$16.00
+[Com T, CG, TN] Grilled Pork, Shrimp, and Egg Roll with Rice
+$18.00
+[Com Bi, Cha, TN] Grilled Pork, Shredded Skin Pork, and Egg Foo Young with Rice
+$18.00
+[Com BN] Grilled Beef with Rice
+$16.00
+[Com T, CG, BN] Grilled Beef, Shrimp, & Egg Roll with Rice
+$18.00
+[Com Bi, Cha, BN] Grilled Beef, Shredded Skin Pork and Egg Foo Young with Rice
+$18.00
+[Com GN] Grilled Chicken with Rice
+$16.00
+[Com T, CG, GN] Chicken, Shrimp, and Egg Roll with Rice
+$18.00
+[Com Bi, Cha, GN] Grilled Chicken, Shredded Skin Pork and Egg Foo Young with Rice
+$18.00
+[Com Ga HN] Steamed Chicken with Garlic Rice
+$18.00
+[Com Ga XXO] Spicy Lemon Grass Chicken with Rice
+$16.00
+[Com Bo Mong Co] Mongolian Beef with Rice
+$16.00
+[Com Bo Luc Lac] Shaken Beef with Rice
+$18.00
+[Com Ca Hoi] Grilled Salmon with Rice
+$18.00
+[Com Suon DH] Grilled Korean BBQ Ribs with Rice
+$18.00
+
+Stir Fry
+[Com Chien] Fried Rice
+$18.00
+[Mi Xao] Chow Mein
+$18.00
+[Hu Tieu Xao] Chow Fun
+$18.00
+
+Vermicelli
+[Bun T, TN, CG] Grilled Pork, Prawn and Egg Roll w/Vermicelli
+$17.00
+[Bun T, BN, CG] Grilled Beef, Prawn, and Egg Roll w/Vermicelli
+$17.00
+[Bun T, GN, CG] Grilled Chicken, Prawn, and Egg Roll w/Vermicelli
+$17.00
+[Bun Tom Nuong] Grilled Prawn w/Vermicelli
+$16.00
+[Bun Tom, TN] Grilled Pork and Prawn w/Vermicelli
+$16.00
+[Bun BN] Grilled Beef w/Vermicelli
+$15.00
+[Bun TN] Grilled Pork w/Vermicelli
+$15.00
+[Bun GN] Grilled Chicken w/Vermicelli
+$15.00
+[Bun Dau Hu Chien] Fried Tofu w/Vermicelli
+$15.00
+[Bun TN, CG] Grilled Pork and Egg Roll w/Vermicelli
+$16.00
+[Bun BN, CG] Grilled Beef and Egg Roll w/Vermicelli
+$16.00
+[Bun GN, CG] Grilled Chicken and Egg Roll w/Vermicelli
+$16.00
+[Bun Tom, BN} Grilled Beef and Prawn w/Vermicelli
+$16.00
+[Bun Tom, GN] Grilled Chicken and Prawn w/Vermicelli
+
+Ala Carte
+[Ga Chua Ngot] Sweet and Sour Chicken
+$18.00
+[Ca Kho To] Catfish Clay Pot
+$18.00
+[Canh Chua] Sweet and Sour Catfish or Shrimp Soup
+$26.00
+[Tom Pha Le] Honey Walnut Shrimp
+$19.00
+[Suon Rang Muoi] Pepper Salted Pork Spare Ribs
+$18.00
+[Suon Nuong] Pork Chop
+$18.00
+[Bo Luc Lac] Shaken Beef
+$22.00
+[Bo Xao Dau Ve] Beef w/Green Beans
+$18.00
+[Do Bien Rau Xao Thap Cam] Seafood Mixed Vegetables
+$19.00
+[Tom Rang Muoi] Pepper Salted Prawns
+$19.00
+[Ga Luoc] Steamed Chicken
+$20.00
+[Thit Nuong] Grilled Pork
+$18.00
+[Ga Xa Xao Ot] Lemon Grass Chicken
+$18.00
+[Bo Mong Co] Mongolian Beef
+$18.00
+
+Shakes
+Passion Fruit Slushy
+$7.00
+Strawberry Shake
+$7.00
+Avocado Shake
+$8.00
+Coconut Shake
+$7.00
+Jackfruit Shake
+$7.00
+Durian Shake
+$8.00
+Mocha Shake
+$7.00
+Taro Shake
+$7.00
+Honeydew Shake
+$7.00
+Mango Shake
+$7.00
+Thai Tea Shake
+$7.00
+Red Bean Shake
+$7.00
+Banana Smoothie
+$7.00
+Pineapple Shake
+$7.00
+Chocolate Shake
+$7.00
+
+Dessert
+Three Color Bean
+$7.00
+Red Bean w/Grass Jelly
+$7.00

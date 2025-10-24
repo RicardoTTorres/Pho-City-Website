@@ -17,11 +17,9 @@ export default function Menu(): JSX.Element {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {category.items.map((item) => (
               <div
-                key={item.code}
                 className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex justify-between items-start mb-2">
-                  <span className="text-red-600 font-semibold">{item.code}</span>
                   <span className="text-lg font-semibold">{item.price}</span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">
