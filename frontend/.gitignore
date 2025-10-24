@@ -27,6 +27,7 @@ build/
 *.sw?
 .env
 .env.*
+.txt
 
 
 # TypeScript build info
