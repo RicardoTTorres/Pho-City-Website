@@ -9,7 +9,7 @@ export const Footer = memo(function Footer({ config = footerConfig }: { config?:
   const { brand, navLinks, instagram, contact } = config;
 
   return (
-  <footer className="bg-brand-gold/15 border-t-2 border-brand-red text-[var(--foreground)]">
+  <footer className="bg-brand-cream/70 border-t-2 border-brand-red text-[var(--foreground)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Top row: logo | nav | instagram+contact */}
         <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center gap-6 md:gap-8">
