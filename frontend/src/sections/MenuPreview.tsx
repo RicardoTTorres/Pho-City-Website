@@ -1,4 +1,5 @@
 import * as React from "react";
+import { motion } from "framer-motion";
 import {
   Card,
   CardHeader,
@@ -7,15 +8,26 @@ import {
 } from "@/components/ui/card";
 import { menuConfig } from "@/config/menu.config";
 
-export default function MenuPreview(): JSX.Element {
+export default function MenuPreview(): React.JSX.Element {
   const phoCategory = menuConfig.categories.find((cat) =>
-    cat.name.includes("Pho Noodle Soup")
+    cat.name.includes("Pho")
   );
   const featured = phoCategory ? phoCategory.items.slice(0, 4) : [];
 
+  //Animation config
+  const fadeInUp = {
+    initial: { opacity: 0, y: 50 },
+    whileInView: { opacity: 1, y: 0 },
+    transition: { duration: 0.5, delay: 0.1 },
+    viewport: { once: true },
+  };
+
   return (
-    <section id="menu" className="py-20 bg-[#fef8f4]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="menu" className="py-20 bg-brand-gold/5 ">
+      <motion.div
+        {...fadeInUp}
+        className="mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8"
+      >
         {/*Header row*/}
         <div className="flex items-baseline justify-between mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
@@ -46,8 +58,8 @@ export default function MenuPreview(): JSX.Element {
         {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {featured.map((dish) => (
-            <li key={dish.code}>
-              <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+            <li key={dish.name}>
+              <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out border border-gray-100">
                 {/*Image*/}
                   
                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center">
@@ -89,7 +101,7 @@ export default function MenuPreview(): JSX.Element {
             </li>
           ))}
         </ul>
-      </div>
+      </motion.div>
     </section>
   );
 }

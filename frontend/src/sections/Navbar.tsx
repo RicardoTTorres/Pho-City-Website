@@ -26,7 +26,7 @@ export function Navbar(): ReactElement {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-brand-gold/25  border-b-2 border-brand-red/50">
+    <header className="sticky top-0 z-50 bg-brand-cream/70  border-b-2 border-brand-red/50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/*Desktop navbar*/}
         <div className="hidden md:flex items-center justify-between h-16 lg:h-20">
