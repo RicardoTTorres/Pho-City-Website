@@ -31,7 +31,7 @@ export function CMSHeader(props: CMSHeaderProps) {
     return { title: entry.t, showSearch: entry.s };
   }, [location.pathname, props.title, props.showSearch]);
 
-  // Close menu on outside click or Escape
+  //Close menu on outside click or Escape
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (!menuRef.current) return;
@@ -53,12 +53,12 @@ export function CMSHeader(props: CMSHeaderProps) {
   return (
     <div className="sticky top-4 z-40 mb-4">
       <div className="flex items-center gap-3 justify-between bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-xl px-4 py-3">
-        {/* Left: Title */}
+        {/*Left: Title */}
         <div className="min-w-0">
           <h1 className="text-xl font-semibold text-gray-800 truncate">{title}</h1>
         </div>
 
-        {/* Middle: Search (optional) */}
+        {/*Middle: Search*/}
         {showSearch && (
           <div className="hidden sm:flex items-center w-full max-w-md gap-2">
             <div className="relative w-full">
@@ -74,11 +74,11 @@ export function CMSHeader(props: CMSHeaderProps) {
           </div>
         )}
 
-        {/* Right: Avatar / Settings */}
-        {/* Right: Avatar / Settings + User Menu */}
+        {/*Right: Avatar / Settings*/}
+        {/*Right: Avatar / Settings + User Menu*/}
         <div className="relative" ref={menuRef}>
           <div className="flex items-center gap-2 shrink-0">
-            {/* Avatar placeholder */}
+            {/*Avatar placeholder*/}
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
@@ -119,7 +119,7 @@ export function CMSHeader(props: CMSHeaderProps) {
                 className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition"
                 onClick={() => {
                   setMenuOpen(false);
-                  // Placeholder for real auth logout flow
+                  //Placeholder for real auth logout flow
                   window.location.href = "/adminlogin";
                 }}
               >
