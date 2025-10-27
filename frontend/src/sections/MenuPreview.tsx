@@ -13,19 +13,15 @@ export default function MenuPreview(): React.JSX.Element {
     cat.name.includes("Pho")
   );
   const featured = phoCategory ? phoCategory.items.slice(0, 4) : [];
-
-  //Animation config
-  const fadeInUp = {
-    initial: { opacity: 0, y: 50 },
-    whileInView: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, delay: 0.1 },
-    viewport: { once: true },
-  };
+  // Animation applied inline on motion.div
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
       <motion.div
-        {...fadeInUp}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        viewport={{ once: true }}
         className="mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8"
       >
         {/*Header row*/}
