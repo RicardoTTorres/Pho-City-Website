@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+﻿import { useState, type FormEvent } from "react";
 
 export const ContactForm = () => {
   const [name, setName] = useState("");
@@ -33,70 +33,63 @@ export const ContactForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10">
-      <h2 className="text-center text-2xl font-semibold text-brand-red mb-2">
-        Send us a message
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl ring-1 ring-brand-gold/30 p-8 md:p-10 flex flex-col h-full w-full">
+      <h2 className="text-center text-2xl md:text-3xl font-bold text-brand-red mb-2">
+        Send us a Message
       </h2>
-      <p className="text-center text-gray-600 mb-6">
-        We’ll get back to you as soon as possible.
+      <p className="text-center text-gray-700 mb-8">
+        We'll get back to you as soon as possible.
       </p>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 h-full">
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Your Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full bg-brand-gold/10 border border-gray-300 rounded-md p-3 text-gray-800 
-                     placeholder-gray-500 focus:outline-none focus:ring-2 
-                     focus:ring-brand-gold focus:border-brand-red transition duration-200"
+          className="w-full bg-white border border-brand-gold/30 rounded-lg p-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 transition-all duration-200 shadow-sm"
         />
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Your Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full bg-brand-gold/10 border border-gray-300 rounded-md p-3 text-gray-800 
-                     placeholder-gray-500 focus:outline-none focus:ring-2 
-                     focus:ring-brand-gold focus:border-brand-red transition duration-200"
+          className="w-full bg-white border border-brand-gold/30 rounded-lg p-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 transition-all duration-200 shadow-sm"
         />
 
         <textarea
-          placeholder="Message"
+          placeholder="Your Message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required
-          rows={4}
-          className="w-full bg-brand-gold/10 border border-gray-300 rounded-md p-3 text-gray-800 
-                     placeholder-gray-500 focus:outline-none focus:ring-2 
-                     focus:ring-brand-gold focus:border-brand-red transition duration-200 resize-none"
+          rows={8}
+          className="w-full bg-white border border-brand-gold/30 rounded-lg p-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 transition-all duration-200 resize-none shadow-sm"
         />
 
         <button
           type="submit"
           disabled={status === "loading"}
-          className={`w-full font-semibold py-3 rounded-md text-white transition-all duration-300 shadow-sm 
-                     ${
+          className={`w-full font-semibold py-4 rounded-lg text-white transition-all duration-300 shadow-md ${
                        status === "loading"
                          ? "bg-brand-gold cursor-wait"
-                         : "bg-brand-red hover:bg-brand-gold hover:text-brand-red"
+                         : "bg-brand-red hover:bg-brand-redHover hover:shadow-lg hover:scale-[1.02]"
                      }`}
         >
-          {status === "loading" ? "Sending..." : "Send"}
+          {status === "loading" ? "Sending..." : "Send Message"}
         </button>
       </form>
 
       {status === "success" && (
-        <p className="text-center text-green-600 font-medium mt-4">
-           Message sent successfully!
+        <p className="text-center text-green-600 font-semibold mt-6 bg-green-50 py-3 rounded-lg">
+          ✓ Message sent successfully!
         </p>
       )}
       {status === "error" && (
-        <p className="text-center text-red-600 font-medium mt-4">
-           Failed to send message. Please try again.
+        <p className="text-center text-red-600 font-semibold mt-6 bg-red-50 py-3 rounded-lg">
+          ✗ Failed to send message. Please try again.
         </p>
       )}
     </div>
