@@ -3,10 +3,10 @@ import { mockUsers, type MockUser } from "@/data/mockUsers";
 import { Trash, Users as UsersIcon, X } from "lucide-react";
 
 export default function UsersPage() {
-  // Page-local state so new users render immediately (no API yet)
+  //Page-local state so new users render immediately (no API yet)
   const [users, setUsers] = useState<MockUser[]>(mockUsers);
 
-  // Modal state
+  //Modal state
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -24,7 +24,7 @@ export default function UsersPage() {
       email: form.email,
       role: form.role,
     };
-    // eslint-disable-next-line no-console
+    
     console.log("Create user:", newUser);
     setUsers((prev) => [...prev, newUser]);
     setOpen(false);
@@ -33,10 +33,9 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
       <p className="text-sm text-gray-500">CMS / User Management</p>
 
-      {/* Main card */}
+      {/*Main card*/}
       <section className="bg-white rounded-xl shadow-sm border p-6 mt-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
@@ -51,7 +50,7 @@ export default function UsersPage() {
           </button>
         </div>
 
-        {/* Table for md+ */}
+        {/*Table for md+*/}
         <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -93,7 +92,7 @@ export default function UsersPage() {
           </table>
         </div>
 
-        {/* Cards for small screens */}
+        {/*Cards for small screens*/}
         <div className="md:hidden space-y-3">
           {users.map((u) => (
             <div key={u.id} className="rounded-lg border border-gray-200 p-4">
@@ -122,7 +121,7 @@ export default function UsersPage() {
         </div>
       </section>
 
-      {/* Modal */}
+      {/*Modal*/}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
