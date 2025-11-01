@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
-import { menuConfig } from "@/config/menu.config";
+//import { menuConfig } from "@/config/menu.config";
+import { useContent } from "@/context/ContentContext";
 
 export default function Menu() {
+  const { content } = useContent();
+  const menuData = content.menu; 
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Filter logic
   const filteredCategories =
     selectedCategory === "All"
-      ? menuConfig.categories
-      : menuConfig.categories.filter(
+      ? menuData.categories
+      : menuData.categories.filter(
           (cat) => cat.name === selectedCategory
         );
 
@@ -40,7 +44,7 @@ export default function Menu() {
             className="appearance-none border border-brand-red/40 rounded-xl px-6 py-3 pr-10 bg-white/90 text-brand-red font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 transition-all"
           >
             <option value="All">All Categories</option>
-            {menuConfig.categories.map((cat) => (
+            {menuData.categories.map((cat) => (
               <option key={cat.name} value={cat.name}>
                 {cat.name}
               </option>
