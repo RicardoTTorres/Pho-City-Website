@@ -19,7 +19,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const res = await fetch("http://localhost:5000/api/menu");
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${url}/api/menu`);
         const data = await res.json();
 
         updateContent({
