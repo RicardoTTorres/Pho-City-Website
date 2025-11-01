@@ -14,6 +14,25 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<RestaurantContent>(defaultContent);
 
+  // Load menu items from backend API when the app starts
+  // Replaces default static menu data in ContentContext with database content
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const res = await fetch("http://localhost:5000/api/menu");
+        const data = await res.json();
+
+        updateContent({
+          menu: data.menu
+        });
+      } catch (err) {
+        console.error("Menu fetch failed:", err);
+      }
+    }
+
+    fetchMenu();
+  }, []);
+
   //Load content from localStorage on mount
   useEffect(() => {
     const savedContent = localStorage.getItem('pho-city-content');
