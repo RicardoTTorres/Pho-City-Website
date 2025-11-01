@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
+import contactRoutes from './routes/contact.js';
+import aboutRoutes from './routes/about.js';
 import cookieParser from 'cookie-parser';
 
 
@@ -23,7 +25,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/contact', contactRoutes);
-
+app.use('/api/about', aboutRoutes);
 
 // Root test route
 app.get('/', (req, res) => {
