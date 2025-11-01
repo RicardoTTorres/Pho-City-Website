@@ -16,7 +16,7 @@ export function Hero(): ReactElement {
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative min-h-[70vh] text-white"
+      className="relative flex items-center justify-center min-h-[70vh] text-white"
       style={{
         backgroundImage: "url('/hero_pho_bowl.jpg')",
         backgroundSize: "cover",
