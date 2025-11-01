@@ -2,7 +2,7 @@ import { PlusCircle, Edit, Image, BarChart3, Pencil, CheckCircle2, Utensils, Rep
 import { useState } from "react";
 
 export default function DashboardPage() {
-  // Placeholder data until backend integration
+  //Placeholder data until backend integration
   const recentActivity = [
     { icon: <Pencil size={16} className="text-gray-500" />, text: "Edited ‘About Us’ page", time: "2 days ago" },
     { icon: <CheckCircle2 size={16} className="text-green-600" />, text: "Published seasonal promo banner", time: "1 day ago" },
@@ -42,7 +42,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page intro (below shared header) */}
+      {/*Page intro*/}
       <p className="text-sm text-gray-500">Here's a quick overview of your site today.</p>
 
       {/*Quick Actions*/}
@@ -86,9 +86,9 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Recent Activity + Latest Messages */}
+      {/*Recent Activity + Latest Messages*/}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Recent Activity */}
+        {/*Recent Activity*/}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
           <ul className="space-y-3">
@@ -108,7 +108,7 @@ export default function DashboardPage() {
           </ul>
         </section>
 
-        {/* Latest Messages */}
+        {/*Latest Messages*/}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Latest Messages</h3>
           <div className="space-y-3">
