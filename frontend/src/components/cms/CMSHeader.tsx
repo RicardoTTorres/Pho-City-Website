@@ -74,7 +74,6 @@ export function CMSHeader(props: CMSHeaderProps) {
           </div>
         )}
 
-        {/*Right: Avatar / Settings*/}
         {/*Right: Avatar / Settings + User Menu*/}
         <div className="relative" ref={menuRef}>
           <div className="flex items-center gap-2 shrink-0">

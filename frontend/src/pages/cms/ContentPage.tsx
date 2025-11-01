@@ -16,7 +16,7 @@ export default function ContentPage() {
     <div className="space-y-6">
       <p className="text-sm text-gray-500">Edit text, images, and content across your site.</p>
 
-      {/* Section Tabs */}
+      {/*Section Tabs*/}
       <div className="flex gap-2 border-b border-gray-200 pb-2">
         {sections.map((section) => (
           <button
@@ -35,7 +35,7 @@ export default function ContentPage() {
         ))}
       </div>
 
-      {/* Section Content */}
+      {/*Section Content*/}
       <div>
         {activeSection === "hero" && <HeroSectionEditor />}
         {activeSection === "about" && <AboutSectionEditor />}

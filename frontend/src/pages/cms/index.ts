@@ -1,5 +1,5 @@
-// CMS Page Components Index
-// Centralized exports for easy importing
+//CMS Page Components Index
+//Centralized exports for easy importing
 
 export { default as DashboardPage } from './DashboardPage';
 export { default as MenuPage } from './MenuPage';
