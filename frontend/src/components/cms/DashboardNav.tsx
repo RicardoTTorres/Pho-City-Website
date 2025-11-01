@@ -41,7 +41,7 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
         ${collapsed ? "w-20" : "w-64"}
       `}
     >
-      {/*--- Top Section ---*/}
+      {/*Top Section*/}
       <div className="p-4 flex items-center justify-between">
         {collapsed && (
             <img
@@ -59,7 +59,7 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
         </button>
       </div>
 
-      {/*---Navigation Links ---*/}
+      {/*Navigation Links*/}
       <nav className="flex-1 mt-4 px-2 space-y-1 overflow-y-auto">
         {tabs.map(({ name, path, icon: Icon }) => (
           <Link
@@ -82,7 +82,7 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
         ))}
       </nav>
 
-      {/*--- Footer / Help Box ---*/}
+      {/*Help Box*/}
       <div
         className={`m-4 p-3 rounded-xl bg-gray-50 border text-center text-xs text-gray-500 transition-all
           ${collapsed ? "hidden" : "block"}

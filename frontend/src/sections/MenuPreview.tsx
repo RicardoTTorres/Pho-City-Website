@@ -13,7 +13,7 @@ export default function MenuPreview(): React.JSX.Element {
     cat.name.includes("Pho")
   );
   const featured = phoCategory ? phoCategory.items.slice(0, 4) : [];
-  // Animation applied inline on motion.div
+  //Animation applied inline on motion.div
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
