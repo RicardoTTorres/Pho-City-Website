@@ -3,20 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
 //import { menuConfig } from "@/config/menu.config";
 import { useContent } from "@/context/ContentContext";
+const ALL_CATEGORIES = "All";
 
 export default function Menu() {
   const { content } = useContent();
   const menuData = content.menu; 
 
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
   const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Prevents page from crashing if menu isn't fetched yet
+  if (!menuData || !menuData.categories) {
+    return <div className="text-center py-20 text-gray-600">Loading menu...</div>;
+  }
 
   // Filter logic
   const filteredCategories =
-    selectedCategory === "All"
+    selectedCategory === ALL_CATEGORIES
       ? menuData.categories
       : menuData.categories.filter(
-          (cat) => cat.name === selectedCategory
+          (cat) => cat.name.toLowerCase() === selectedCategory.toLowerCase()
         );
 
   // Show/hide Back to Top button based on scroll
@@ -43,7 +49,7 @@ export default function Menu() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="appearance-none border border-brand-red/40 rounded-xl px-6 py-3 pr-10 bg-white/90 text-brand-red font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 transition-all"
           >
-            <option value="All">All Categories</option>
+            <option value={ALL_CATEGORIES}>All Categories</option>
             {menuData.categories.map((cat) => (
               <option key={cat.name} value={cat.name}>
                 {cat.name}
