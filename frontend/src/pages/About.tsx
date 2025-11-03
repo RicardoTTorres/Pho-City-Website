@@ -1,15 +1,37 @@
 import { useContent } from "@/context/ContentContext";
+import aboutUs from "@/assets/aboutUs.png";
 
 export default function About() {
     const { content } = useContent();
-    const about = content.about
     
-    // this is very bare bones just to test the backend for the about page.
-    // frontend for about page still needs to be coded
     return (
-        <>
-            <h1>{about.title}</h1>
-            <p>{about.content}</p>
-        </>
+        
+        /*Formats Text and Image*/
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",      
+                justifyContent: "space-between",
+                padding: "50px",           
+      }}>
+
+        <div style={{ maxWidth: "45%"}}>
+            
+            {/*Header With Space at the bottom*/}
+            <h1 style={{ marginBottom: "50px"}}>{content.about.title}</h1>
+
+            {/*About Us content from ContentContext.tsx*/}
+            <p>
+                {content.about.content}
+            </p>
+            </div>
+            
+            {/*Image*/}
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <img src = {aboutUs} 
+            alt = "About Us"
+            style={{ width: "650px", height: "auto"}} />
+            </div>
+        </div>
     );
 }
