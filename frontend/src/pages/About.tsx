@@ -18,7 +18,7 @@ export default function About() {
         <div style={{ maxWidth: "45%"}}>
             
             {/*Header With Space at the bottom*/}
-            <h1 style={{ marginBottom: "50px"}}>Pho City: Where Vietnamese Cuisine Transends Expectations!</h1>
+            <h1 style={{ marginBottom: "50px"}}>{content.about.title}</h1>
 
             {/*About Us content from ContentContext.tsx*/}
             <p>
