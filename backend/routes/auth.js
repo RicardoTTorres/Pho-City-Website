@@ -9,6 +9,9 @@ import { sign } from "crypto";
 
 const router = express.Router();
 
+//BlackListToken function
+const blackListToken = new Set();
+
 
 function signAccess(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET || "dev_secret", { expiresIn: "2h" });
@@ -30,6 +33,12 @@ function requireAuth(req, res, next) {
   try {
     const token = req.cookies?.auth;
     if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+    
+    //Check if token is blacklisted
+    if (blackListToken.has(token)) {
+      return res.status(401).json({ error: "This token is invalidated. Please login again."});
+    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
     req.user = decoded;
     next();
@@ -117,7 +126,15 @@ router.post("/update-password", requireAuth, async (req, res) => {
     res.status(500).json({ error: "server error" });
   }
 });
+
 router.post("/logout", (_req, res) => {
+
+  //Blacklist the token
+  const token = _req.cookies?.auth;
+  if (token){
+    blackListToken.add(token);
+  }
+
   res.clearCookie("auth", { ...cookieOptions, maxAge: 0 });
   res.json({ ok: true });
 });
