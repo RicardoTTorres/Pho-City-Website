@@ -1,15 +1,25 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import contactRoutes from './routes/contactRoutes.js';
 import adminContactRoutes from './routes/adminContactRoutes.js';
+
+import authRoutes from './routes/auth.js';
+import menuRoutes from './routes/menuRoutes.js';
+import aboutRoutes from './routes/aboutRoutes.js';
+
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Logs all requests for debugging purposes
+app.use((req, res, next) => {
+  console.log("Incoming request:", req.method, req.url, "Origin:", req.get("Origin"));
+  next();
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -25,6 +35,8 @@ app.use(cors({
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);  
+app.use('/api/menu', menuRoutes);
+app.use('/api/about', aboutRoutes);
 
 // Root test route
 app.get('/', (req, res) => {
