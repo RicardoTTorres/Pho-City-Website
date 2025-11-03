@@ -34,6 +34,24 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchMenu();
   }, []);
 
+  useEffect(() => {
+    async function fetchAbout() {
+      try {
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${url}/api/about`);
+        const data = await res.json();
+
+        updateContent({
+          about: data.about
+        });
+      } catch (err) {
+        console.error("About fetch failed:", err);
+      }
+    }
+    fetchAbout();
+  }, []);
+
+
   //Load content from localStorage on mount
   useEffect(() => {
     const savedContent = localStorage.getItem('pho-city-content');
