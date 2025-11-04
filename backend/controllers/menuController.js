@@ -221,7 +221,7 @@ export async function deleteItem(req, res) {
     const id = req.params.id;
     if (id === undefined) throw new Error("Could not get id from url parameters");
 
-    await pool.query(`
+    const [result] = await pool.query(`
       DELETE FROM menu_items
       WHERE item_id = ?;
     `, [id]);
