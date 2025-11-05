@@ -11,7 +11,7 @@ export default function Menu() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   console.log("Menu Data:", content.menu);
 
-  // Set initial active category
+  //Set initial active category
   useEffect(() => {
     if (allCategories.length > 0 && !activeCategory) {
       const first = allCategories[0];
@@ -33,7 +33,7 @@ export default function Menu() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-cream via-brand-gold/10 to-brand-cream scroll-smooth">
       <div className="flex gap-8 max-w-7xl mx-auto px-4 py-8">
-        {/* Sidebar */}
+        {/*Sidebar*/}
         <aside className="w-64 sticky top-24 h-fit bg-gradient-to-b from-brand-cream to-brand-gold/10 border-r border-brand-gold/30 rounded-lg shadow-sm">
           <div className="p-6">
             <h2 className="text-brand-red font-bold mb-1">Categories</h2>
@@ -49,7 +49,7 @@ export default function Menu() {
           </nav>
         </aside>
 
-        {/* Main Content */}
+        {/*Main Content*/}
         <main className="flex-1">
           {allCategories.map((category) => (
             <section 
