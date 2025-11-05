@@ -27,7 +27,7 @@ export async function getMenu(): Promise<MenuData> {
   const res = await fetch(`${API_URL}/api/menu`);
   if (!res.ok) throw new Error("Failed to fetch menu data");
   const data = await res.json();
-  // Support both { menu: { categories: [...] }} and { categories: [...] }
+  // Support both { menu: { categories: }} and { categories}
   return (data && data.menu) ? data.menu as MenuData : (data as MenuData);
 }
 
