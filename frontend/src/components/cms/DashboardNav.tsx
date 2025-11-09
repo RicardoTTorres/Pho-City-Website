@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Utensils, FileText, Image, Settings, ChevronLeft,
-  ChevronRight, Users,
+  ChevronRight, Users, BookUser
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { navConfig } from "@/config/nav.config";
@@ -19,6 +19,7 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
     { name: "Menu", path: "/cms/menu", icon: Utensils },
     { name: "Content", path: "/cms/content", icon: FileText },
     { name: "Media", path: "/cms/media", icon: Image },
+    { name: "User Manual", path: "/cms/usermanual", icon: BookUser },
     { name: "Settings", path: "/cms/settings", icon: Settings },
   ] as const;
 
