@@ -51,4 +51,8 @@ export const defaultContent = {
     pickupUrl: "https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200",
     deliveryUrl: "https://www.doordash.com/store/pho-city-sacramento-30636201/41947147/?pickup=false",
   },
+  dashboard: {
+    numMenuItems: 7,
+    numMenuCategories: 3
+  }
 } satisfies RestaurantContent;
