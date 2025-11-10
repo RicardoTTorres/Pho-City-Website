@@ -21,9 +21,15 @@ export default function About() {
             <h1 style={{ marginBottom: "50px"}}>{content.about.title}</h1>
 
             {/*About Us content from ContentContext.tsx*/}
-            <p>
+            <div
+                style={{
+                    whiteSpace:"pre-line",
+                    color: "#2B2B2B",
+                    lineHeight: "1.6",
+                }}
+            >
                 {content.about.content}
-            </p>
+            </div>
             </div>
             
             {/*Image*/}
