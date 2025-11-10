@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { defaultContent } from "@/content/content";
+import React, { useState, useRef, useLayoutEffect } from "react";
+import { useContent } from "@/context/ContentContext";
 import { Button } from "@/components/ui/button";
 import AboutIcon from "@/assets/About.svg";
 import ImageIcon from "@/assets/ImageIcon.svg";
 import aboutUs from "@/assets/aboutUs.png";
-
-type LocalAbout = typeof defaultContent.about;
 
 //using the constants to try and imitate the live preview of about page
 const CANVAS_WIDTH = 1600;
@@ -17,10 +15,8 @@ const SCALE = 0.55;
 
 //for user input
 export function AboutSectionEditor() {
-  const [aboutContent, setAboutContent] = useState<LocalAbout>({
-    title: defaultContent.about.title,
-    content: defaultContent.about.content,
-  });
+  const { content, updateContent } = useContent();
+  const aboutContent = content.about;
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -34,29 +30,11 @@ export function AboutSectionEditor() {
     }
   }, [aboutContent]);
 
-  //Get the about content from the backend, and load it
-  useEffect(() => {
-    const fetchAbout = async () => {
-      try {
-        const url = import.meta.env.VITE_API_URL || "http://localhost:5000";
-        const res = await fetch(`${url}/api/about`);
-        const data = await res.json();
-        if (data?.about) {
-          setAboutContent({
-            title: data.about.title,
-            content: data.about.content,
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching About section:", err);
-      }
-    };
-    fetchAbout();
-  }, []);
-
   //updating changed input/content
-  const handleChange = <K extends keyof LocalAbout>(field: K, value: LocalAbout[K]) => {
-    setAboutContent((prev) => ({ ...prev, [field]: value }));
+  const handleChange = <K extends keyof typeof aboutContent>(field: K, value: (typeof aboutContent)[K]) => {
+    updateContent({
+      about: { ...aboutContent, [field]: value },
+    });
   };
 
   //updates to database, should reflect on about pg as well
@@ -68,10 +46,7 @@ export function AboutSectionEditor() {
       const res = await fetch(`${url}/api/about`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: aboutContent.title,
-          content: aboutContent.content,
-        }),
+        body: JSON.stringify(aboutContent),
       });
       if (!res.ok) throw new Error("Failed to update About section.");
       const data = await res.json();
