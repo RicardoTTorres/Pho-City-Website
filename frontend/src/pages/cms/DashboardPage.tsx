@@ -1,7 +1,9 @@
 import { PlusCircle, Edit, Image, BarChart3, Pencil, CheckCircle2, Utensils, Reply as ReplyIcon, Send } from "lucide-react";
 import { useState } from "react";
+import { useContent } from "@/context/ContentContext";
 
 export default function DashboardPage() {
+  const { content } = useContent();
   //Placeholder data until backend integration
   const recentActivity = [
     { icon: <Pencil size={16} className="text-gray-500" />, text: "Edited ‘About Us’ page", time: "2 days ago" },
@@ -66,7 +68,15 @@ export default function DashboardPage() {
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-500">Menu Items</p>
-          <h2 className="text-2xl font-semibold">7</h2>
+          <h2 className="text-2xl font-semibold">
+            {content.dashboard.numMenuItems}
+          </h2>
+        </div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border">
+          <p className="text-sm text-gray-500">Menu Categories</p>
+          <h2 className="text-2xl font-semibold">
+            {content.dashboard.numMenuCategories}
+          </h2>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-500">Images Uploaded</p>

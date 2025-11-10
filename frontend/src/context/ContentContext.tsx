@@ -51,6 +51,23 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchAbout();
   }, []);
 
+  // -> add /api/dashboard/stats
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${url}/api/admin/dashboard/stats`);
+        const data = await res.json();
+
+        updateContent({
+          dashboard: data.dashboard
+        });
+      } catch (err) {
+        console.error("About fetch failed:", err);
+      }
+    }
+    fetchDashboard();
+  }, []);
 
   //Load content from localStorage on mount
   useEffect(() => {
