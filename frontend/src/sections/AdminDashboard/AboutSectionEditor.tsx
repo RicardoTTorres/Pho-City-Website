@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { defaultContent } from "@/content/content";
 import { Button } from "@/components/ui/button";
 import AboutIcon from "@/assets/About.svg";
@@ -16,6 +16,26 @@ export function AboutSectionEditor() {
 
 const [isSaving, setIsSaving] = useState(false);
 const [message, setMessage] = useState("");
+
+//Get the about content from the backend, and load it
+  useEffect(() => {
+    const fetchAbout = async () => {
+      try {
+        const url = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const res = await fetch(`${url}/api/about`);
+        const data = await res.json();
+        if (data?.about) {
+          setAboutContent({
+            title: data.about.title,
+            content: data.about.content,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching About section:", err);
+      }
+    };
+    fetchAbout();
+  }, []);
 
 return (
     <section className="flex flex-col md:flex-row gap-6 w-full px-6 py-6">
