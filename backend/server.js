@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import contactRoutes from './routes/contactRoutes.js';
 import adminContactRoutes from './routes/adminContactRoutes.js';
+import adminDashboardRoutes from './routes/adminDashboardRoutes.js' // -> add import statement
 
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
@@ -33,6 +34,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/contact', contactRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes); // -> new route
 app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);  
 app.use('/api/menu', menuRoutes);
