@@ -46,4 +46,8 @@ export interface RestaurantContent {
     pickupUrl: string;
     deliveryUrl: string;
   };
+  dashboard: {
+    numMenuItems: number;
+    numMenuCategories: number;
+  };
 }
