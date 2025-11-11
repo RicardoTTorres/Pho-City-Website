@@ -95,7 +95,7 @@ export function MenuSectionEditor({
         description: item.description,
         price: item.price,
         categoryId: item.categoryId,
-        image: item.image,
+        image: item.image || "",
         visible: !item.visible,
       });
     } catch (error) {

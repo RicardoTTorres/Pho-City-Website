@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+
+import { useMemo } from "react";
+import { useContent } from "@/context/ContentContext";
 import { MenuSectionEditor } from "@/sections/AdminDashboard/MenuSectionEditor";
 import {
   createItem,
@@ -9,7 +11,6 @@ import {
   deleteCategory,
   type NewItemPayload,
   type NewCategoryPayload,
-  getMenuAdmin,
 } from "@/api/menu";
 
 export interface MenuItem {
@@ -19,7 +20,7 @@ export interface MenuItem {
   price: string;
   category: string;
   categoryId: string;
-  image?: string;
+  image?: string | undefined;
   visible: boolean;
 }
 
@@ -34,35 +35,13 @@ export interface MenuData {
 }
 
 export default function MenuPage() {
-  const [loading, setLoading] = useState(true);
-  const [menuDataState, setMenuDataState] = useState<MenuData>({ categories: [] });
+  // Shared content source from context
+  const { content, refreshMenu } = useContent();
+  const menuData = content.menu;
 
-  const refreshAdminMenu = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getMenuAdmin();
-      setMenuDataState(data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        await refreshAdminMenu();
-      } finally {
-        if (!mounted) return;
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [refreshAdminMenu]);
-
+  // Transform menu data for editor UI
   const derivedCategories: Category[] = useMemo(() => {
-    const cats = menuDataState?.categories ?? [];
+    const cats = menuData?.categories ?? [];
     return cats.map((cat) => ({
       id: String(cat.id),
       name: cat.name,
@@ -74,73 +53,68 @@ export default function MenuPage() {
         category: cat.name,
         categoryId: String(cat.id),
         image: i.image,
-        visible: (i as any).visible ?? true,
+        visible: Boolean((i as any).visible ?? true),
       })),
     }));
-  }, [menuDataState]);
+  }, [menuData]);
 
-  const menuData: MenuData = useMemo(() => ({ categories: derivedCategories }), [derivedCategories]);
+  const formattedMenuData: MenuData = useMemo(
+    () => ({ categories: derivedCategories }),
+    [derivedCategories]
+  );
+
+  // CRUD callbacks
+  const handleCreateItem = async (data: NewItemPayload) => {
+    await createItem(data);
+    await refreshMenu();
+  };
+
+  const handleUpdateItem = async (id: string, data: NewItemPayload) => {
+    await updateItem(id, data);
+    await refreshMenu();
+  };
+
+  const handleDeleteItem = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    await deleteItem(id);
+    await refreshMenu();
+  };
+
+  const handleCreateCategory = async (data: NewCategoryPayload) => {
+    await createCategory(data);
+    await refreshMenu();
+  };
+
+  const handleUpdateCategory = async (id: string, data: NewCategoryPayload) => {
+    await updateCategory(id, data);
+    await refreshMenu();
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    await deleteCategory(id);
+    await refreshMenu();
+  };
 
   return (
     <div className="space-y-6">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Menu Management</h1>
-        <p className="text-sm text-gray-500">Add, edit, or remove menu items and categories.</p>
-      </div>
+        <p className="text-sm text-gray-500">
+          Add, edit, or remove menu items and categories.
+        </p>
+      </header>
 
-      <MenuSectionEditor 
-        menuData={menuData}
+      <MenuSectionEditor
+        menuData={formattedMenuData}
         categories={derivedCategories}
-        loading={loading}
-        onCreateItem={async (data: NewItemPayload) => {
-          await createItem(data);
-          await refreshAdminMenu();
-        }}
-        onUpdateItem={async (id: string, data: NewItemPayload) => {
-          await updateItem(id, data);
-          // Optimistically update local state so hidden items remain manageable in CMS
-          setMenuDataState((prev) => {
-            const next: MenuData = {
-              categories: prev.categories.map((cat) => {
-                return {
-                  ...cat,
-                  items: (cat.items || []).map((itm) => {
-                    if (String(itm.id) !== String(id)) return itm as any;
-                    return {
-                      ...(itm as any),
-                      name: data.name ?? itm.name,
-                      description: data.description ?? itm.description,
-                      price: data.price ?? itm.price,
-                      image: data.image ?? (itm as any).image,
-                      visible: (data.visible ?? (itm as any).visible ?? true) as any,
-                    } as any;
-                  }),
-                } as any;
-              }),
-            } as any;
-            return next;
-          });
-        }}
-        onDeleteItem={async (id: string) => {
-          const ok = window.confirm("Are you sure you want to delete this item?");
-          if (!ok) return;
-          await deleteItem(id);
-          await refreshAdminMenu();
-        }}
-        onCreateCategory={async (data: NewCategoryPayload) => {
-          await createCategory(data);
-          await refreshAdminMenu();
-        }}
-        onUpdateCategory={async (id: string, data: NewCategoryPayload) => {
-          await updateCategory(id, data);
-          await refreshAdminMenu();
-        }}
-        onDeleteCategory={async (id: string) => {
-          const ok = window.confirm("Are you sure you want to delete this category?");
-          if (!ok) return;
-          await deleteCategory(id);
-          await refreshAdminMenu();
-        }}
+        loading={!menuData}
+        onCreateItem={handleCreateItem}
+        onUpdateItem={handleUpdateItem}
+        onDeleteItem={handleDeleteItem}
+        onCreateCategory={handleCreateCategory}
+        onUpdateCategory={handleUpdateCategory}
+        onDeleteCategory={handleDeleteCategory}
       />
     </div>
   );
