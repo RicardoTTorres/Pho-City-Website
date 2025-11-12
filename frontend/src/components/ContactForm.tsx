@@ -84,12 +84,12 @@ export const ContactForm = () => {
 
       {status === "success" && (
         <p className="text-center text-green-600 font-semibold mt-6 bg-green-50 py-3 rounded-lg">
-          ✓ Message sent successfully!
+           Message sent successfully!
         </p>
       )}
       {status === "error" && (
         <p className="text-center text-red-600 font-semibold mt-6 bg-red-50 py-3 rounded-lg">
-          ✗ Failed to send message. Please try again.
+           Failed to send message. Please try again.
         </p>
       )}
     </div>

@@ -217,6 +217,23 @@
   }
 }
 
+/* Optional scroll shadow overlay for scrollable panes */
+@layer components {
+  .scroll-shadow {
+    background: linear-gradient(to bottom, rgba(255,255,255,0.92) 0%, transparent 28%, transparent 72%, rgba(255,255,255,0.92) 100%);
+    mask: linear-gradient(to bottom, rgba(0,0,0,0.9) 0, transparent 24px) top,
+          linear-gradient(to top, rgba(0,0,0,0.9) 0, transparent 24px) bottom;
+    -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Fallback scrollbar styling if Tailwind plugin isn't active */
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: var(--brand-cream); }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--brand-gold); border-radius: 10px; }
+}
+
 /* Typography */
 @layer base {
   h1 {
