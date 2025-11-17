@@ -11,10 +11,16 @@ export const ContactForm = () => {
     setStatus("loading");
 
     try {
+
+      const token = await (window as any).grecaptcha.enterprise.execute(
+      import.meta.env.RECAPTCHA_SITE_KEY,
+      { action: "CONTACT_FORM" }
+    );
+
       const res = await fetch('http://localhost:5000/api/contact', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message, token }),
       });
 
       if (res.ok) {

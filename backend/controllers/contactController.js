@@ -1,13 +1,20 @@
+import { verifyRecaptcha } from '../utils/recaptcha.js';
 import nodemailer from 'nodemailer';
 
 export async function handleContactForm(req, res) {
-  const { name, email, message } = req.body;
+  const { name, email, message, token } = req.body;
 
-  if (!name || !email || !message) {
+  if (!name || !email || !message || !token) {
     return res.status(400).json({ success: false, error: 'All fields are required' });
   }
 
   try {
+
+    const score = await verifyRecaptcha(token, 'CONTACT_FORM');
+    console.log("reCAPTCHA score:", score); 
+if (score < 0.5) {
+  return res.status(400).json({ success: false, error: 'reCAPTCHA verification failed' });
+}
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
