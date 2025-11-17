@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { RestaurantContent } from '@/content/content.types';
 import { defaultContent } from '@/content/content';
@@ -7,6 +7,7 @@ interface ContentContextType {
   content: RestaurantContent;
   updateContent: (newContent: Partial<RestaurantContent>) => void;
   resetContent: () => void;
+  refreshMenu: () => Promise<void>;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -14,24 +15,28 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<RestaurantContent>(defaultContent);
 
-  // Load menu items from backend API when the app starts
-  // Replaces default static menu data in ContentContext with database content
-  useEffect(() => {
-    async function fetchMenu() {
-      try {
-        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${url}/api/menu`);
-        const data = await res.json();
+  //Load menu items from backend API when the app starts
+  //Replaces default static menu data in ContentContext with database content
+  const updateContent = useCallback((newContent: Partial<RestaurantContent>) => {
+    setContent(prev => ({
+      ...prev,
+      ...newContent
+    }));
+  }, []);
 
-        updateContent({
-          menu: data.menu
-        });
-      } catch (err) {
-        console.error("Menu fetch failed:", err);
-      }
+  const refreshMenu = useCallback(async () => {
+    try {
+      const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${url}/api/menu`);
+      const data = await res.json();
+      updateContent({ menu: data.menu });
+    } catch (err) {
+      console.error("Menu fetch failed:", err);
     }
+  }, [updateContent]);
 
-    fetchMenu();
+  useEffect(() => {
+    refreshMenu();
   }, []);
 
   useEffect(() => {
@@ -87,20 +92,15 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('pho-city-content', JSON.stringify(content));
   }, [content]);
 
-  const updateContent = (newContent: Partial<RestaurantContent>) => {
-    setContent(prev => ({
-      ...prev,
-      ...newContent
-    }));
-  };
-
-  const resetContent = () => {
+  const resetContent = useCallback(() => {
     setContent(defaultContent);
     localStorage.removeItem('pho-city-content');
-  };
+  }, []);
+
+  const value = useMemo(() => ({ content, updateContent, resetContent, refreshMenu }), [content, updateContent, resetContent, refreshMenu]);
 
   return (
-    <ContentContext.Provider value={{ content, updateContent, resetContent }}>
+    <ContentContext.Provider value={value}>
       {children}
     </ContentContext.Provider>
   );

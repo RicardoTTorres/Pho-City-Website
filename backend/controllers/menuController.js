@@ -47,6 +47,56 @@ export async function getMenu(req, res) {
   }
 }
 
+export async function getAdminMenu(req, res) {
+  try {
+    //Fetch all categories
+    const [categories] = await pool.query(`
+      SELECT category_id AS id, category_name AS name
+      FROM menu_categories
+      ORDER BY id;
+    `);
+
+    //Fetch ALL menu items (including hidden ones for admin)
+    const [items] = await pool.query(`
+      SELECT 
+        item_id AS id,
+        item_name AS name,
+        item_description AS description,
+        item_price AS price,
+        item_image_url AS image,
+        item_is_visible AS visible,
+        is_featured AS featured,
+        category_id
+      FROM menu_items
+      ORDER BY category_id, id;
+    `);
+
+    //Shape data for admin frontend
+    const formatted = categories.map(cat => ({
+      id: String(cat.id),
+      name: cat.name,
+      items: items
+        .filter(i => i.category_id === cat.id)
+        .map(i => ({
+          id: String(i.id),
+          name: i.name,
+          description: i.description,
+          price: Number(i.price),
+          image: i.image,
+          visible: Boolean(i.visible),
+          featured: Boolean(i.featured),
+          categoryId: i.category_id
+        }))
+    }));
+
+    res.json({ menu: { categories: formatted } });
+
+  } catch (err) {
+    console.error("Admin menu fetch error:", err);
+    res.status(500).json({ error: "Error fetching admin menu" });
+  }
+}
+
 export async function addCategory(req, res) {
   try {
     const {name} = req.body;
