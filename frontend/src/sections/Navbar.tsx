@@ -62,23 +62,27 @@ export function Navbar(): ReactElement {
 
           <div className="flex items-center gap-3">
             <a
-              href="/order"
+              href={content.onlineOrder.pickupUrl}
               className="inline-flex items-center justify-center px-4 py-2 rounded-full
              bg-brand-red text-white hover:bg-brand-red-hover
              shadow-md shadow-black/15 ring-1 ring-black/5
              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40
              transition"
+             target="_blank"
+             rel="nooopener noreferrer"
             >
               Order Online
             </a>
 
             <a
-              href="/delivery"
+              href={content.onlineOrder.deliveryUrl}
               className="inline-flex items-center justify-center px-4 py-2 rounded-full
              border border-brand-charcoal/80 text-brand-charcoal
              hover:bg-brand-cream ring-1 ring-black/5 shadow-sm
              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30
              transition"
+             target="_blank"
+             rel="nooopener noreferrer"
             >
               Delivery
             </a>
@@ -151,6 +155,16 @@ export function Navbar(): ReactElement {
               }
             >
               Order Online
+            </Button>
+            <Button
+              size="sm"
+              className="w-full bg-brand-cream border-brand-charcoal text-brand-charcoal
+             hover:bg-brand-cream ring-1 ring-black/10 shadow-sm"
+              onClick={() =>
+                window.open(content.onlineOrder.deliveryUrl, "_blank")
+              }
+            >
+              Delivery
             </Button>
           </div>
         </div>
