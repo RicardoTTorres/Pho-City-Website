@@ -48,11 +48,14 @@ export default function App() {
 
   function NavFooter() {
     return (
-      <>
+      <div className="min-h-screen flex flex-col bg-white">
         <Navbar />
-        <Outlet />
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+
         <Footer config={footerConfig} />
-      </>
+      </div>
     );
   }
 }

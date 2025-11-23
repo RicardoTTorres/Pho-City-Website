@@ -1,19 +1,70 @@
-import { PlusCircle, Edit, Image, BarChart3, Pencil, CheckCircle2, Utensils, Reply as ReplyIcon, Send } from "lucide-react";
+import {
+  PlusCircle,
+  Edit,
+  Image,
+  BarChart3,
+  Pencil,
+  CheckCircle2,
+  Utensils,
+  Reply as ReplyIcon,
+  Send,
+} from "lucide-react";
 import { useState } from "react";
+import { TrafficOverviewEditor } from "@/sections/AdminDashboard/TrafficOverviewEditor";
 
 export default function DashboardPage() {
   //Placeholder data until backend integration
   const recentActivity = [
-    { icon: <Pencil size={16} className="text-gray-500" />, text: "Edited ‘About Us’ page", time: "2 days ago" },
-    { icon: <CheckCircle2 size={16} className="text-green-600" />, text: "Published seasonal promo banner", time: "1 day ago" },
-    { icon: <Image size={16} className="text-gray-500" />, text: "Uploaded 3 new gallery images", time: "5 hours ago" },
-    { icon: <Utensils size={16} className="text-gray-500" />, text: "Updated menu item ‘Pho Ga’ price", time: "3 hours ago" },
+    {
+      icon: <Pencil size={16} className="text-gray-500" />,
+      text: "Edited ‘About Us’ page",
+      time: "2 days ago",
+    },
+    {
+      icon: <CheckCircle2 size={16} className="text-green-600" />,
+      text: "Published seasonal promo banner",
+      time: "1 day ago",
+    },
+    {
+      icon: <Image size={16} className="text-gray-500" />,
+      text: "Uploaded 3 new gallery images",
+      time: "5 hours ago",
+    },
+    {
+      icon: <Utensils size={16} className="text-gray-500" />,
+      text: "Updated menu item ‘Pho Ga’ price",
+      time: "3 hours ago",
+    },
   ];
 
-  const latestMessages: Array<{ name: string; snippet: string; time: string; email: string; subject?: string }> = [
-    { name: "Bill Nye", snippet: "Loved the pho!", time: "5 hours ago", email: "bill@example.com", subject: "Thanks for your feedback" },
-    { name: "John Doe", snippet: "Do you have gluten-free options?", time: "1 day ago", email: "john@example.com", subject: "About gluten-free options" },
-    { name: "Lychee T", snippet: "Dog friendly??", time: "2 days ago", email: "lychee@example.com", subject: "Re: Dog friendly" },
+  const latestMessages: Array<{
+    name: string;
+    snippet: string;
+    time: string;
+    email: string;
+    subject?: string;
+  }> = [
+    {
+      name: "Bill Nye",
+      snippet: "Loved the pho!",
+      time: "5 hours ago",
+      email: "bill@example.com",
+      subject: "Thanks for your feedback",
+    },
+    {
+      name: "John Doe",
+      snippet: "Do you have gluten-free options?",
+      time: "1 day ago",
+      email: "john@example.com",
+      subject: "About gluten-free options",
+    },
+    {
+      name: "Lychee T",
+      snippet: "Dog friendly??",
+      time: "2 days ago",
+      email: "lychee@example.com",
+      subject: "Re: Dog friendly",
+    },
   ];
 
   const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
@@ -21,7 +72,7 @@ export default function DashboardPage() {
 
   function startReply(idx: number, name: string) {
     setReplyingIndex(idx);
-  const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
+    const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
     setReplyText(`Hi ${firstName},\n\n`);
   }
 
@@ -35,7 +86,9 @@ export default function DashboardPage() {
     if (!m) return;
     const subject = m.subject ?? `Re: Your message to Pho City`;
     const body = replyText || "Hi,\n\n";
-    const href = `mailto:${m.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const href = `mailto:${m.email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     window.location.href = href;
     cancelReply();
   }
@@ -43,7 +96,9 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/*Page intro*/}
-      <p className="text-sm text-gray-500">Here's a quick overview of your site today.</p>
+      <p className="text-sm text-gray-500">
+        Here's a quick overview of your site today.
+      </p>
 
       {/*Quick Actions*/}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -74,26 +129,23 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/*Analytics Summary*/}
       <section className="bg-white p-6 rounded-xl shadow-sm border">
-        <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-          <BarChart3 size={18} /> Traffic Overview
-        </h3>
-        <p className="text-sm text-gray-500">This month: 1,230 visitors</p>
-        {/*Placeholder for future chart integration*/}
-        <div className="mt-4 h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-          [Chart Placeholder]
-        </div>
+        <TrafficOverviewEditor />
       </section>
 
       {/*Recent Activity + Latest Messages*/}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {/*Recent Activity*/}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Recent Activity
+          </h3>
           <ul className="space-y-3">
             {recentActivity.map((item, idx) => (
-              <li key={idx} className={idx > 0 ? "border-t border-gray-100 pt-3" : ""}>
+              <li
+                key={idx}
+                className={idx > 0 ? "border-t border-gray-100 pt-3" : ""}
+              >
                 <div className="flex items-start gap-3 text-sm text-gray-700 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50 transition-colors">
                   <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gray-100">
                     {item.icon}
@@ -110,13 +162,20 @@ export default function DashboardPage() {
 
         {/*Latest Messages*/}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Latest Messages</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Latest Messages
+          </h3>
           <div className="space-y-3">
             {latestMessages.map((m, idx) => (
-              <article key={idx} className="rounded-lg border border-gray-100 p-3">
+              <article
+                key={idx}
+                className="rounded-lg border border-gray-100 p-3"
+              >
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-800 truncate">{m.name}</h4>
+                    <h4 className="font-semibold text-sm text-gray-800 truncate">
+                      {m.name}
+                    </h4>
                     <span className="text-xs text-gray-500">{m.time}</span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -135,7 +194,9 @@ export default function DashboardPage() {
 
                 {replyingIndex === idx && (
                   <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Reply</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Reply
+                    </label>
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}

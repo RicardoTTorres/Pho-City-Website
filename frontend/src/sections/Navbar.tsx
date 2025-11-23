@@ -46,6 +46,9 @@ export function Navbar(): ReactElement {
 
           {/*Center: Links*/}
           <nav className="flex items-center gap-8 text-gray-800 font-medium">
+            <a href="/" className="hover:text-brand-red transition-colors">
+              Home
+            </a>
             <a href="about" className="hover:text-brand-red transition-colors">
               About
             </a>
@@ -69,7 +72,7 @@ export function Navbar(): ReactElement {
              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40
              transition"
              target="_blank"
-             rel="nooopener noreferrer"
+             rel="noopener noreferrer"
             >
               Order Online
             </a>
@@ -82,7 +85,7 @@ export function Navbar(): ReactElement {
              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30
              transition"
              target="_blank"
-             rel="nooopener noreferrer"
+             rel="noopener noreferrer"
             >
               Delivery
             </a>

@@ -1,20 +1,26 @@
 import { HeroSectionEditor } from "@/sections/AdminDashboard/HeroSectionEditor";
 import { AboutSectionEditor } from "@/sections/AdminDashboard/AboutSectionEditor";
 import { ContactSectionEditor } from "@/sections/AdminDashboard/ContactSectionEditor";
+import { NavbarSectionEditor } from "@/sections/AdminDashboard/NavbarSectionEditor";
 import { useState } from "react";
 
 export default function ContentPage() {
-  const [activeSection, setActiveSection] = useState<"hero" | "about" | "contact">("hero");
+  const [activeSection, setActiveSection] = useState<
+    "hero" | "about" | "contact" | "navbar"
+  >("hero");
 
   const sections = [
     { id: "hero" as const, label: "Hero Section" },
     { id: "about" as const, label: "About Section" },
     { id: "contact" as const, label: "Contact Section" },
+    { id: "navbar" as const, label: "Navbar Section" },
   ];
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-500">Edit text, images, and content across your site.</p>
+      <p className="text-sm text-gray-500">
+        Edit text, images, and content across your site.
+      </p>
 
       {/*Section Tabs*/}
       <div className="flex gap-2 border-b border-gray-200 pb-2">
@@ -40,6 +46,7 @@ export default function ContentPage() {
         {activeSection === "hero" && <HeroSectionEditor />}
         {activeSection === "about" && <AboutSectionEditor />}
         {activeSection === "contact" && <ContactSectionEditor />}
+        {activeSection === "navbar" && <NavbarSectionEditor />}
       </div>
     </div>
   );
