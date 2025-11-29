@@ -10,6 +10,27 @@ To solve these problems, this project focuses on building a user-friendly, moder
 
 Another key problem this project addresses is creating an authorized administrative side of the website. This includes a full **Content Management System (CMS)** that allows the restaurant and authorized users to create, update, delete, and manage website content, such as menu categories, items, prices, descriptions, images, and page text. This ensures Pho City can independently maintain their website and keep information up to date even after the project is completed.
 
+<br></br>
+
+# Table of Contents
+- [Technologies](#technologies)
+- [Installation Instructions](#installation-instructions)
+- [Database Setup](#database-setup)
+- [Environment Files](#environment-files)
+- [File Organization](#file-organization)
+- [Backend API](#backend-api)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [ER Diagram](#er-diagram)
+- [Figma Prototype](#figma-prototype)
+- [Jira Timeline](#jira-timeline)
+  - [Sprint 01](#sprint01)
+  - [Sprint 02](#sprint02)
+  - [Sprint 03](#sprint03)
+  - [Sprint 04](#sprint04)
+- [Project Charter](#project-charter)
+- [Team Praxis Credits](#team-praxis-credits)
+
 <br><br>
 
 # Technologies:
@@ -135,7 +156,13 @@ VITE_API_URL="http://localhost:5000"
 
 # ER Diagram:
 
-<br><br>
+<img src="assets/images/erd_1.png" width="700"/>
+<img src="assets/images/erd_2.png" width="700"/>
+<img src="assets/images/erd_3.png" width="700"/>
+<img src="assets/images/erd_4.png" width="700"/>
+<img src="assets/images/erd_5.png" width="700"/>
+
+<br></br>
 
 # Figma Prototype:
 
