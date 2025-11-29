@@ -62,22 +62,75 @@ CREATE DATABASE <db_name>;
 USE <db_name>;
 ```
 3. Click File -> Open SQL script and import .sql file and click lightning bolt icon
+4. See the section below to configure the .env file with the details of your database
 
-4. Setup the .env file:
+<br><br>
+
+# Environment Files:
+In the backend folder, create a file titled `.env` with the following contents:
 
 ```bash
 # Local MySQL Connection
-DB_HOST= localhost
-DB_USER= root
-DB_PASS= Password                        #Choose a password
-DB_NAME= Name                            #Choose a name
-DB_PORT= 3306
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=Your MySQL root password
+DB_NAME=Your MySQL database name
+DB_PORT=3306
 
-FRONTEND_ORIGIN= http://localhost:5173
+# The url of the frontend to filter requests
+FRONTEND_ORIGIN="http://localhost:5173"
 
-# Express server port
+# The port to run the Express server on
 PORT=5000
 ```
+
+In the frontend folder, create a file titled `.env` with the following contents:
+```bash
+# The url of the backend api
+VITE_API_URL="http://localhost:5000"
+```
+
+<br><br>
+
+# File Organization:
+
+<br><br>
+
+# Backend API:
+| Route | Description |
+| ----- | ----------- |
+**About**
+`GET /api/about` | Get about page contents
+`PUT /api/about` | Edit about page contents
+**Contact**
+`GET /api/contact` | Get contact page contents
+`PUT /api/contact` | Edit contact page contents
+`POST /api/contact` | Send message from contact page
+**Hero**
+`GET /api/hero` | Get hero section contents
+`PUT /api/hero` | Edit hero section contents
+**Dashboard**
+`GET /api/admin/dashboard/stats` | Get stats for dashboard page
+**Menu**
+`GET /api/menu` | Get all public menu data
+`GET /api/menu/admin` | Get all menu data including hidden items
+`POST /api/menu/categories` | Create new category
+`PUT /api/menu/categories/:id` | Edit category
+`DELETE /api/menu/categories/:id` | Delete category
+`POST /api/menu/items` | Create new menu item
+`PUT /api/menu/items/:id` | Edit menu item
+`DELETE /api/menu/items/:id` | Delete menu item
+
+
+
+<br><br>
+
+# Testing:
+
+<br><br>
+
+# Deployment:
+
 <br><br>
 
 # ER Diagram:
@@ -107,10 +160,21 @@ PORT=5000
 <br><br>
 
 # Project Charter:
+The project charter outlines the agreement between the client and the development team.
 
-https://docs.google.com/document/d/1E-cD62M-6Qs4I3NS7wFqUizgAiBlvkPL/edit
+[**Open Project Charter**](https://docs.google.com/document/d/1E-cD62M-6Qs4I3NS7wFqUizgAiBlvkPL/edit)
+
 
 <br><br>
 
 # [Team Praxis] Credits:
-#### David Lor, Mukesh Mehmi, Cole Wood, Ricardo Torres, James Garcia, Shika Kandel, Kwin Lee, Ryan Peterson
+| Name | Github |
+| ----- | ---- |
+| David Lor | [@davidlor2015](https://github.com/davidlor2015) |
+| Mukesh Mehmi | [@MukeshByte](https://github.com/MukeshByte) |
+| Cole Wood | [@ColeWood1](https://github.com/ColeWood1)
+| Ricardo Torres | [@RicardoTTorres](https://github.com/RicardoTTorres)
+| James Garcia | [@jamesg00](https://github.com/jamesg00)
+| Shika Kandel | [@skandelol](https://github.com/skandelol)
+| Kwin Lee | [@KwinLeeGit](https://github.com/KwinLeeGit)
+| Ryan Petersen | [@ryanp4096](https://github.com/ryanp4096)
