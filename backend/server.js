@@ -4,12 +4,11 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import contactRoutes from './routes/contactRoutes.js';
 import adminContactRoutes from './routes/adminContactRoutes.js';
-import adminDashboardRoutes from './routes/adminDashboardRoutes.js' // -> add import statement
+import adminDashboardRoutes from './routes/adminDashboardRoutes.js';
 
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
-
 
 dotenv.config();
 
@@ -28,15 +27,15 @@ app.use(cookieParser());
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 
 app.use(cors({
-  origin: FRONTEND_ORIGIN,   
-  credentials: true          
+  origin: FRONTEND_ORIGIN,
+  credentials: true
 }));
 
 // Routes
 app.use('/api/contact', contactRoutes);
-app.use('/api/admin/dashboard', adminDashboardRoutes); // -> new route
+app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/contact', adminContactRoutes);
-app.use('/api/admin', authRoutes);  
+app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
 
