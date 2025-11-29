@@ -102,31 +102,33 @@ VITE_API_URL="http://localhost:5000"
 
 ```
 Pho-City-Website/
-  frontend/                    # Vite React frontend
-    src/
-      pages/                   # Public pages and CMS routes (Home, Menu, About, Contact, AdminLogin)
-        cms/                   # CMS pages (DashboardPage, MenuPage, ContentPage, MediaPage, UsersPage, SettingsPage)
-      sections/                # Page sections and CMS editors (Hero, Navbar, Footer, MenuPreview)
-        AdminDashboard/        # CMS editors (NavbarSectionEditor, MenuSectionEditor, AboutSectionEditor, HeroSectionEditor, ContactSectionEditor, SettingsSectionEditor, TrafficOverviewEditor)
-      components/              # Reusable UI and CMS components
-        ui/                    # Shared UI primitives (button, card, accordion, menu items)
-        cms/                   # CMS layout pieces (DashboardNav, CMSHeader)
-      api/                     # Frontend API client (menu.ts)
-      context/                 # React context providers (ContentContext for CMS state)
-      config/                  # UI configuration (nav, footer, menu)
-      layouts/                 # Page layout wrappers
-      content/                 # Static content fragments
-      data/                    # Seed/static data helpers
-      menu/                    # Menu-specific helpers
-      lib/                     # Shared utilities
-      styles/                  # Global and component styles
-      assets/                  # Frontend images and media
-    public/                    # Static assets served as-is
-  backend/                     # Express/Node API
-    routes/                    # Route definitions (about, contact, hero, admin, menu)
-    controllers/               # Request handlers for each domain area
-    db/                        # Database connection and schema files (connect_db.js, init.sql)
-    server.js                  # Express app entrypoint and middleware setup
+├── frontend/                               # Vite + React frontend
+│   ├── src/
+│   │   ├── pages/                          # Public pages + CMS page routes
+│   │   │   └── cms/                        # CMS pages (DashboardPage, MenuPage, ContentPage, etc.)
+│   │   ├── sections/                       # Page sections & CMS editors
+│   │   │   └── AdminDashboard/             # CMS editors (Navbar, Menu, About, Hero, Contact, Settings, TrafficOverview)
+│   │   ├── components/                     # Reusable UI + CMS components
+│   │   │   ├── ui/                         # UI primitives (Button, Card, Accordion, etc.)
+│   │   │   └── cms/                        # CMS layout pieces (DashboardNav, CMSHeader)
+│   │   ├── api/                            # Frontend API client (menu.ts, etc.)
+│   │   ├── context/                        # React contexts (ContentContext)
+│   │   ├── config/                         # UI configuration (nav, footer, menu)
+│   │   ├── layouts/                        # Page layout wrappers
+│   │   ├── content/                        # Static content fragments
+│   │   ├── data/                           # Static/seed data helpers
+│   │   ├── menu/                           # Menu-related helpers
+│   │   ├── lib/                            # Shared utilities
+│   │   ├── styles/                         # Global + component styles
+│   │   └── assets/                         # Images and media
+│   └── public/                             # Static assets served directly
+│
+└── backend/                                # Express/Node API
+    ├── routes/                             # Endpoint routes (about, contact, hero, admin, menu)
+    ├── controllers/                        # Controllers for each domain
+    ├── db/                                 # DB connection + schema (connect_db.js, init.sql)
+    └── server.js                           # API entrypoint + middleware
+
 ```
 
 <br><br>
