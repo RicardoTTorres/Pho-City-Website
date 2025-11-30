@@ -156,30 +156,29 @@ Pho-City-Website/
 
 # Backend API:
 
-| Route | Description |
-| ----- | ----------- |
-
-**About**
-`GET /api/about` | Get about page contents
-`PUT /api/about` | Edit about page contents
-**Contact**
-`GET /api/contact` | Get contact page contents
-`PUT /api/contact` | Edit contact page contents
-`POST /api/contact` | Send message from contact page
-**Hero**
-`GET /api/hero` | Get hero section contents
-`PUT /api/hero` | Edit hero section contents
-**Dashboard**
-`GET /api/admin/dashboard/stats` | Get stats for dashboard page
-**Menu**
-`GET /api/menu` | Get all public menu data
-`GET /api/menu/admin` | Get all menu data including hidden items
-`POST /api/menu/categories` | Create new category
-`PUT /api/menu/categories/:id` | Edit category
-`DELETE /api/menu/categories/:id` | Delete category
-`POST /api/menu/items` | Create new menu item
-`PUT /api/menu/items/:id` | Edit menu item
-`DELETE /api/menu/items/:id` | Delete menu item
+| Route                             | Description                              |
+| --------------------------------- | ---------------------------------------- |
+| **About**                         |                                          |
+| `GET /api/about`                  | Get about page contents                  |
+| `PUT /api/about`                  | Edit about page contents                 |
+| **Contact**                       |                                          |
+| `GET /api/contact`                | Get contact page contents                |
+| `PUT /api/contact`                | Edit contact page contents               |
+| `POST /api/contact`               | Send message from contact page           |
+| **Hero**                          |                                          |
+| `GET /api/hero`                   | Get hero section contents                |
+| `PUT /api/hero`                   | Edit hero section contents               |
+| **Dashboard**                     |                                          |
+| `GET /api/admin/dashboard/stats`  | Get stats for dashboard page             |
+| **Menu**                          |                                          |
+| `GET /api/menu`                   | Get all public menu data                 |
+| `GET /api/menu/admin`             | Get all menu data including hidden items |
+| `POST /api/menu/categories`       | Create new category                      |
+| `PUT /api/menu/categories/:id`    | Edit category                            |
+| `DELETE /api/menu/categories/:id` | Delete category                          |
+| `POST /api/menu/items`            | Create new menu item                     |
+| `PUT /api/menu/items/:id`         | Edit menu item                           |
+| `DELETE /api/menu/items/:id`      | Delete menu item                         |
 
 <br><br>
 
