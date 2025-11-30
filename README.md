@@ -35,11 +35,11 @@ Another key problem this project addresses is creating an authorized administrat
 
 # Technologies:
 
-| **Frontend**            | **Backend**            | **Tools**                     |
-|-------------------------|-------------------------|-------------------------------|
-| React                   | Node.js                 | Git & GitHub                 |
-| TypeScript              | Express.js              | Vite (Build Tool)            |
-| TailwindCSS             | MySQL (AWS RDS)         | Jira (Project Management)    |
+| **Frontend** | **Backend**     | **Tools**                 |
+| ------------ | --------------- | ------------------------- |
+| React        | Node.js         | Git & GitHub              |
+| TypeScript   | Express.js      | Vite (Build Tool)         |
+| TailwindCSS  | MySQL (AWS RDS) | Jira (Project Management) |
 
 <br><br>
 
@@ -55,6 +55,7 @@ cd Pho-City-Website                                                      #(4) Mo
 ```
 
 #### Running Frontend
+
 ```bash
 cd frontend                                                              #(5) Navigate into the frontend folder
 npm install                                                              #(6) Install all frontend dependencies
@@ -62,6 +63,7 @@ npm run dev                                                              #(7) St
 ```
 
 #### Running Backend
+
 ```bash
 cd backend                                                               #(8) Navigate into the backend folder
 npm install                                                              #(9) Install backend dependencies
@@ -71,6 +73,7 @@ npm run dev                                                              #(10) S
 <br><br>
 
 # Database Setup:
+
 To run the project locally with MySQL, follow the steps below.
 
 #### Create a Local Database in MySQL Workbench
@@ -82,12 +85,14 @@ To run the project locally with MySQL, follow the steps below.
 CREATE DATABASE <db_name>;
 USE <db_name>;
 ```
+
 3. Click File -> Open SQL script and import .sql file and click lightning bolt icon
 4. See the section below to configure the .env file with the details of your database
 
 <br><br>
 
 # Environment Files:
+
 In the backend folder, create a file titled `.env` with the following contents:
 
 ```bash
@@ -106,6 +111,7 @@ PORT=5000
 ```
 
 In the frontend folder, create a file titled `.env` with the following contents:
+
 ```bash
 # The url of the backend api
 VITE_API_URL="http://localhost:5000"
@@ -115,11 +121,44 @@ VITE_API_URL="http://localhost:5000"
 
 # File Organization:
 
+```
+Pho-City-Website/
+├── frontend/                               # Vite + React frontend
+│   ├── src/
+│   │   ├── pages/                          # Public pages + CMS page routes
+│   │   │   └── cms/                        # CMS pages (DashboardPage, MenuPage, ContentPage, etc.)
+│   │   ├── sections/                       # Page sections & CMS editors
+│   │   │   └── AdminDashboard/             # CMS editors (Navbar, Menu, About, Hero, Contact, Settings, TrafficOverview)
+│   │   ├── components/                     # Reusable UI + CMS components
+│   │   │   ├── ui/                         # UI primitives (Button, Card, Accordion, etc.)
+│   │   │   └── cms/                        # CMS layout pieces (DashboardNav, CMSHeader)
+│   │   ├── api/                            # Frontend API client (menu.ts, etc.)
+│   │   ├── context/                        # React contexts (ContentContext)
+│   │   ├── config/                         # UI configuration (nav, footer, menu)
+│   │   ├── layouts/                        # Page layout wrappers
+│   │   ├── content/                        # Static content fragments
+│   │   ├── data/                           # Static/seed data helpers
+│   │   ├── menu/                           # Menu-related helpers
+│   │   ├── lib/                            # Shared utilities
+│   │   ├── styles/                         # Global + component styles
+│   │   └── assets/                         # Images and media
+│   └── public/                             # Static assets served directly
+│
+└── backend/                                # Express/Node API
+    ├── routes/                             # Endpoint routes (about, contact, hero, admin, menu)
+    ├── controllers/                        # Controllers for each domain
+    ├── db/                                 # DB connection + schema (connect_db.js, init.sql)
+    └── server.js                           # API entrypoint + middleware
+
+```
+
 <br><br>
 
 # Backend API:
+
 | Route | Description |
 | ----- | ----------- |
+
 **About**
 `GET /api/about` | Get about page contents
 `PUT /api/about` | Edit about page contents
@@ -141,8 +180,6 @@ VITE_API_URL="http://localhost:5000"
 `POST /api/menu/items` | Create new menu item
 `PUT /api/menu/items/:id` | Edit menu item
 `DELETE /api/menu/items/:id` | Delete menu item
-
-
 
 <br><br>
 
@@ -187,21 +224,22 @@ VITE_API_URL="http://localhost:5000"
 <br><br>
 
 # Project Charter:
+
 The project charter outlines the agreement between the client and the development team.
 
 [**Open Project Charter**](https://docs.google.com/document/d/1E-cD62M-6Qs4I3NS7wFqUizgAiBlvkPL/edit)
 
-
 <br><br>
 
 # [Team Praxis] Credits:
-| Name | Github |
-| ----- | ---- |
-| David Lor | [@davidlor2015](https://github.com/davidlor2015) |
-| Mukesh Mehmi | [@MukeshByte](https://github.com/MukeshByte) |
-| Cole Wood | [@ColeWood1](https://github.com/ColeWood1)
-| Ricardo Torres | [@RicardoTTorres](https://github.com/RicardoTTorres)
-| James Garcia | [@jamesg00](https://github.com/jamesg00)
-| Shika Kandel | [@skandelol](https://github.com/skandelol)
-| Kwin Lee | [@KwinLeeGit](https://github.com/KwinLeeGit)
-| Ryan Petersen | [@ryanp4096](https://github.com/ryanp4096)
+
+| Name           | Github                                               |
+| -------------- | ---------------------------------------------------- |
+| David Lor      | [@davidlor2015](https://github.com/davidlor2015)     |
+| Mukesh Mehmi   | [@MukeshByte](https://github.com/MukeshByte)         |
+| Cole Wood      | [@ColeWood1](https://github.com/ColeWood1)           |
+| Ricardo Torres | [@RicardoTTorres](https://github.com/RicardoTTorres) |
+| James Garcia   | [@jamesg00](https://github.com/jamesg00)             |
+| Shika Kandel   | [@skandelol](https://github.com/skandelol)           |
+| Kwin Lee       | [@KwinLeeGit](https://github.com/KwinLeeGit)         |
+| Ryan Petersen  | [@ryanp4096](https://github.com/ryanp4096)           |
