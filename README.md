@@ -206,21 +206,129 @@ Pho-City-Website/
 
 # Jira Timeline:
 
-#### Sprint01 -
+#### Sprint01 - Project Initialization
+
+- Create ERD  
+- Research API  
+- Decide tech stack  
+- Write product charter  
+- Create UI mockups  
+- Research database costs  
+- Lab meeting notes  
+- Retrospective notes  
+- Client review meeting  
 
 <br><br>
 
-#### Sprint02 -
+#### Sprint02 - Base Layout & Structure
+
+- PC-7
+- PC-60
+- PC-79
+- PC-58
+- PC-61
+- PC-78
+- PC-17
+- PC-72 
 
 <br><br>
 
-#### Sprint03 -
+#### Sprint03 - Core Functionality Setup
+
+- PC-55
+- PC-46
+- PC-40
+- PC-27
+- PC-82
+- PC-58
+- PC-41
+- PC-19
+- PC-21
+- PC-24
+- PC-70
+- PC-80
 
 <br><br>
 
-#### Sprint04 -
+#### Sprint04 - Ongoing Development
+
+- PC-101
+- PC-90
+- PC-91
+- PC-92
+- PC-29
+- PC-74
+- PC-76
+- PC-95
+- PC-26
+- PC-93
+- PC-94
+- PC-103
+- PC-96
 
 <br><br>
+
+#### Sprint05 - Future Development
+
+- PC-66
+- PC-67
+- PC-68
+- PC-69
+- PC-71
+- PC-98
+- PC-99
+- PC-97
+- PC-100
+- PC-102
+
+<br><br>
+
+#### Sprint06 - Future Development
+
+- PC-24
+- PC-25
+- PC-30
+- PC-31
+- PC-33
+- PC-28
+- PC-20
+- PC-86
+- PC-83
+- PC-97
+- PC-88
+- PC-89
+
+<br><br>
+
+#### Sprint07 - Future Development
+
+- PC-23
+- PC-24
+- PC-42
+- PC-43
+- PC-44
+- PC-45
+- PC-32
+- PC-20
+
+<br><br>
+
+#### Sprint08 - Future Development/ Testing
+
+- Funcational Testing
+- Usability/ UX Testing
+- Performance Testing
+- Compatibilty Testing
+- Security Testing
+
+<br><br>
+
+
+
+
+
+
+
 
 # Project Charter:
 
