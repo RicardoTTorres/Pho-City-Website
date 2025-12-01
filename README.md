@@ -202,6 +202,32 @@ Pho-City-Website/
 
 # Figma Prototype:
 
+#### Home Page
+
+<img src="assets/images/proto_home.png" width="700"/>
+
+#### Menu Page
+
+<img src="assets/images/proto_menu.png" width="700"/>
+
+#### About Us Page
+
+<img src="assets/images/proto_about.png" width="700"/>
+
+### CMS
+
+#### Login Page
+
+<img src="assets/images/proto_login.png" width="700"/>
+
+#### Admin Home Page
+
+<img src="assets/images/proto_adminHome.png" width="700"/>
+
+#### Editing View
+
+<img src="assets/images/proto_editing.png" width="700"/>
+
 <br><br>
 
 # Jira Timeline:
