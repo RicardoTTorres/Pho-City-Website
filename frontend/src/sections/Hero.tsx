@@ -13,7 +13,7 @@ type HeroState = {
 
 const FALLBACK_HERO: HeroState = {
   title: "Authentic Vietnamese Cuisine",
-  subtitle: "Experience authentic Vietnamese flavors in the heart of Sacramento.",
+  subtitle: "Experience Authentic Vietnamese flavors in the heat of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.",
   ctaText: "View Our Menu",
   imageUrl: "/hero_pho_bowl.jpg",
 };
