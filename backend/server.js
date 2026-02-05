@@ -9,6 +9,7 @@ import adminDashboardRoutes from './routes/adminDashboardRoutes.js';
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
 
 // Root test route
 app.get('/', (req, res) => {
