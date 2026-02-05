@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  DefaultTooltipContent,
 } from "recharts";
 
 export function TrafficOverviewEditor() {
@@ -25,8 +26,8 @@ export function TrafficOverviewEditor() {
           { day: "2025-11-12", views: 95 },
           { day: "2025-11-13", views: 180 },
           { day: "2025-11-14", views: 160 },
-          { day: "2025-11-15", views: 130 },
-        ],
+          { day: "2025-11-16", views: 130 },
+        ].map(item => ({day: Date.parse(item.day), views: item.views})),
         topPages: [
           { path: "/menu", views: 500 },
           { path: "/", views: 420 },
@@ -70,9 +71,23 @@ export function TrafficOverviewEditor() {
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data.daily}>
-            <XAxis dataKey="day" />
+            <XAxis
+              dataKey="day"
+              type="number"
+              scale="time"
+              domain={['auto','auto']}
+              tickFormatter={timestampToDate}
+            />
             <YAxis />
-            <Tooltip />
+            <Tooltip
+              content={(
+                <DefaultTooltipContent
+                  accessibilityLayer={false}
+                  labelFormatter={timestampToDate}
+                  formatter={formatViews}
+                />
+              )}
+            />
             <Line
               type="monotone"
               dataKey="views"
@@ -97,4 +112,16 @@ export function TrafficOverviewEditor() {
       </div>
     </div>
   );
+}
+
+function timestampToDate(timestamp: number): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(timestamp));
+}
+
+function formatViews(views: number): string[] {
+  return [`Views: ${views}`];
 }
