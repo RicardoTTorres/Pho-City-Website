@@ -15,7 +15,7 @@ import ContentPage from "@/pages/cms/ContentPage";
 import MediaPage from "@/pages/cms/MediaPage";
 import SettingsPage from "@/pages/cms/SettingsPage";
 import UsersPage from "@/pages/cms/UsersPage";
-
+import UserManualPage from "@/pages/cms/UserManualPage";
 export default function App() {
   return (
     <Routes>
@@ -29,7 +29,7 @@ export default function App() {
 
       {/* Admin routes without navbar/footer */}
       <Route path="/adminlogin" element={<AdminLogin />} />
-      
+
       {/* CMS routes with CMSLayout (floating sidebar) */}
       <Route path="/cms" element={<CMSLayout />}>
         <Route index element={<Navigate to="/cms/dashboard" replace />} />
@@ -39,10 +39,14 @@ export default function App() {
         <Route path="media" element={<MediaPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="/cms/usermanual" element={<UserManualPage />} />;
       </Route>
 
       {/* Legacy route redirect */}
-      <Route path="/adminpage*" element={<Navigate to="/cms/dashboard" replace />} />
+      <Route
+        path="/adminpage*"
+        element={<Navigate to="/cms/dashboard" replace />}
+      />
     </Routes>
   );
 

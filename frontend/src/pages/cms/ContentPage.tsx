@@ -2,11 +2,12 @@ import { HeroSectionEditor } from "@/sections/AdminDashboard/HeroSectionEditor";
 import { AboutSectionEditor } from "@/sections/AdminDashboard/AboutSectionEditor";
 import { ContactSectionEditor } from "@/sections/AdminDashboard/ContactSectionEditor";
 import { NavbarSectionEditor } from "@/sections/AdminDashboard/NavbarSectionEditor";
+import FooterSectionEditor from "@/sections/AdminDashboard/FooterSectionEditor";
 import { useState } from "react";
 
 export default function ContentPage() {
   const [activeSection, setActiveSection] = useState<
-    "hero" | "about" | "contact" | "navbar"
+    "hero" | "about" | "contact" | "navbar" | "footer"
   >("hero");
 
   const sections = [
@@ -14,6 +15,7 @@ export default function ContentPage() {
     { id: "about" as const, label: "About Section" },
     { id: "contact" as const, label: "Contact Section" },
     { id: "navbar" as const, label: "Navbar Section" },
+    { id: "footer" as const, label: "Footer Section" },
   ];
 
   return (
@@ -47,6 +49,7 @@ export default function ContentPage() {
         {activeSection === "about" && <AboutSectionEditor />}
         {activeSection === "contact" && <ContactSectionEditor />}
         {activeSection === "navbar" && <NavbarSectionEditor />}
+        {activeSection === "footer" && <FooterSectionEditor />}
       </div>
     </div>
   );
