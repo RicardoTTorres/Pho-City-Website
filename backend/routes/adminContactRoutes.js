@@ -1,10 +1,12 @@
 import express from 'express';
-import { getContactInfo, updateContactInfo } from '../controllers/adminContactController.js';
+import { getContactInfo } from '../controllers/adminContactController.js';
 
 const router = express.Router();
 
 router.get('/', getContactInfo);
 
-router.put('/', updateContactInfo);
+// router.put('/', updateContactInfo);
 
 export default router;
+
+
