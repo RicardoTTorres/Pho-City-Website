@@ -13,14 +13,19 @@ export interface MenuItem {
   id: string;
   name: string;
   description: string;
-  price: string;
+  price: string | number;
   image?: string;
+  visible?: boolean;
 }
 
 export interface MenuCategory {
   id: string;
   name: string;
-  items: MenuItem[];
+  items?: MenuItem[];
+}
+
+export interface MenuData {
+  categories: MenuCategory[];
 }
 
 export interface RestaurantContent {
@@ -39,9 +44,8 @@ export interface RestaurantContent {
     phone: string;
     hours: Record<Weekday, string>;
   };
-  menu: {
-    categories: MenuCategory[];
-  };
+  menuPublic: MenuData | null;
+  menuAdmin: MenuData | null;
   onlineOrder: {
     pickupUrl: string;
     deliveryUrl: string;
@@ -49,5 +53,25 @@ export interface RestaurantContent {
   dashboard: {
     numMenuItems: number;
     numMenuCategories: number;
+  };
+  footer: {
+    brand: {
+      name: string;
+      logo: string;
+    };
+    navLinks: {
+      label: string;
+      path: string;
+      external?: boolean;
+    }[];
+    instagram: {
+      url: string;
+      icon: string;
+    };
+    contact: {
+      address: string;
+      cityZip: string;
+      phone: string;
+    };
   };
 }

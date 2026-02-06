@@ -1,6 +1,12 @@
 import {
-  LayoutDashboard, Utensils, FileText, Image, Settings, ChevronLeft,
-  ChevronRight, Users,
+  LayoutDashboard,
+  Utensils,
+  FileText,
+  Image,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Users,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { navConfig } from "@/config/nav.config";
@@ -22,13 +28,14 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
     { name: "Settings", path: "/cms/settings", icon: Settings },
   ] as const;
 
-  const tabs = role === "admin"
-    ? [
-        { name: "Dashboard", path: "/cms/dashboard", icon: LayoutDashboard },
-        { name: "Users", path: "/cms/users", icon: Users },
-        ...baseTabs.slice(1),
-      ]
-    : baseTabs;
+  const tabs =
+    role === "admin"
+      ? [
+          { name: "Dashboard", path: "/cms/dashboard", icon: LayoutDashboard },
+          { name: "Users", path: "/cms/users", icon: Users },
+          ...baseTabs.slice(1),
+        ]
+      : baseTabs;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -44,11 +51,11 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
       {/*Top Section*/}
       <div className="p-4 flex items-center justify-between">
         {collapsed && (
-            <img
-              src="/PhoFavicon.png"
-              alt={navConfig.brand.name}
-              className="h-8 w-auto transition-all duration-300"
-            />
+          <img
+            src="/PhoFavicon.png"
+            alt={navConfig.brand.name}
+            className="h-8 w-auto transition-all duration-300"
+          />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -89,7 +96,10 @@ export function DashboardNav({ collapsed, setCollapsed }: DashboardNavProps) {
         `}
       >
         Need help? <br />
-        <a href="#" className="text-brand-red font-semibold hover:underline">
+        <a
+          href="/cms/usermanual"
+          className="text-brand-red font-semibold hover:underline"
+        >
           Documentation
         </a>
       </div>
