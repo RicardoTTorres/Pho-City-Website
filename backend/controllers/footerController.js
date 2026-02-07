@@ -23,3 +23,49 @@ export async function getFooter(req, res) {
         return res.status(500).json({ error: "Failed to fetch footer" });
     }
 }
+
+/*
+ * PUT /api/footer
+ *
+ * Expects request body in the following format:
+ *
+ * {
+ *   "footer": {
+ *     "navLinks": [
+ *       { "label": "Home", "path": "/" },
+ *       { "label": "Menu", "path": "/menu" },
+ *       { "label": "Order", "path": "https://...", "external": true }
+ *     ],
+ *     "contact": {
+ *       "address": "6175 Stockton Blvd #200",
+ *       "cityZip": "Sacramento, CA 95824",
+ *       "phone": "(916) 754-2143"
+ *     },
+ *     "socialLinks": [
+ *       { "platform": "instagram", "url": "https://instagram.com/", "icon": "instagram" }
+ *     ]
+ *   }
+ * }
+ *
+ * This endpoint overwrites the footer configuration stored in site_settings.footer_json (single-row table, id = 1).
+ * Intended to be used by the CMS.
+ */
+export async function putFooter(req, res) {
+    try {
+        const { footer } = req.body;
+
+        if (!footer) {
+        return res.status(400).json({ error: "Missing footer in request body" });
+        }
+
+        await pool.query(
+        "UPDATE site_settings SET footer_json = ? WHERE id = 1",
+        [JSON.stringify(footer)]
+        );
+
+        res.json({ ok: true, footer });
+    } catch (err) {
+        console.error("putFooter error:", err);
+        res.status(500).json({ error: "Failed to update footer" });
+    }
+}
