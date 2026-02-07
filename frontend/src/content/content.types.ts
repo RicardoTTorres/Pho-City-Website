@@ -62,7 +62,8 @@ export interface RestaurantContent {
     navLinks: {
       label: string;
       path: string;
-      external?: boolean;
+      external: boolean;
+      visible: boolean;
     }[];
     instagram: {
       url: string;
@@ -75,3 +76,5 @@ export interface RestaurantContent {
     };
   };
 }
+
+export type Footer = RestaurantContent["footer"];

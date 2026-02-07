@@ -66,11 +66,12 @@ export const defaultContent = {
     navLinks: [
       { label: "Home", path: "/" },
       { label: "Menu", path: "/menu" },
+      { label: "Contact", path: "/contact" },
       { label: "About", path: "/about" },
     ],
     instagram: {
       url: "https://www.instagram.com/phocity_vietnamesecuisine/",
-      icon: "/assets/instagram_icon.png",
+      icon: "/instagram_icon.png",
     },
     contact: {
       address: "6175 Stockton Blvd #200, Sacramento, CA 95824",
