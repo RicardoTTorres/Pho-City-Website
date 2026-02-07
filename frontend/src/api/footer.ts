@@ -23,3 +23,14 @@ export async function getFooter() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json() as Promise<{footer: FooterData}>;
 }
+
+export async function updateFooter(footer: FooterData) {
+    const res = await fetch(`${API_URL}/api/footer`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ footer })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
