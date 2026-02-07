@@ -1,25 +1,25 @@
-export function getFooter(req, res) {
-    res.json({
-        footer: {
-            navLinks: [
-                { label: "Home", path: "/"},
-                { label: "About", path: "/about"},
-                { label: "Menu", path: "/menu"},
-                { label: "Contact", path: "/contact"},
-                {
-                    label: "Order",
-                    path: "https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200",
-                    external: true
-                }
-            ],
-            contact: {
-                address: "6175 Stockton Blvd #200",
-                cityZip: "Sacramento, CA 95824",
-                phone: "(916) 754-2143"
-            },
-            instagram: {
-                href: "https://instagram.com/"
-            }
+import { pool } from "../db/connect_db.js";
+
+export async function getFooter(req, res) {
+    try {
+        const [rows] = await pool.query(
+        "SELECT footer_json FROM site_settings WHERE id = 1 LIMIT 1"
+        );
+
+        // table empty
+        if (rows.length === 0) {
+        return res.status(404).json({ error: "Footer settings not found" });
         }
-    });
+
+        // return JSON as an object
+        const footer =
+        typeof rows[0].footer_json === "string"
+            ? JSON.parse(rows[0].footer_json)
+            : rows[0].footer_json;
+
+        return res.json({ footer });
+    } catch (err) {
+        console.error("getFooter error:", err);
+        return res.status(500).json({ error: "Failed to fetch footer" });
+    }
 }

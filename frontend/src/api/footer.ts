@@ -11,9 +11,11 @@ export type FooterData = {
         cityZip: string;
         phone: string;
     };
-    instagram: {
-        href: string;
-    };
+    socialLinks: {
+        platform: string;
+        url: string;
+        icon?: string;  
+    }[];
 };
 
 export async function getFooter() {
