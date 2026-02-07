@@ -1,3 +1,4 @@
+//src/context/ContentContext.tsx
 import React, {
   createContext,
   useContext,
@@ -7,8 +8,9 @@ import React, {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
-import type { RestaurantContent } from "@/content/content.types";
+import type { Footer, RestaurantContent } from "@/content/content.types";
 import { defaultContent } from "@/content/content";
+import { getFooter } from "@/api/footer";
 
 interface ContentContextType {
   content: RestaurantContent;
@@ -32,7 +34,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         ...newContent,
       }));
     },
-    []
+    [],
   );
 
   const refreshMenuPublic = useCallback(async () => {
@@ -59,10 +61,20 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
   }, [updateContent]);
 
+  const refreshFooter = useCallback(async () => {
+    try {
+      const footer: Footer = await getFooter();
+      updateContent({ footer });
+    } catch (err) {
+      console.error("Footer fetch failed:", err);
+    }
+  }, [updateContent]);
+
   useEffect(() => {
     refreshMenuPublic();
     refreshMenuAdmin();
-  }, [refreshMenuPublic, refreshMenuAdmin]);
+    refreshFooter();
+  }, [refreshMenuPublic, refreshMenuAdmin, refreshFooter]);
 
   useEffect(() => {
     async function fetchAbout() {
@@ -138,8 +150,16 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       resetContent,
       refreshMenuPublic,
       refreshMenuAdmin,
+      refreshFooter,
     }),
-    [content, updateContent, resetContent, refreshMenuPublic, refreshMenuAdmin]
+    [
+      content,
+      updateContent,
+      resetContent,
+      refreshMenuPublic,
+      refreshMenuAdmin,
+      refreshFooter,
+    ],
   );
 
   return (

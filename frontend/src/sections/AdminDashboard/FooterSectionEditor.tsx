@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -10,51 +10,142 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useContent } from "@/context/ContentContext";
+import type { Footer } from "@/content/content.types";
 
-export default function FooterSectionEditor() {
-  const { content, updateContent } = useContent();
-  const footer = content.footer;
+const DEFAULT_LOGO = "/logo.png";
+const DEFAULT_INSTAGRAM_ICON = "/instagram_icon.png";
 
-  const [brandName, setBrandName] = useState(footer.brand.name);
-  const [brandLogo, setBrandLogo] = useState(footer.brand.logo);
-  const [openMediaPicker, setOpenMediaPicker] = useState(false);
-  const [footerLogo, setFooterLogo] = useState(footer.brand.logo);
+type FooterSectionEditorProps = {
+  footer: Footer;
+  loading: boolean;
+  onSave: (payload: Footer) => Promise<void>;
+};
 
-  const [navLinks, setNavLinks] = useState([...footer.navLinks]);
+function pickString(value: unknown, defaultValue: string) {
+  if (typeof value !== "string") return defaultValue;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : defaultValue;
+}
 
-  const [instagramUrl, setInstagramUrl] = useState(footer.instagram.url);
-  const [instagramIcon, setInstagramIcon] = useState(footer.instagram.icon);
+function normalizeFooter(footer: Footer): Footer {
+  return {
+    brand: {
+      name: typeof footer.brand?.name === "string" ? footer.brand.name : "",
+      logo: pickString(footer.brand?.logo, DEFAULT_LOGO),
+    },
+    navLinks: (footer.navLinks ?? []).map((link) => ({
+      label: typeof link.label === "string" ? link.label : "",
+      path: typeof link.path === "string" ? link.path : "",
+      external: typeof link.external === "boolean" ? link.external : false,
+      visible: typeof link.visible === "boolean" ? link.visible : true,
+    })),
+    instagram: {
+      url:
+        typeof footer.instagram?.url === "string" ? footer.instagram.url : "",
+      icon: pickString(footer.instagram?.icon, DEFAULT_INSTAGRAM_ICON),
+    },
+    contact: {
+      address:
+        typeof footer.contact?.address === "string"
+          ? footer.contact.address
+          : "",
+      cityZip:
+        typeof footer.contact?.cityZip === "string"
+          ? footer.contact.cityZip
+          : "",
+      phone:
+        typeof footer.contact?.phone === "string" ? footer.contact.phone : "",
+    },
+  };
+}
 
-  const [address, setAddress] = useState(footer.contact.address);
-  const [cityZip, setCityZip] = useState(footer.contact.cityZip);
-  const [phone, setPhone] = useState(footer.contact.phone);
+export default function FooterSectionEditor({
+  footer,
+  loading,
+  onSave,
+}: FooterSectionEditorProps) {
+  const initialFooter = normalizeFooter(footer);
 
-  function handleSave() {
-    updateContent({
-      footer: {
-        brand: {
-          name: brandName,
-          logo: footerLogo,
-        },
-        navLinks,
-        instagram: {
-          url: instagramUrl,
-          icon: instagramIcon,
-        },
-        contact: {
-          address,
-          cityZip,
-          phone,
-        },
+  const [brandName, setBrandName] = useState(initialFooter.brand.name);
+  const [, setOpenMediaPicker] = useState(false);
+  const [footerLogo, setFooterLogo] = useState(initialFooter.brand.logo);
+
+  const [navLinks, setNavLinks] = useState([...initialFooter.navLinks]);
+
+  const [instagramUrl, setInstagramUrl] = useState(initialFooter.instagram.url);
+  const [instagramIcon, setInstagramIcon] = useState(
+    initialFooter.instagram.icon,
+  );
+
+  const [address, setAddress] = useState(initialFooter.contact.address);
+  const [cityZip, setCityZip] = useState(initialFooter.contact.cityZip);
+  const [phone, setPhone] = useState(initialFooter.contact.phone);
+
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+
+  const syncFromFooter = useCallback((next: Footer) => {
+    const normalized = normalizeFooter(next);
+    setBrandName(normalized.brand.name);
+    setFooterLogo(normalized.brand.logo);
+    setNavLinks([...normalized.navLinks]);
+    setInstagramUrl(normalized.instagram.url);
+    setInstagramIcon(normalized.instagram.icon);
+    setAddress(normalized.contact.address);
+    setCityZip(normalized.contact.cityZip);
+    setPhone(normalized.contact.phone);
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!isDirty) syncFromFooter(footer);
+  }, [footer, loading, isDirty, syncFromFooter]);
+
+  const markDirty = () => setIsDirty(true);
+
+  async function handleSave() {
+    const normalizedNavLinks = navLinks.map((link) => ({
+      label: typeof link.label === "string" ? link.label : "",
+      path: typeof link.path === "string" ? link.path : "",
+      external: typeof link.external === "boolean" ? link.external : false,
+      visible: typeof link.visible === "boolean" ? link.visible : true,
+    }));
+
+    const payloadFooter: Footer = {
+      brand: {
+        name: typeof brandName === "string" ? brandName : "",
+        logo: pickString(footerLogo, DEFAULT_LOGO),
       },
-    });
+      navLinks: normalizedNavLinks,
+      instagram: {
+        url: typeof instagramUrl === "string" ? instagramUrl : "",
+        icon: pickString(instagramIcon, DEFAULT_INSTAGRAM_ICON),
+      },
+      contact: {
+        address: typeof address === "string" ? address : "",
+        cityZip: typeof cityZip === "string" ? cityZip : "",
+        phone: typeof phone === "string" ? phone : "",
+      },
+    };
+
+    try {
+      await onSave(payloadFooter);
+      setFooterLogo(payloadFooter.brand.logo);
+      setInstagramIcon(payloadFooter.instagram.icon);
+      setNavLinks([...normalizedNavLinks]);
+      setSaveError(null);
+      setIsDirty(false);
+    } catch (err) {
+      console.error("Footer update failed:", err);
+      setSaveError("Failed to save footer changes.");
+    }
   }
 
   function updateNav(index: number, field: string, value: string | boolean) {
     const copy = [...navLinks];
     (copy[index] as any)[field] = value;
     setNavLinks(copy);
+    markDirty();
   }
 
   function addNavLink() {
@@ -62,23 +153,31 @@ export default function FooterSectionEditor() {
       ...navLinks,
       { label: "", path: "", external: false, visible: true },
     ]);
+    markDirty();
   }
 
   function removeNavLink(index: number) {
     setNavLinks(navLinks.filter((_, i) => i !== index));
+    markDirty();
   }
 
   function moveNav(index: number, direction: number) {
     const newLinks = [...navLinks];
     const newIndex = index + direction;
-
     if (newIndex < 0 || newIndex >= newLinks.length) return;
-
     const temp = newLinks[index];
     newLinks[index] = newLinks[newIndex];
     newLinks[newIndex] = temp;
-
     setNavLinks(newLinks);
+    markDirty();
+  }
+
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Loading footer settings...
+      </div>
+    );
   }
 
   return (
@@ -95,10 +194,8 @@ export default function FooterSectionEditor() {
         <p className="font-medium text-gray-700">Footer Brand</p>
 
         <div className="space-y-2 bg-white/70 p-4 rounded-xl border shadow-sm">
-          {/* Image Picker Box (same UI as Navbar editor) */}
           <div
-            className="w-40 h-20 border rounded-xl bg-white/70 flex items-center justify-center cursor-pointer
-      hover:ring-2 hover:ring-brand-red transition"
+            className="w-40 h-20 border rounded-xl bg-white/70 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-brand-red transition"
             onClick={() => setOpenMediaPicker(true)}
           >
             {footerLogo ? (
@@ -116,13 +213,16 @@ export default function FooterSectionEditor() {
             <Label>Brand Name</Label>
             <Input
               value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
+              onChange={(e) => {
+                setBrandName(e.target.value);
+                markDirty();
+              }}
             />
           </div>
         </div>
       </div>
 
-      {/* NAV LINKS */}
+      {/*NAV LINKS*/}
       <div className="space-y-4">
         <p className="font-medium text-gray-700">Footer Navigation Links</p>
 
@@ -168,7 +268,6 @@ export default function FooterSectionEditor() {
                 </button>
               </div>
 
-              {/* Move buttons */}
               <div className="flex gap-2 ml-8">
                 <button
                   onClick={() => moveNav(index, -1)}
@@ -204,7 +303,10 @@ export default function FooterSectionEditor() {
             <Label>Instagram URL</Label>
             <Input
               value={instagramUrl}
-              onChange={(e) => setInstagramUrl(e.target.value)}
+              onChange={(e) => {
+                setInstagramUrl(e.target.value);
+                markDirty();
+              }}
             />
           </div>
 
@@ -212,7 +314,10 @@ export default function FooterSectionEditor() {
             <Label>Instagram Icon URL</Label>
             <Input
               value={instagramIcon}
-              onChange={(e) => setInstagramIcon(e.target.value)}
+              onChange={(e) => {
+                setInstagramIcon(e.target.value);
+                markDirty();
+              }}
             />
           </div>
         </div>
@@ -227,7 +332,10 @@ export default function FooterSectionEditor() {
             <Label>Address</Label>
             <Input
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                markDirty();
+              }}
             />
           </div>
 
@@ -235,13 +343,22 @@ export default function FooterSectionEditor() {
             <Label>City + ZIP</Label>
             <Input
               value={cityZip}
-              onChange={(e) => setCityZip(e.target.value)}
+              onChange={(e) => {
+                setCityZip(e.target.value);
+                markDirty();
+              }}
             />
           </div>
 
           <div>
             <Label>Phone Number</Label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                markDirty();
+              }}
+            />
           </div>
         </div>
       </div>
@@ -252,6 +369,7 @@ export default function FooterSectionEditor() {
       >
         Save Footer Changes
       </Button>
+      {saveError ? <p className="text-sm text-red-600">{saveError}</p> : null}
     </div>
   );
 }

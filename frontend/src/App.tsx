@@ -1,7 +1,6 @@
 
 import { Navbar } from "@/sections/Navbar";
 import { Footer } from "@/sections/Footer";
-import { footerConfig } from "@/config/footer.config";
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Home from "@/pages/Home";
 import About from "@/pages/About";
@@ -58,7 +57,7 @@ export default function App() {
           <Outlet />
         </main>
 
-        <Footer config={footerConfig} />
+        <Footer />
       </div>
     );
   }

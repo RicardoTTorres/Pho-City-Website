@@ -3,12 +3,18 @@ import { AboutSectionEditor } from "@/sections/AdminDashboard/AboutSectionEditor
 import { ContactSectionEditor } from "@/sections/AdminDashboard/ContactSectionEditor";
 import { NavbarSectionEditor } from "@/sections/AdminDashboard/NavbarSectionEditor";
 import FooterSectionEditor from "@/sections/AdminDashboard/FooterSectionEditor";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { Footer } from "@/content/content.types";
+import { useContent } from "@/context/ContentContext";
+import { getFooter, updateFooter } from "@/api/footer";
 
 export default function ContentPage() {
+  const { content, updateContent } = useContent();
   const [activeSection, setActiveSection] = useState<
     "hero" | "about" | "contact" | "navbar" | "footer"
   >("hero");
+  const [footerLoading, setFooterLoading] = useState(false);
+  const [footerLoaded, setFooterLoaded] = useState(false);
 
   const sections = [
     { id: "hero" as const, label: "Hero Section" },
@@ -17,6 +23,36 @@ export default function ContentPage() {
     { id: "navbar" as const, label: "Navbar Section" },
     { id: "footer" as const, label: "Footer Section" },
   ];
+
+  const refreshFooter = useCallback(async () => {
+    const latest = await getFooter();
+    updateContent({ footer: latest });
+  }, [updateContent]);
+
+  useEffect(() => {
+    if (activeSection !== "footer" || footerLoaded) return;
+    let active = true;
+    setFooterLoading(true);
+    (async () => {
+      try {
+        await refreshFooter();
+      } finally {
+        if (active) {
+          setFooterLoading(false);
+          setFooterLoaded(true);
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [activeSection, footerLoaded, refreshFooter]);
+
+  const handleFooterSave = async (payload: Footer) => {
+    await updateFooter(payload);
+    await refreshFooter();
+    setFooterLoaded(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -49,7 +85,13 @@ export default function ContentPage() {
         {activeSection === "about" && <AboutSectionEditor />}
         {activeSection === "contact" && <ContactSectionEditor />}
         {activeSection === "navbar" && <NavbarSectionEditor />}
-        {activeSection === "footer" && <FooterSectionEditor />}
+        {activeSection === "footer" && (
+          <FooterSectionEditor
+            footer={content.footer}
+            loading={footerLoading}
+            onSave={handleFooterSave}
+          />
+        )}
       </div>
     </div>
   );
