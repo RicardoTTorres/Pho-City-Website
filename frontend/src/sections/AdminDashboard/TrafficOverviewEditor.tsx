@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { getTraffic } from "@/api/traffic";
+import type { TrafficData } from "@/api/traffic";
+
 import {
   LineChart,
   Line,
@@ -10,34 +13,51 @@ import {
 } from "recharts";
 
 export function TrafficOverviewEditor() {
-  const [data, setData] = useState<any>(null);
+  const emptyData: TrafficData = {
+    total: {
+      totalViews: 0,
+      uniqueVisitors: 0
+    },
+    daily: [],
+    topPages: []
+  }
+  const [data, setData] = useState<TrafficData>(emptyData);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetchedData = await getTraffic();
+      setData(fetchedData);
+    };
+
+    fetchData();
+  }, []);
 
   //mock data until backend exists
-  useEffect(() => {
-    setTimeout(() => {
-      setData({
-        total: {
-          totalViews: 1248,
-          uniqueVisitors: 367,
-        },
-        daily: [
-          { day: "2025-11-10", views: 75 },
-          { day: "2025-11-11", views: 120 },
-          { day: "2025-11-12", views: 95 },
-          { day: "2025-11-13", views: 180 },
-          { day: "2025-11-14", views: 160 },
-          { day: "2025-11-16", views: 130 },
-        ].map(item => ({day: Date.parse(item.day), views: item.views})),
-        topPages: [
-          { path: "/menu", views: 500 },
-          { path: "/", views: 420 },
-          { path: "/about", views: 180 },
-          { path: "/contact", views: 110 },
-          { path: "/stats", views: 38 },
-        ],
-      });
-    }, 300);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setData({
+  //       total: {
+  //         totalViews: 1248,
+  //         uniqueVisitors: 367,
+  //       },
+  //       daily: [
+  //         { day: "2025-11-10", views: 75 },
+  //         { day: "2025-11-11", views: 120 },
+  //         { day: "2025-11-12", views: 95 },
+  //         { day: "2025-11-13", views: 180 },
+  //         { day: "2025-11-14", views: 160 },
+  //         { day: "2025-11-16", views: 130 },
+  //       ].map(item => ({day: Date.parse(item.day), views: item.views})),
+  //       topPages: [
+  //         { path: "/menu", views: 500 },
+  //         { path: "/", views: 420 },
+  //         { path: "/about", views: 180 },
+  //         { path: "/contact", views: 110 },
+  //         { path: "/stats", views: 38 },
+  //       ],
+  //     });
+  //   }, 300);
+  // }, []);
 
   if (!data) {
     return (
