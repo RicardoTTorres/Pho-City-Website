@@ -8,6 +8,7 @@ export const getHero = async (req, res) => {
         hero_main_title,
         hero_subtitle,
         hero_button_text,
+        hero_secondary_button_text,
         hero_image_url
        FROM hero_section
        ORDER BY hero_id ASC
@@ -24,6 +25,7 @@ export const getHero = async (req, res) => {
       title: h.hero_main_title,
       subtitle: h.hero_subtitle,
       ctaText: h.hero_button_text,
+      secondaryCtaText: h.hero_secondary_button_text ?? null,
       imageUrl: h.hero_image_url ?? null,
     });
   } catch (err) {
@@ -34,9 +36,9 @@ export const getHero = async (req, res) => {
 
 export const updateHero = async (req, res) => {
   try {
-    const { title, subtitle, ctaText, imageUrl } = req.body;
+    const { title, subtitle, ctaText, secondaryCtaText,imageUrl } = req.body;
 
-    if (typeof title !== "string" || typeof subtitle !== "string" || typeof ctaText !== "string") {
+    if (typeof title !== "string" || typeof subtitle !== "string" || typeof ctaText !== "string" || typeof secondaryCtaText !== "string") {
       return res.status(400).json({ message: "Invalid payload" });
     }
 
@@ -45,9 +47,10 @@ export const updateHero = async (req, res) => {
        SET hero_main_title = ?,
            hero_subtitle = ?,
            hero_button_text = ?,
+           hero_secondary_button_text =?,
            hero_image_url = ?
        WHERE hero_id = 1`,
-      [title, subtitle, ctaText, imageUrl ?? null]
+      [title, subtitle, ctaText, secondaryCtaText, imageUrl ?? null]
     );
 
     const [rows] = await pool.query(
@@ -56,6 +59,7 @@ export const updateHero = async (req, res) => {
         hero_main_title,
         hero_subtitle,
         hero_button_text,
+        hero_secondary_button_text,
         hero_image_url
        FROM hero_section
        WHERE hero_id = 1
@@ -68,6 +72,7 @@ export const updateHero = async (req, res) => {
       title: h.hero_main_title,
       subtitle: h.hero_subtitle,
       ctaText: h.hero_button_text,
+      secondaryCtaText: h.hero_secondary_button_text,
       imageUrl: h.hero_image_url ?? null,
     });
   } catch (err) {
