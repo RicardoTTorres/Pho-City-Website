@@ -11,6 +11,37 @@ import ShowPasswordIcon from "@/assets/ShowPasswordIcon.svg";
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+
+  async function handleLogin() {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await fetch("http://localhost:5000/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || "Login failed");
+      return;
+    }
+
+    window.location.href = "/cms/dashboard";
+  } catch (_err) {
+    setError("Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+}
+
 
 
 /*Everything Below is just rendering the setup for the login Page you will see for our CMS system*/
@@ -38,6 +69,17 @@ export default function AdminLogin() {
           <h2 className="font-bold text-sm text-gray-700">Secure Access</h2>
           <p className="text-gray-500 text-xs text-center mb-4">Enter your credentials to manage restaurant content</p>
 
+          {/*Label above email input*/}
+          <label className="w-full text-xs text-black-700 mb-1">Admin Email</label>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Enter your email"
+            className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-red bg-brand-cream border-2 border-brand-gold text-brand-charcoal text-xs mb-3"
+          />
+
+          
           {/*Label above password input*/}
           <label className="w-full text-xs text-black-700 mb-1">Admin Password</label>
 
@@ -67,10 +109,20 @@ export default function AdminLogin() {
             />
           </div>
 
+          {/*Error message display if login fails*/}
+          {error && (
+            <div className="w-full text-xs text-red-600 mb-3 text-center">
+              {error}
+            </div>
+          )}
+
           {/*Access button*/} {/*Will implement a login authentication*/}
-          <button className="w-full bg-gradient-to-b from-brand-red to-brand-redHover text-white text-xs py-2 rounded-lg hover:bg-brand-redHover transition" 
-           onClick={() => { alert("Login Authentication implemented at a later time");}}>
-            Access Admin Dashboard
+          <button
+            className="w-full bg-gradient-to-b from-brand-red to-brand-redHover text-white text-xs py-2 rounded-lg hover:bg-brand-redHover transition disabled:opacity-70"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Access Admin Dashboard"}
           </button>
 
           {/*Demo Credentials*/}

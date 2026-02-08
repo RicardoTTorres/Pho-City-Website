@@ -38,6 +38,7 @@ app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/auth', authRoutes);
 
 // Root test route
 app.get('/', (req, res) => {

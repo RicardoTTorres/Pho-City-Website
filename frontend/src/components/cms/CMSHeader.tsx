@@ -50,6 +50,19 @@ export function CMSHeader(props: CMSHeaderProps) {
     };
   }, []);
 
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:5000/api/admin/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (_err) {
+      // ignore network errors on logout
+    } finally {
+      window.location.href = "/adminlogin";
+    }
+  }
+
   return (
     <div className="sticky top-4 z-40 mb-4">
       <div className="flex items-center gap-3 justify-between bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-xl px-4 py-3">
@@ -118,8 +131,7 @@ export function CMSHeader(props: CMSHeaderProps) {
                 className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition"
                 onClick={() => {
                   setMenuOpen(false);
-                  //Placeholder for real auth logout flow
-                  window.location.href = "/adminlogin";
+                  handleLogout();
                 }}
               >
                 <LogOut size={16} /> Logout
