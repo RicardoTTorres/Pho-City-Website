@@ -56,6 +56,23 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchAbout();
   }, []);
 
+  useEffect(() => {
+    async function fetchAdminUsers() {
+      try {
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${url}/api/adminUsers`);
+        const data = await res.json();
+
+        updateContent({
+          adminUsers: data.adminUsers
+        });
+      } catch (err) {
+        console.error("Admin users fetch failed:", err);
+      }
+    }
+    fetchAdminUsers();
+  }, []);
+
   // -> add /api/dashboard/stats
   useEffect(() => {
     async function fetchDashboard() {
