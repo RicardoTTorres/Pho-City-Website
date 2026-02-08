@@ -9,7 +9,9 @@ export const Footer = memo(function Footer(): ReactElement {
   const config = content.footer;
 
   const year = new Date().getFullYear();
-  const { brand, navLinks, instagram, contact } = config;
+  //const { brand, navLinks, instagram, contact } = config;
+  const { brand, navLinks, socialLinks, contact } = config;
+  const instagram = (socialLinks ?? []).find((s) => s.platform === "instagram");
 
   return (
     <footer className="bg-brand-cream/70 border-t-2 border-brand-red text-[var(--foreground)]">
@@ -33,33 +35,31 @@ export const Footer = memo(function Footer(): ReactElement {
           {/* Center: Nav */}
           <nav aria-label="Footer navigation" className="flex justify-center">
             <ul className="flex flex-wrap justify-center gap-x-3 md:gap-x-5 gap-y-2 text-sm md:text-base font-medium">
-              {(navLinks ?? [])
-                .filter((link) => link.visible !== false)
-                .map((link) => (
-                  <li key={`${link.label}-${link.path}`}>
-                    {link.external ? (
-                      <a
-                        href={link.path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-brand-redHover transition"
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        to={link.path}
-                        className="hover:text-brand-redHover transition"
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
+              {(navLinks ?? []).map((link) => (
+                <li key={`${link.label}-${link.path}`}>
+                  {link.external ? (
+                    <a
+                      href={link.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-brand-redHover transition"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className="hover:text-brand-redHover transition"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
             </ul>
           </nav>
 
-          {/* Instagram + Address/Phone */}
+          {/* Social + Address/Phone */}
           <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
             {instagram?.url ? (
               <a
@@ -69,13 +69,16 @@ export const Footer = memo(function Footer(): ReactElement {
                 aria-label="Pho City Instagram"
                 className="hover:opacity-80 transition"
               >
-                {instagram?.icon ? (
+                {/* If icon is an image path, this works. If icon is just "instagram", set it to "/instagram_icon.png" in your JSON. */}
+                {instagram.icon ? (
                   <img
                     src={instagram.icon}
                     alt="Instagram"
                     className="w-8 h-8"
                   />
-                ) : null}
+                ) : (
+                  <span className="text-sm underline">Instagram</span>
+                )}
               </a>
             ) : null}
 

@@ -62,13 +62,13 @@ export interface RestaurantContent {
     navLinks: {
       label: string;
       path: string;
-      external: boolean;
-      visible: boolean;
+      external?: boolean;
     }[];
-    instagram: {
+    socialLinks: {
+      platform: string;
       url: string;
       icon: string;
-    };
+    }[];
     contact: {
       address: string;
       cityZip: string;
@@ -77,4 +77,4 @@ export interface RestaurantContent {
   };
 }
 
-export type Footer = RestaurantContent["footer"];
+export type FooterData = RestaurantContent["footer"];
