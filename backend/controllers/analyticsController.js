@@ -65,6 +65,38 @@ export async function getTraffic(req, res) {
 }
 
 export async function postTraffic(req, res) {
-    // TODO: implement logging
-    res.json({ok: true});
+    try {
+        const {uuid, path} = req.body;
+        if (uuid === undefined || path === undefined) {
+            res.status(400).json({ error: "Missing required properties" });
+        }
+
+        const [result] = await pool.query(`
+            INSERT INTO traffic_pages
+            VALUES (?, 1)
+            ON DUPLICATE KEY UPDATE
+                page_views = page_views + 1;`,
+            [path]
+        );
+
+        const [result2] = await pool.query(`
+            INSERT INTO traffic_dates
+            VALUES (?, 1)
+            ON DUPLICATE KEY UPDATE
+                date_views = date_views + 1;`,
+            [new Date().toISOString()]
+        );
+
+        const [result3] = await pool.query(`
+            INSERT IGNORE INTO traffic_visitors
+            VALUES (?);`,
+            [uuid]
+        );
+
+        res.json({ok: true});
+
+    } catch (err) {
+        console.error("Post Traffic Error:", err);
+        res.json({ok: false, error: "Error logging traffic"});
+    }
 }
