@@ -123,6 +123,19 @@ INSERT INTO `menu_categories` VALUES (11,'Ala Carte'),(3,'Appetizers'),(5,'Bun R
 UNLOCK TABLES;
 
 --
+-- Table structure for table `admin_users`
+--
+
+DROP TABLE IF EXISTS `admin_users`;
+CREATE TABLE `admin_users` (
+  `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`email`)
+);
+
+INSERT INTO `admin_users` VALUES ("testemail", "testpassword");
+
+--
 -- Table structure for table `menu_items`
 --
 
