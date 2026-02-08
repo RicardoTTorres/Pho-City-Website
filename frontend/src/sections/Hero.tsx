@@ -8,6 +8,7 @@ type HeroState = {
   title: string;
   subtitle: string;
   ctaText: string;
+  secondaryCtaText: string;
   imageUrl: string | null;
 };
 
@@ -15,8 +16,9 @@ const FALLBACK_HERO: HeroState = {
   title: "Authentic Vietnamese Cuisine",
   subtitle: "Experience Authentic Vietnamese flavors in the heat of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.",
   ctaText: "View Our Menu",
+  secondaryCtaText: "Call Now",
   imageUrl: "/hero_pho_bowl.jpg",
-};
+};  
 
 export function Hero(): ReactElement {
   const [hero, setHero] = useState<HeroState>(FALLBACK_HERO);
@@ -28,6 +30,7 @@ export function Hero(): ReactElement {
           title: h.title || FALLBACK_HERO.title,
           subtitle: h.subtitle || FALLBACK_HERO.subtitle,
           ctaText: h.ctaText || FALLBACK_HERO.ctaText,
+          secondaryCtaText: h.secondaryCtaText || FALLBACK_HERO.secondaryCtaText,
           imageUrl: h.imageUrl ?? FALLBACK_HERO.imageUrl,
         });
       })
@@ -81,7 +84,7 @@ export function Hero(): ReactElement {
               asChild
               className="shadow-lg ring-1 ring-brand-red/20"
             >
-              <a href="tel:+19167542143">Call Now</a>
+              <a href="tel:+19167542143"> {hero.secondaryCtaText}</a>
             </Button>
           </div>
         </div>

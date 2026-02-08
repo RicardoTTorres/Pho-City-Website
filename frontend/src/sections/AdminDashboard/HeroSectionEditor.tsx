@@ -33,6 +33,7 @@ export function HeroSectionEditor() {
           title: h.title ?? "",
           subtitle: h.subtitle ?? "",
           ctaText: h.ctaText ?? "",
+          secondaryCtaText: h.secondaryCtaText ?? "",
           imageUrl: h.imageUrl ?? null,
         }));
       })
@@ -58,6 +59,7 @@ export function HeroSectionEditor() {
         title: heroContent.title,
         subtitle: heroContent.subtitle,
         ctaText: heroContent.ctaText,
+        secondaryCtaText: heroContent.secondaryCtaText,
         imageUrl: heroContent.imageUrl,
       });
       setMessage("Hero section updated successfully!");
