@@ -59,9 +59,10 @@ export async function putFooter(req, res) {
         }
 
         await pool.query(
-        "UPDATE site_settings SET footer_json = ? WHERE id = 1",
-        [JSON.stringify(footer)]
-        );
+        "INSERT INTO site_settings (id, footer_json) VALUES (1, ?) " +
+        "ON DUPLICATE KEY UPDATE footer_json = VALUES(footer_json)",
+      [JSON.stringify(footer)],
+    );
 
         res.json({ ok: true, footer });
     } catch (err) {
