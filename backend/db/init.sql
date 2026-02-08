@@ -218,3 +218,28 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-10-24 19:19:35
+
+
+
+/* PC-104 Traffic Analytics requires new SQL tables. */
+/* These are also included separately in traffic_tables.sql */;
+
+DROP TABLE IF EXISTS `traffic_dates`;
+CREATE TABLE `traffic_dates` (
+  `date` DATE NOT NULL,
+  `date_views` INT NOT NULL,
+  PRIMARY KEY (`date`)
+);
+
+DROP TABLE IF EXISTS `traffic_pages`;
+CREATE TABLE `traffic_pages` (
+  `page` VARCHAR(255) NOT NULL,
+  `page_views` INT NOT NULL,
+  PRIMARY KEY (`page`)
+);
+
+DROP TABLE IF EXISTS `traffic_visitors`;
+CREATE TABLE `traffic_visitors` (
+    `visitor_id` CHAR(36) NOT NULL,
+    PRIMARY KEY (`visitor_id`)
+);
