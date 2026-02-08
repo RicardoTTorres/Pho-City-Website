@@ -1,9 +1,12 @@
-import { Router } from "express";
-import { getFooter, updateFooter } from "../controllers/footerController.js";
 
-const router = Router();
+
+import express from "express";
+import { getFooter } from "../controllers/footerController.js";
+import { putFooter } from "../controllers/footerController.js";
+
+const router = express.Router();
 
 router.get("/", getFooter);
-router.put("/", updateFooter);
+router.put("/", putFooter);
 
 export default router;

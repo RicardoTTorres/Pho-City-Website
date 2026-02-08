@@ -8,7 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
-import type { Footer, RestaurantContent } from "@/content/content.types";
+import type { FooterData, RestaurantContent } from "@/content/content.types";
 import { defaultContent } from "@/content/content";
 import { getFooter } from "@/api/footer";
 
@@ -63,7 +63,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const refreshFooter = useCallback(async () => {
     try {
-      const footer: Footer = await getFooter();
+      const { footer }: { footer: FooterData } = await getFooter();
       updateContent({ footer });
     } catch (err) {
       console.error("Footer fetch failed:", err);

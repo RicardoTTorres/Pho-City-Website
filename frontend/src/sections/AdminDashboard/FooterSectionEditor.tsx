@@ -1,24 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Trash2,
-  GripVertical,
-  Plus,
-  Footprints,
-} from "lucide-react";
+// src/sections/cms/FooterSectionEditor.tsx
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Trash2, GripVertical, Plus, Footprints } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { Footer } from "@/content/content.types";
+import type { FooterData } from "@/content/content.types";
 
 const DEFAULT_LOGO = "/logo.png";
 const DEFAULT_INSTAGRAM_ICON = "/instagram_icon.png";
 
 type FooterSectionEditorProps = {
-  footer: Footer;
+  footer: FooterData;
   loading: boolean;
-  onSave: (payload: Footer) => Promise<void>;
+  onSave: (payload: FooterData) => Promise<void>;
 };
 
 function pickString(value: unknown, defaultValue: string) {
@@ -27,7 +21,16 @@ function pickString(value: unknown, defaultValue: string) {
   return trimmed ? trimmed : defaultValue;
 }
 
-function normalizeFooter(footer: Footer): Footer {
+function normalizeFooter(footer: FooterData): FooterData {
+  const socialLinks = Array.isArray(footer.socialLinks)
+    ? footer.socialLinks
+    : [];
+  const instagram = socialLinks.find((s) => s.platform === "instagram") ?? {
+    platform: "instagram",
+    url: "",
+    icon: DEFAULT_INSTAGRAM_ICON,
+  };
+
   return {
     brand: {
       name: typeof footer.brand?.name === "string" ? footer.brand.name : "",
@@ -37,13 +40,14 @@ function normalizeFooter(footer: Footer): Footer {
       label: typeof link.label === "string" ? link.label : "",
       path: typeof link.path === "string" ? link.path : "",
       external: typeof link.external === "boolean" ? link.external : false,
-      visible: typeof link.visible === "boolean" ? link.visible : true,
     })),
-    instagram: {
-      url:
-        typeof footer.instagram?.url === "string" ? footer.instagram.url : "",
-      icon: pickString(footer.instagram?.icon, DEFAULT_INSTAGRAM_ICON),
-    },
+    socialLinks: [
+      {
+        platform: "instagram",
+        url: typeof instagram.url === "string" ? instagram.url : "",
+        icon: pickString(instagram.icon, DEFAULT_INSTAGRAM_ICON),
+      },
+    ],
     contact: {
       address:
         typeof footer.contact?.address === "string"
@@ -64,7 +68,7 @@ export default function FooterSectionEditor({
   loading,
   onSave,
 }: FooterSectionEditorProps) {
-  const initialFooter = normalizeFooter(footer);
+  const initialFooter = useMemo(() => normalizeFooter(footer), [footer]);
 
   const [brandName, setBrandName] = useState(initialFooter.brand.name);
   const [, setOpenMediaPicker] = useState(false);
@@ -72,25 +76,40 @@ export default function FooterSectionEditor({
 
   const [navLinks, setNavLinks] = useState([...initialFooter.navLinks]);
 
-  const [instagramUrl, setInstagramUrl] = useState(initialFooter.instagram.url);
+  const initialInstagram = initialFooter.socialLinks[0] ?? {
+    platform: "instagram",
+    url: "",
+    icon: DEFAULT_INSTAGRAM_ICON,
+  };
+  const [instagramUrl, setInstagramUrl] = useState(initialInstagram.url);
   const [instagramIcon, setInstagramIcon] = useState(
-    initialFooter.instagram.icon,
+    initialInstagram.icon ?? DEFAULT_INSTAGRAM_ICON,
   );
 
   const [address, setAddress] = useState(initialFooter.contact.address);
   const [cityZip, setCityZip] = useState(initialFooter.contact.cityZip);
   const [phone, setPhone] = useState(initialFooter.contact.phone);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
+  const dirtyRef = useRef(false);
+  const didInitRef = useRef(false);
 
-  const syncFromFooter = useCallback((next: Footer) => {
+  const syncFromFooter = useCallback((next: FooterData) => {
     const normalized = normalizeFooter(next);
+
     setBrandName(normalized.brand.name);
     setFooterLogo(normalized.brand.logo);
     setNavLinks([...normalized.navLinks]);
-    setInstagramUrl(normalized.instagram.url);
-    setInstagramIcon(normalized.instagram.icon);
+
+    const ig = normalized.socialLinks[0] ?? {
+      platform: "instagram",
+      url: "",
+      icon: DEFAULT_INSTAGRAM_ICON,
+    };
+    setInstagramUrl(ig.url);
+    setInstagramIcon(ig.icon ?? DEFAULT_INSTAGRAM_ICON);
+
     setAddress(normalized.contact.address);
     setCityZip(normalized.contact.cityZip);
     setPhone(normalized.contact.phone);
@@ -98,29 +117,36 @@ export default function FooterSectionEditor({
 
   useEffect(() => {
     if (loading) return;
-    if (!isDirty) syncFromFooter(footer);
-  }, [footer, loading, isDirty, syncFromFooter]);
+    if (!didInitRef.current) {
+      syncFromFooter(footer);
+      didInitRef.current = true;
+      return;
+    }
+  }, [footer, loading, syncFromFooter]);
 
-  const markDirty = () => setIsDirty(true);
-
+  const markDirty = () => {
+    dirtyRef.current = true;
+  };
   async function handleSave() {
     const normalizedNavLinks = navLinks.map((link) => ({
       label: typeof link.label === "string" ? link.label : "",
       path: typeof link.path === "string" ? link.path : "",
       external: typeof link.external === "boolean" ? link.external : false,
-      visible: typeof link.visible === "boolean" ? link.visible : true,
     }));
 
-    const payloadFooter: Footer = {
+    const payloadFooter: FooterData = {
       brand: {
         name: typeof brandName === "string" ? brandName : "",
         logo: pickString(footerLogo, DEFAULT_LOGO),
       },
       navLinks: normalizedNavLinks,
-      instagram: {
-        url: typeof instagramUrl === "string" ? instagramUrl : "",
-        icon: pickString(instagramIcon, DEFAULT_INSTAGRAM_ICON),
-      },
+      socialLinks: [
+        {
+          platform: "instagram",
+          url: typeof instagramUrl === "string" ? instagramUrl : "",
+          icon: pickString(instagramIcon, DEFAULT_INSTAGRAM_ICON),
+        },
+      ],
       contact: {
         address: typeof address === "string" ? address : "",
         cityZip: typeof cityZip === "string" ? cityZip : "",
@@ -130,18 +156,27 @@ export default function FooterSectionEditor({
 
     try {
       await onSave(payloadFooter);
+      dirtyRef.current = false;
       setFooterLogo(payloadFooter.brand.logo);
-      setInstagramIcon(payloadFooter.instagram.icon);
+      setInstagramIcon(
+        payloadFooter.socialLinks[0]?.icon ?? DEFAULT_INSTAGRAM_ICON,
+      );
       setNavLinks([...normalizedNavLinks]);
+      setSaveSuccess("Footer saved successfully!");
+      setTimeout(() => setSaveSuccess(null), 3000);
+
       setSaveError(null);
-      setIsDirty(false);
     } catch (err) {
       console.error("Footer update failed:", err);
       setSaveError("Failed to save footer changes.");
     }
   }
 
-  function updateNav(index: number, field: string, value: string | boolean) {
+  function updateNav(
+    index: number,
+    field: "label" | "path" | "external",
+    value: string | boolean,
+  ) {
     const copy = [...navLinks];
     (copy[index] as any)[field] = value;
     setNavLinks(copy);
@@ -149,10 +184,7 @@ export default function FooterSectionEditor({
   }
 
   function addNavLink() {
-    setNavLinks([
-      ...navLinks,
-      { label: "", path: "", external: false, visible: true },
-    ]);
+    setNavLinks([...navLinks, { label: "", path: "", external: false }]);
     markDirty();
   }
 
@@ -164,10 +196,20 @@ export default function FooterSectionEditor({
   function moveNav(index: number, direction: number) {
     const newLinks = [...navLinks];
     const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= newLinks.length) return;
+
+    if (
+      newIndex < 0 ||
+      newIndex >= newLinks.length ||
+      newLinks[index] === undefined ||
+      newLinks[newIndex] === undefined
+    ) {
+      return;
+    }
+
     const temp = newLinks[index];
     newLinks[index] = newLinks[newIndex];
     newLinks[newIndex] = temp;
+
     setNavLinks(newLinks);
     markDirty();
   }
@@ -250,19 +292,9 @@ export default function FooterSectionEditor({
                 />
 
                 <button
-                  onClick={() => updateNav(index, "visible", !link.visible)}
-                  className="p-2 text-gray-600 hover:text-brand-red"
-                >
-                  {link.visible !== false ? (
-                    <Eye size={18} />
-                  ) : (
-                    <EyeOff size={18} />
-                  )}
-                </button>
-
-                <button
                   onClick={() => removeNavLink(index)}
                   className="p-2 text-gray-500 hover:text-red-500"
+                  aria-label="Remove nav link"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -369,6 +401,10 @@ export default function FooterSectionEditor({
       >
         Save Footer Changes
       </Button>
+      {saveSuccess && (
+        <p className="text-sm text-green-600 mt-2 text-center">{saveSuccess}</p>
+      )}
+
       {saveError ? <p className="text-sm text-red-600">{saveError}</p> : null}
     </div>
   );

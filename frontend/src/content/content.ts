@@ -64,17 +64,20 @@ export const defaultContent = {
       logo: "/logo.png",
     },
     navLinks: [
-      { label: "Home", path: "/" },
-      { label: "Menu", path: "/menu" },
-      { label: "Contact", path: "/contact" },
-      { label: "About", path: "/about" },
+      { label: "Home", path: "/",external: false },
+      { label: "Menu", path: "/menu",external: false },
+      { label: "Contact", path: "/contact", external: false },
+      { label: "About", path: "/about", external: false},
     ],
-    instagram: {
-      url: "https://www.instagram.com/phocity_vietnamesecuisine/",
-      icon: "/instagram_icon.png",
-    },
+    socialLinks: [
+      {
+        platform: "instagram",
+        url: "https://www.instagram.com/phocity_vietnamesecuisine/",
+        icon: "/instagram_icon.png",
+      },
+    ],
     contact: {
-      address: "6175 Stockton Blvd #200, Sacramento, CA 95824",
+      address: "6175 Stockton Blvd #2004",
       cityZip: "Sacramento, CA 95824",
       phone: "(916) 754-2143",
     },
