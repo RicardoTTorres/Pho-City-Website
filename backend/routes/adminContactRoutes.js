@@ -5,6 +5,9 @@ const router = express.Router();
 
 router.get('/', getContactInfo);
 
+// add admin authentication later 
+// router.put('/', isAdmin, updateContactInfo);
+
 router.put('/', updateContactInfo);
 
 export default router;
