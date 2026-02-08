@@ -104,6 +104,22 @@ router.get("/me", requireAuth, (req, res) => {
   res.json({ ok: true, user: req.user });
 });
 
+router.get("/verify", (req, res) => {
+  try {
+    const token = req.cookies?.auth;
+    if (!token) return res.status(403).json({ error: "No token" });
+
+    if (blackListToken.has(token)) {
+      return res.status(403).json({ error: "Token invalidated" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
+    return res.status(200).json({ ok: true });
+  } catch (_err) {
+    return res.status(403).json({ error: "Invalid or expired token" });
+  }
+});
+
 router.post("/update-password", requireAuth, async (req, res) => {
   try {
     const {oldPassword, newPassword } = req.body || {};
