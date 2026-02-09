@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `pho_city_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `pho_city_db`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pho_city_db
@@ -220,6 +222,31 @@ LOCK TABLES `ordering_links` WRITE;
 INSERT INTO `ordering_links` VALUES (1,'Toast',NULL),(2,'DoorDash',NULL);
 /*!40000 ALTER TABLE `ordering_links` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `site_settings`
+--
+
+DROP TABLE IF EXISTS `site_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `site_settings` (
+  `id` int NOT NULL,
+  `footer_json` json NOT NULL,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `site_settings`
+--
+
+LOCK TABLES `site_settings` WRITE;
+/*!40000 ALTER TABLE `site_settings` DISABLE KEYS */;
+INSERT INTO `site_settings` VALUES (1,'{\"contact\": {\"phone\": \"(916) 754-2143\", \"address\": \"6175 Stockton Blvd #200\", \"cityZip\": \"Sacramento, CA 95824\"}, \"navLinks\": [{\"path\": \"/\", \"label\": \"Home\"}, {\"path\": \"/about\", \"label\": \"About\"}, {\"path\": \"/menu\", \"label\": \"Menu\"}, {\"path\": \"/contact\", \"label\": \"Contact\"}, {\"path\": \"https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200\", \"label\": \"Order\", \"external\": true}], \"socialLinks\": [{\"url\": \"https://instagram.com/\", \"icon\": \"instagram\", \"platform\": \"instagram\"}]}','2026-02-07 05:16:50');
+/*!40000 ALTER TABLE `site_settings` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -230,4 +257,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-24 19:19:35
+-- Dump completed on 2026-02-06 21:27:17
