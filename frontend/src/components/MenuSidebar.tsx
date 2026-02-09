@@ -1,7 +1,8 @@
-import { MenuCategory } from "@/components/ui/MenuCategory";
+import { MenuCategory as MenuCategoryPill } from "@/components/ui/MenuCategory";
+import type { MenuCategory as MenuCategoryData } from "@/content/content.types";
 
 interface MenuSidebarProps {
-  categories: { name: string; items: { name: string }[] }[];
+  categories: MenuCategoryData[];
   activeCategory: string | null;
   onCategoryClick: (categoryName: string) => void;
 }
@@ -10,7 +11,7 @@ export function MenuSidebar({ categories, activeCategory, onCategoryClick }: Men
   return (
     <div className="space-y-2">
       {categories.map((category) => (
-        <MenuCategory
+        <MenuCategoryPill
           key={category.name}
           label={category.name}
           isActive={activeCategory === category.name}

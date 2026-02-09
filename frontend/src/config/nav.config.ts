@@ -1,5 +1,5 @@
 export const navConfig = {
-  brand: { name: "Pho City", logo: "/src/assets/logo.png" },
+  brand: { name: "Pho City", logo: "/logo.png" },
   nav: [
     { label: "About", path: "about" },
     { label: "Menu", path: "menu" },
