@@ -68,18 +68,20 @@ export function TrafficOverviewEditor() {
   }
 
   return (
-    <div className="bg-white/70 p-6 rounded-2xl shadow border space-y-6">
-      <h2 className="text-2xl font-semibold">Traffic Overview</h2>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Traffic Overview
+      </h3>
 
       {/*Summary Cards*/}
       <div className="grid grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm border">
+        <div className="bg-white p-2 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-500">Total Views</p>
           <p className="text-3xl font-bold text-brand-red">
             {data.total.totalViews}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border">
+        <div className="bg-white p-2 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-500">Unique Visitors</p>
           <p className="text-3xl font-bold text-brand-red">
             {data.total.uniqueVisitors}

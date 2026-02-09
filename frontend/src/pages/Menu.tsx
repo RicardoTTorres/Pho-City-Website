@@ -7,9 +7,9 @@ import { MenuItem as MenuItemCard } from "@/components/ui/MenuItem";
 
 export default function Menu() {
   const { content } = useContent();
-  const allCategories = content.menu?.categories ?? [];
+  const allCategories = content.menuPublic?.categories ?? [];
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  console.log("Menu Data:", content.menu);
+  console.log("Menu Data:", content.menuPublic);
 
   //Set initial active category
   useEffect(() => {
@@ -65,12 +65,14 @@ export default function Menu() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.items.map((item) => {
-                  const priceNumber = Number.parseFloat(
-                    (item.price || "0").toString().replace(/[^0-9.]/g, "")
-                  );
-                  return (
-                    <MenuItemCard
+                {(category.items ?? [])
+                  .filter((item) => item.visible !== false)
+                  .map((item) => {
+                    const priceNumber = Number.parseFloat(
+                      (item.price || "0").toString().replace(/[^0-9.]/g, "")
+                    );
+                    return (
+                      <MenuItemCard
                       key={item.id || item.name}
                       name={item.name}
                       price={Number.isFinite(priceNumber) ? priceNumber : 0}

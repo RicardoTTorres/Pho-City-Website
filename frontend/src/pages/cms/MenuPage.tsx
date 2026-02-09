@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import { useContent } from "@/context/ContentContext";
 import { MenuSectionEditor } from "@/sections/AdminDashboard/MenuSectionEditor";
@@ -12,21 +11,20 @@ import {
   type NewItemPayload,
   type NewCategoryPayload,
 } from "@/api/menu";
+import type {
+  MenuData as RawMenuData,
+  MenuCategory as RawCategory,
+  MenuItem as RawMenuItem,
+} from "@/content/content.types";
 
-export interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
+export interface MenuItem extends RawMenuItem {
   category: string;
   categoryId: string;
-  image?: string | undefined;
+  price: string;
   visible: boolean;
 }
 
-export interface Category {
-  id: string;
-  name: string;
+export interface Category extends Omit<RawCategory, "items"> {
   items?: MenuItem[];
 }
 
@@ -36,27 +34,32 @@ export interface MenuData {
 
 export default function MenuPage() {
   // Shared content source from context
-  const { content, refreshMenu } = useContent();
-  const menuData = content.menu;
+  const { content, refreshMenuAdmin } = useContent();
+  const rawMenuData: RawMenuData | null = content.menuAdmin;
 
   // Transform menu data for editor UI
   const derivedCategories: Category[] = useMemo(() => {
-    const cats = menuData?.categories ?? [];
+    const cats: RawCategory[] = rawMenuData?.categories ?? [];
     return cats.map((cat) => ({
       id: String(cat.id),
       name: cat.name,
-      items: (cat.items ?? []).map((i) => ({
-        id: String(i.id),
-        name: i.name,
-        description: i.description,
-        price: String(i.price),
-        category: cat.name,
-        categoryId: String(cat.id),
-        image: i.image,
-        visible: Boolean((i as any).visible ?? true),
-      })),
+      items: (cat.items ?? []).map((item) => {
+        const formatted: MenuItem = {
+          id: String(item.id),
+          name: item.name,
+          description: item.description,
+          price: String(item.price ?? ""),
+          category: cat.name,
+          categoryId: String(cat.id),
+          visible: Boolean(item.visible ?? true),
+        };
+        if (item.image) {
+          formatted.image = item.image;
+        }
+        return formatted;
+      }),
     }));
-  }, [menuData]);
+  }, [rawMenuData]);
 
   const formattedMenuData: MenuData = useMemo(
     () => ({ categories: derivedCategories }),
@@ -66,34 +69,34 @@ export default function MenuPage() {
   // CRUD callbacks
   const handleCreateItem = async (data: NewItemPayload) => {
     await createItem(data);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   const handleUpdateItem = async (id: string, data: NewItemPayload) => {
     await updateItem(id, data);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   const handleDeleteItem = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     await deleteItem(id);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   const handleCreateCategory = async (data: NewCategoryPayload) => {
     await createCategory(data);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   const handleUpdateCategory = async (id: string, data: NewCategoryPayload) => {
     await updateCategory(id, data);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   const handleDeleteCategory = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
     await deleteCategory(id);
-    await refreshMenu();
+    await refreshMenuAdmin();
   };
 
   return (
@@ -108,7 +111,7 @@ export default function MenuPage() {
       <MenuSectionEditor
         menuData={formattedMenuData}
         categories={derivedCategories}
-        loading={!menuData}
+        loading={!rawMenuData}
         onCreateItem={handleCreateItem}
         onUpdateItem={handleUpdateItem}
         onDeleteItem={handleDeleteItem}

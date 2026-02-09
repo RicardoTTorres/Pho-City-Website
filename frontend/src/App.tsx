@@ -1,7 +1,6 @@
 
 import { Navbar } from "@/sections/Navbar";
 import { Footer } from "@/sections/Footer";
-import { footerConfig } from "@/config/footer.config";
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Home from "@/pages/Home";
 import About from "@/pages/About";
@@ -15,6 +14,7 @@ import ContentPage from "@/pages/cms/ContentPage";
 import MediaPage from "@/pages/cms/MediaPage";
 import SettingsPage from "@/pages/cms/SettingsPage";
 import UsersPage from "@/pages/cms/UsersPage";
+import RegisterAdminPage from "@/pages/cms/RegisterAdminPage";
 
 export default function App() {
   return (
@@ -29,7 +29,7 @@ export default function App() {
 
       {/* Admin routes without navbar/footer */}
       <Route path="/adminlogin" element={<AdminLogin />} />
-      
+
       {/* CMS routes with CMSLayout (floating sidebar) */}
       <Route path="/cms" element={<CMSLayout />}>
         <Route index element={<Navigate to="/cms/dashboard" replace />} />
@@ -39,10 +39,14 @@ export default function App() {
         <Route path="media" element={<MediaPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="registeradmin" element={<RegisterAdminPage />} />
       </Route>
 
       {/* Legacy route redirect */}
-      <Route path="/adminpage*" element={<Navigate to="/cms/dashboard" replace />} />
+      <Route
+        path="/adminpage*"
+        element={<Navigate to="/cms/dashboard" replace />}
+      />
     </Routes>
   );
 
@@ -54,7 +58,7 @@ export default function App() {
           <Outlet />
         </main>
 
-        <Footer config={footerConfig} />
+        <Footer />
       </div>
     );
   }

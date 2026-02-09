@@ -1,15 +1,15 @@
 import { pool } from "../db/connect_db.js";
 
 export async function getAbout(req, res) {
-    const [[about]] = await pool.query(`
-        SELECT * FROM ABOUT_SECTION;
+  const [[about]] = await pool.query(`
+        SELECT * FROM about_section;
         `);
-    res.json({
-        about: {
-            title: about.about_title,
-            content: about.about_description
-        }
-    });
+  res.json({
+    about: {
+      title: about.about_title,
+      content: about.about_description,
+    },
+  });
 }
 
 export async function updateAbout(req, res) {
@@ -17,14 +17,16 @@ export async function updateAbout(req, res) {
     const { title, content, about_page_url } = req.body;
 
     if (!title || !content) {
-      return res.status(400).json({ message: "Title and content are required." });
+      return res
+        .status(400)
+        .json({ message: "Title and content are required." });
     }
 
     await pool.query(
       `UPDATE about_section
        SET about_title = ?, about_description = ?, about_page_url = ?
        WHERE about_id = 1`,
-      [title, content, about_page_url || null]
+      [title, content, about_page_url || null],
     );
 
     res.json({ message: "About section updated successfully!" });
