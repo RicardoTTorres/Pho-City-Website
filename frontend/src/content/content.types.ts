@@ -1,5 +1,14 @@
 // src/content/content.types.ts
 
+export type HeroAPI = {
+  id: number | string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  secondaryCtaText: string;
+  imageUrl: string | null;
+};
+
 export type Weekday =
   | "Monday"
   | "Tuesday"

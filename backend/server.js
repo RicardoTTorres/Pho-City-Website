@@ -5,11 +5,13 @@ import cookieParser from 'cookie-parser';
 import contactRoutes from './routes/contactRoutes.js';
 import adminContactRoutes from './routes/adminContactRoutes.js';
 import adminDashboardRoutes from './routes/adminDashboardRoutes.js';
+import footerRoutes from "./routes/footerRoutes.js";
 
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import heroRoutes from './routes/heroRoutes.js';
 
 dotenv.config();
 
@@ -40,6 +42,8 @@ app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/admin/analytics', analyticsRoutes);
+app.use('/api/hero', heroRoutes);
+app.use('/api/footer', footerRoutes);
 
 // Root test route
 app.get('/', (req, res) => {
