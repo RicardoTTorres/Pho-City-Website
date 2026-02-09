@@ -1,16 +1,43 @@
-import { useContent } from "@/context/ContentContext";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
-export function Hero(): ReactElement {
-  const { content } = useContent();
-  const hero = content.hero;
+import { getHero } from "@/api/hero";
 
-  const scrollToSection = (id: string) => {
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+type HeroState = {
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  secondaryCtaText: string;
+  imageUrl: string | null;
+};
+
+const FALLBACK_HERO: HeroState = {
+  title: "Authentic Vietnamese Cuisine",
+  subtitle: "Experience Authentic Vietnamese flavors in the heat of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.",
+  ctaText: "View Our Menu",
+  secondaryCtaText: "Call Now",
+  imageUrl: "/hero_pho_bowl.jpg",
+};  
+
+export function Hero(): ReactElement {
+  const [hero, setHero] = useState<HeroState>(FALLBACK_HERO);
+
+  useEffect(() => {
+    getHero()
+      .then((h) => {
+        setHero({
+          title: h.title || FALLBACK_HERO.title,
+          subtitle: h.subtitle || FALLBACK_HERO.subtitle,
+          ctaText: h.ctaText || FALLBACK_HERO.ctaText,
+          secondaryCtaText: h.secondaryCtaText || FALLBACK_HERO.secondaryCtaText,
+          imageUrl: h.imageUrl ?? FALLBACK_HERO.imageUrl,
+        });
+      })
+      .catch((err) => {
+        console.error("Hero API failed, using fallback:", err);
+      });
+  }, []);
 
   return (
     <section
@@ -18,7 +45,7 @@ export function Hero(): ReactElement {
       aria-labelledby="hero-heading"
       className="relative flex items-center justify-center min-h-[70vh] text-white"
       style={{
-        backgroundImage: "url('/hero_pho_bowl.jpg')",
+        backgroundImage: `url('${hero.imageUrl || "/hero_pho_bowl.jpg"}')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -57,7 +84,7 @@ export function Hero(): ReactElement {
               asChild
               className="shadow-lg ring-1 ring-brand-red/20"
             >
-              <a href="tel:+19167542143">Call Now</a>
+              <a href="tel:+19167542143"> {hero.secondaryCtaText}</a>
             </Button>
           </div>
         </div>

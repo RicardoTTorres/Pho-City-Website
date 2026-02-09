@@ -1,27 +1,5 @@
 // src/content/content.ts
-import type { MenuData, RestaurantContent } from "./content.types";
-
-const defaultMenu: MenuData = {
-  categories: [
-    {
-      id: "pho",
-      name: "Pho",
-      items: [
-        { id: "pho-tai", name: "Pho Tai", description: "Rare beef pho with fresh herbs and lime", price: "$12.95", visible: true },
-        { id: "pho-ga", name: "Pho Ga", description: "Traditional chicken pho with aromatic broth", price: "$11.95", visible: true },
-        { id: "pho-chay", name: "Pho Chay", description: "Vegetarian pho with tofu and vegetables", price: "$10.95", visible: true },
-      ],
-    },
-    {
-      id: "appetizers",
-      name: "Appetizers",
-      items: [
-        { id: "spring-rolls", name: "Fresh Spring Rolls", description: "Rice paper rolls with shrimp, lettuce, and herbs", price: "$8.95", visible: true },
-        { id: "fried-rolls", name: "Fried Spring Rolls", description: "Crispy rolls filled with pork and vegetables", price: "$7.95", visible: true },
-      ],
-    },
-  ],
-};
+import type { RestaurantContent } from "./content.types";
 
 export const defaultContent = {
   hero: {
@@ -48,8 +26,27 @@ export const defaultContent = {
       Sunday: "9:00 AM - 8:00 PM",
     },
   },
-  menuPublic: defaultMenu,
-  menuAdmin: defaultMenu,
+  menu: {
+    categories: [
+      {
+        id: "pho",
+        name: "Pho",
+        items: [
+          { id: "pho-tai", name: "Pho Tai", description: "Rare beef pho with fresh herbs and lime", price: "$12.95" },
+          { id: "pho-ga", name: "Pho Ga", description: "Traditional chicken pho with aromatic broth", price: "$11.95" },
+          { id: "pho-chay", name: "Pho Chay", description: "Vegetarian pho with tofu and vegetables", price: "$10.95" },
+        ],
+      },
+      {
+        id: "appetizers",
+        name: "Appetizers",
+        items: [
+          { id: "spring-rolls", name: "Fresh Spring Rolls", description: "Rice paper rolls with shrimp, lettuce, and herbs", price: "$8.95" },
+          { id: "fried-rolls", name: "Fried Spring Rolls", description: "Crispy rolls filled with pork and vegetables", price: "$7.95" },
+        ],
+      },
+    ],
+  },
   onlineOrder: {
     pickupUrl: "https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200",
     deliveryUrl: "https://www.doordash.com/store/pho-city-sacramento-30636201/41947147/?pickup=false",
@@ -58,30 +55,8 @@ export const defaultContent = {
     numMenuItems: 7,
     numMenuCategories: 3
   },
-  footer: {
-    brand: {
-      name: "Pho City",
-      logo: "/logo.png",
-    },
-    navLinks: [
-      { label: "Home", path: "/",external: false },
-      { label: "Menu", path: "/menu",external: false },
-      { label: "Contact", path: "/contact", external: false },
-      { label: "About", path: "/about", external: false},
-    ],
-    socialLinks: [
-      {
-        platform: "instagram",
-        url: "https://www.instagram.com/phocity_vietnamesecuisine/",
-        icon: "/instagram_icon.png",
-      },
-    ],
-    contact: {
-      address: "6175 Stockton Blvd #2004",
-      cityZip: "Sacramento, CA 95824",
-      phone: "(916) 754-2143",
-    },
+  adminUsers: {
+    email: "test admin email",
+    password: "test admin password"
   }
-  
-  
 } satisfies RestaurantContent;

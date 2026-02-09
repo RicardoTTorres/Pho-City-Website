@@ -14,7 +14,8 @@ import ContentPage from "@/pages/cms/ContentPage";
 import MediaPage from "@/pages/cms/MediaPage";
 import SettingsPage from "@/pages/cms/SettingsPage";
 import UsersPage from "@/pages/cms/UsersPage";
-import UserManualPage from "@/pages/cms/UserManualPage";
+import RegisterAdminPage from "@/pages/cms/RegisterAdminPage";
+
 export default function App() {
   return (
     <Routes>
@@ -38,7 +39,7 @@ export default function App() {
         <Route path="media" element={<MediaPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="users" element={<UsersPage />} />
-        <Route path="/cms/usermanual" element={<UserManualPage />} />;
+        <Route path="registeradmin" element={<RegisterAdminPage />} />
       </Route>
 
       {/* Legacy route redirect */}
