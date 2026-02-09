@@ -2,7 +2,6 @@ import {
   PlusCircle,
   Edit,
   Image,
-  BarChart3,
   Pencil,
   CheckCircle2,
   Utensils,
@@ -95,45 +94,35 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/*Page intro*/}
-      <p className="text-sm text-gray-500">
-        Here's a quick overview of your site today.
-      </p>
-
       {/*Quick Actions*/}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button className="flex items-center justify-center gap-2 bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition">
+          <Edit size={18} /> Edit Content
+        </button>
         <button className="flex items-center justify-center gap-2 bg-brand-red text-white p-3 rounded-lg hover:bg-brand-redHover transition">
           <PlusCircle size={18} /> Add Menu Item
         </button>
         <button className="flex items-center justify-center gap-2 bg-brand-gold text-white p-3 rounded-lg hover:bg-yellow-600 transition">
           <Image size={18} /> Upload Image
         </button>
-        <button className="flex items-center justify-center gap-2 bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition">
-          <Edit size={18} /> Edit Content
-        </button>
       </section>
 
       {/*Overview Stats*/}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white p-5 rounded-xl shadow-sm border">
-          <p className="text-sm text-gray-500">Total Pages</p>
-          <h2 className="text-2xl font-semibold">4</h2>
+          <p className="text-sm text-gray-700">Total Pages</p>
+          <h2 className="text-2xl font-semibold text-gray-600">4</h2>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
-          <p className="text-sm text-gray-500">Menu Items</p>
-          <h2 className="text-2xl font-semibold">7</h2>
+          <p className="text-sm text-gray-700">Menu Items</p>
+          <h2 className="text-2xl font-semibold text-gray-600">120</h2>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
-          <p className="text-sm text-gray-500">Images Uploaded</p>
-          <h2 className="text-2xl font-semibold">3</h2>
+          <p className="text-sm text-gray-700">Images Uploaded</p>
+          <h2 className="text-2xl font-semibold text-gray-600">3</h2>
         </div>
       </section>
 
-      <section className="bg-white p-6 rounded-xl shadow-sm border">
-        <TrafficOverviewEditor />
-      </section>
-
-      {/*Recent Activity + Latest Messages*/}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {/*Recent Activity*/}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -161,10 +150,12 @@ export default function DashboardPage() {
         </section>
 
         {/*Latest Messages*/}
+
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Latest Messages
           </h3>
+
           <div className="space-y-3">
             {latestMessages.map((m, idx) => (
               <article
@@ -178,6 +169,7 @@ export default function DashboardPage() {
                     </h4>
                     <span className="text-xs text-gray-500">{m.time}</span>
                   </div>
+
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
@@ -188,15 +180,19 @@ export default function DashboardPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Message Snippet */}
                 <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2">
                   {`“${m.snippet}”`}
                 </div>
 
+                {/* Reply Box */}
                 {replyingIndex === idx && (
                   <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
                     <label className="block text-xs font-medium text-gray-600 mb-1">
                       Reply
                     </label>
+
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
@@ -204,6 +200,7 @@ export default function DashboardPage() {
                       className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
                       placeholder={`Write a reply to ${m.name}...`}
                     />
+
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
@@ -212,6 +209,7 @@ export default function DashboardPage() {
                       >
                         <Send size={14} /> Send
                       </button>
+
                       <button
                         type="button"
                         onClick={cancelReply}
@@ -227,6 +225,11 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
+
+      {/*Traffic Overview*/}
+      <section className="bg-white p-6 rounded-xl shadow-sm border mt-6">
+        <TrafficOverviewEditor />
+      </section>
     </div>
   );
 }

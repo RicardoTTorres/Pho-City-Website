@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Eye, EyeOff, Trash2, GripVertical, Plus } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Trash2,
+  GripVertical,
+  Plus,
+  Navigation,
+} from "lucide-react";
 // import { MediaPickerModal } from "@/components/MediaPickerModal";
 
 export function NavbarSectionEditor() {
@@ -54,7 +61,12 @@ export function NavbarSectionEditor() {
 
   return (
     <div className="space-y-8 p-4">
-      <h2 className="text-2xl font-semibold text-brand-red">Navbar Settings</h2>
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal mb-4">
+        <div className="bg-brand-red rounded-lg p-1.5 flex items-center justify-center">
+          <Navigation className="w-3.5 h-3.5 text-white" />
+        </div>
+        Navbar Settings
+      </h2>
 
       {/*LOGO SECTION*/}
       <div className="space-y-3">

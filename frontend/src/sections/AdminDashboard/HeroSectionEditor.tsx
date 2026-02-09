@@ -84,7 +84,7 @@ export function HeroSectionEditor() {
               className="w-3.5 h-3.5 brightness-0 invert"
             />
           </div>
-          Hero Section Content
+          Hero Section Editor
         </h2>
 
         {loading ? (
