@@ -66,6 +66,19 @@ export function CMSHeader({
     };
   }, []);
 
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:5000/api/admin/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (_err) {
+      // ignore network errors on logout
+    } finally {
+      window.location.href = "/adminlogin";
+    }
+  }
+
   return (
     <div className="sticky top-4 z-40 mb-4">
       <div
@@ -165,7 +178,7 @@ export function CMSHeader({
               <button
                 onClick={() => {
                   setMenuOpen(false);
-                  window.location.href = "/adminlogin";
+                  handleLogout();
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm 
                            text-red-600 dark:text-red-400 

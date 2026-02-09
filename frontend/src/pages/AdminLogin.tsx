@@ -10,6 +10,37 @@ import ShowPasswordIcon from "@/assets/ShowPasswordIcon.svg";
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+
+  async function handleLogin() {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await fetch("http://localhost:5000/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || "Login failed");
+      return;
+    }
+
+    window.location.href = "/cms/dashboard";
+  } catch (_err) {
+    setError("Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+}
+
 
   const navigate = useNavigate();
 
@@ -44,9 +75,19 @@ export default function AdminLogin() {
             {/*Icon(Chef Hat) Found in Assets*/}
           </div>
           <h2 className="font-bold text-sm text-gray-700">Secure Access</h2>
-          <p className="text-gray-500 text-xs text-center mb-4">
-            Enter your credentials to manage restaurant content
-          </p>
+          <p className="text-gray-500 text-xs text-center mb-4">Enter your credentials to manage restaurant content</p>
+
+          {/*Label above email input*/}
+          <label className="w-full text-xs text-black-700 mb-1">Admin Email</label>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Enter your email"
+            className="w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-red bg-brand-cream border-2 border-brand-gold text-brand-charcoal text-xs mb-3"
+          />
+
+          
           {/*Label above password input*/}
           <label className="w-full text-xs text-black-700 mb-1">
             Admin Password
@@ -76,12 +117,21 @@ export default function AdminLogin() {
               onClick={() => setShowPassword((s) => !s)}
             />
           </div>
+
+          {/*Error message display if login fails*/}
+          {error && (
+            <div className="w-full text-xs text-red-600 mb-3 text-center">
+              {error}
+            </div>
+          )}
+
           {/*Access button*/} {/*Will implement a login authentication*/}
           <button
-            className="w-full bg-brand-red brightness-90 text-white text-xs py-2 rounded-lg hover:bg-brand-redHover transition"
-            onClick={handleDemoLogin}
+            className="w-full bg-gradient-to-b from-brand-red to-brand-redHover text-white text-xs py-2 rounded-lg hover:bg-brand-redHover transition disabled:opacity-70"
+            onClick={handleLogin}
+            disabled={loading}
           >
-            Access Admin Dashboard
+            {loading ? "Signing in..." : "Access Admin Dashboard"}
           </button>
           {/*Demo Credentials*/}
           <div className="mt-6 p-3 text-center text-sm text-brand-charcoal w-full rounded-[10px] bg-gradient-to-r from-brand-gold/10 to-brand-gold/10">

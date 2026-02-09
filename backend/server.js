@@ -50,6 +50,7 @@ app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/admin/analytics', analyticsRoutes);
 app.use('/api/adminUsers', adminUsersRoutes);
 app.use('/api/hero', heroRoutes);
