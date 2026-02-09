@@ -1,4 +1,4 @@
-import type { MenuData } from "@/pages/cms/MenuPage";
+import type { MenuData } from "@/content/content.types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 

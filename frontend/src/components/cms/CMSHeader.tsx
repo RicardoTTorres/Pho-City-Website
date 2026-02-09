@@ -1,20 +1,27 @@
-import { Search, Settings, User, LogOut } from "lucide-react";
+import { Search, Settings, User, LogOut, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type CMSHeaderProps = {
   title?: string;
   showSearch?: boolean;
+  toggleTheme: () => void;
+  theme: string;
 };
 
-export function CMSHeader(props: CMSHeaderProps) {
+export function CMSHeader({
+  title: forcedTitle,
+  showSearch: forcedSearch,
+  toggleTheme,
+  theme,
+}: CMSHeaderProps) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   const { title, showSearch } = useMemo(() => {
-    if (props.title || typeof props.showSearch === "boolean") {
-      return { title: props.title ?? "", showSearch: props.showSearch ?? false };
+    if (forcedTitle || typeof forcedSearch === "boolean") {
+      return { title: forcedTitle ?? "", showSearch: forcedSearch ?? false };
     }
 
     const path = location.pathname.toLowerCase();
@@ -25,28 +32,37 @@ export function CMSHeader(props: CMSHeaderProps) {
       "/cms/content": { t: "Content", s: true },
       "/cms/media": { t: "Media Library", s: true },
       "/cms/settings": { t: "Settings", s: false },
+      "/cms/usermanual": { t: "User-manual", s: true },
     };
 
-    const entry = map[path] ?? { t: path.split("/").pop()?.replace(/[-_]/g, " ")?.replace(/\b\w/g, c => c.toUpperCase()) || "CMS", s: false };
-    return { title: entry.t, showSearch: entry.s };
-  }, [location.pathname, props.title, props.showSearch]);
+    const entry = map[path] ?? {
+      t:
+        path
+          .split("/")
+          .pop()
+          ?.replace(/[-_]/g, " ")
+          ?.replace(/\b\w/g, (c) => c.toUpperCase()) || "CMS",
+      s: false,
+    };
 
-  //Close menu on outside click or Escape
+    return { title: entry.t, showSearch: entry.s };
+  }, [location.pathname, forcedTitle, forcedSearch]);
+
+  // Close menu events
   useEffect(() => {
-    function onClick(e: MouseEvent) {
+    function handleClick(e: MouseEvent) {
       if (!menuRef.current) return;
-      if (!menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     }
-    function onKey(e: KeyboardEvent) {
+    function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") setMenuOpen(false);
     }
-    document.addEventListener("mousedown", onClick);
-    document.addEventListener("keydown", onKey);
+
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
     return () => {
-      document.removeEventListener("mousedown", onClick);
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
     };
   }, []);
 
@@ -65,74 +81,108 @@ export function CMSHeader(props: CMSHeaderProps) {
 
   return (
     <div className="sticky top-4 z-40 mb-4">
-      <div className="flex items-center gap-3 justify-between bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-xl px-4 py-3">
-        {/*Left: Title */}
-        <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-gray-800 truncate">{title}</h1>
-        </div>
+      <div
+        className="flex items-center gap-3 justify-between
+          bg-white/80 dark:bg-[#2A2A2A]/90 
+          border border-gray-100 dark:border-[#3A3A3A]
+          shadow-sm rounded-xl px-4 py-3 transition-colors"
+      >
+        {/* Title */}
+        <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100 truncate">
+          {title}
+        </h1>
 
-        {/*Middle: Search*/}
+        {/* Search Bar */}
         {showSearch && (
           <div className="hidden sm:flex items-center w-full max-w-md gap-2">
             <div className="relative w-full">
-              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
                 <Search size={16} />
               </span>
               <input
                 type="search"
                 placeholder="Search..."
-                className="w-full bg-white/70 border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm shadow-inner focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40 outline-none"
+                className="w-full bg-white/70 dark:bg-[#2A2A2A] 
+                           dark:text-gray-100 border border-gray-200 dark:border-[#3A3A3A]
+                           rounded-lg pl-9 pr-3 py-2 text-sm shadow-inner 
+                           focus:ring-2 focus:ring-brand-red/40 outline-none"
               />
             </div>
           </div>
         )}
 
-        {/*Right: Avatar / Settings + User Menu*/}
+        {/* User + Settings + Theme Toggle */}
         <div className="relative" ref={menuRef}>
           <div className="flex items-center gap-2 shrink-0">
-            {/*Avatar placeholder*/}
+            {/* DARK MODE TOGGLE */}
             <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="h-9 w-9 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold select-none hover:ring-2 hover:ring-gray-300 transition"
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-label="Open user menu"
+              onClick={toggleTheme}
+              className="p-2 rounded-lg 
+                         hover:bg-gray-100 dark:hover:bg-[#3A3A3A]
+                         text-gray-600 dark:text-gray-100 transition"
             >
-              HT
+              {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
+
+            {/* Settings */}
             <button
-              type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              aria-label="Open settings"
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition"
+              className="p-2 rounded-lg 
+                         hover:bg-gray-100 dark:hover:bg-[#3A3A3A]
+                         text-gray-600 dark:text-gray-100 transition"
             >
               <Settings size={18} />
             </button>
+
+            {/* Avatar */}
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="h-9 w-9 rounded-full 
+                         bg-gray-200 dark:bg-[#3A3A3A] 
+                         text-gray-700 dark:text-gray-100
+                         flex items-center justify-center font-semibold 
+                         hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-500 transition"
+            >
+              HT
+            </button>
           </div>
 
+          {/* Dropdown Menu */}
           {menuOpen && (
             <div
-              role="menu"
-              aria-label="User menu"
-              className="absolute right-0 mt-2 w-44 bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl rounded-xl overflow-hidden z-50"
+              className="absolute right-0 mt-2 w-44 
+                bg-white/90 dark:bg-[#2A2A2A]/90 backdrop-blur-md 
+                border border-gray-100 dark:border-[#3A3A3A]
+                shadow-xl rounded-xl overflow-hidden z-50 transition-colors"
             >
-              <div className="px-3 py-2 text-xs text-gray-500">Signed in as</div>
-              <div className="px-3 pb-2 text-sm font-medium text-gray-800 truncate">phocity-admin</div>
-              <div className="h-px bg-gray-100" />
+              <div className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
+                Signed in as
+              </div>
+
+              <div className="px-3 pb-2 text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
+                phocity-admin
+              </div>
+
+              <div className="h-px bg-gray-100 dark:bg-[#3A3A3A]" />
+
               <Link
                 to="/cms/settings"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition"
+                className="flex items-center gap-2 px-3 py-2 text-sm 
+                           text-gray-700 dark:text-gray-200 
+                           hover:bg-gray-50 dark:hover:bg-[#3A3A3A]"
                 onClick={() => setMenuOpen(false)}
               >
                 <User size={16} /> Profile
               </Link>
+
               <button
-                className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition"
                 onClick={() => {
                   setMenuOpen(false);
                   handleLogout();
                 }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm 
+                           text-red-600 dark:text-red-400 
+                           hover:bg-red-50 dark:hover:bg-red-900/40 transition"
               >
                 <LogOut size={16} /> Logout
               </button>

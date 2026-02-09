@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/logo.png" alt="Pho City Logo" width="200"/>
+  <img src="frontend/public/logo.png" alt="Pho City Logo" width="200"/>
 </p>
 
 # Pho-City-Website Synopsis:
@@ -13,6 +13,7 @@ Another key problem this project addresses is creating an authorized administrat
 <br></br>
 
 # Table of Contents
+
 - [Technologies](#technologies)
 - [Installation Instructions](#installation-instructions)
 - [Database Setup](#database-setup)
@@ -234,15 +235,15 @@ Pho-City-Website/
 
 #### Sprint01 - Project Initialization
 
-- Create ERD  
-- Research API  
-- Decide tech stack  
-- Write product charter  
-- Create UI mockups  
-- Research database costs  
-- Lab meeting notes  
-- Retrospective notes  
-- Client review meeting  
+- Create ERD
+- Research API
+- Decide tech stack
+- Write product charter
+- Create UI mockups
+- Research database costs
+- Lab meeting notes
+- Retrospective notes
+- Client review meeting
 
 <br><br>
 
@@ -255,7 +256,7 @@ Pho-City-Website/
 - PC-61
 - PC-78
 - PC-17
-- PC-72 
+- PC-72
 
 <br><br>
 
@@ -348,13 +349,6 @@ Pho-City-Website/
 - Security Testing
 
 <br><br>
-
-
-
-
-
-
-
 
 # Project Charter:
 
