@@ -10,6 +10,7 @@ import footerRoutes from "./routes/footerRoutes.js";
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
 import adminUsersRoutes from './routes/adminUsersRoutes.js';
 
@@ -49,6 +50,7 @@ app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
 app.use('/api/adminUsers', adminUsersRoutes);
 app.use('/api/hero', heroRoutes);
 app.use('/api/footer', footerRoutes);
