@@ -4,11 +4,9 @@ import { navConfig } from "./nav.config";
 export const footerConfig = {
   brand: {
     name: "Pho City",
-    logo: "/src/assets/logo.png"
+    logo: "/logo.png"
   },
-  // reuse the shared nav items (if footer needs additional links, extend here)
   navLinks: [
-    // include a Home link plus the shared nav items
     { label: "Home", path: "/" },
     ...navConfig.nav,
     { label: "Order", path: "https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200", external: true },

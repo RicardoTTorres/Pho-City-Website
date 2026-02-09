@@ -10,6 +10,8 @@ import footerRoutes from "./routes/footerRoutes.js";
 import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
+import heroRoutes from './routes/heroRoutes.js';
+import adminUsersRoutes from './routes/adminUsersRoutes.js';
 
 dotenv.config();
 
@@ -18,7 +20,13 @@ const PORT = process.env.PORT || 5000;
 
 // Logs all requests for debugging purposes
 app.use((req, res, next) => {
-  console.log("Incoming request:", req.method, req.url, "Origin:", req.get("Origin"));
+  console.log(
+    "Incoming request:",
+    req.method,
+    req.url,
+    "Origin:",
+    req.get("Origin"),
+  );
   next();
 });
 
@@ -27,10 +35,12 @@ app.use(cookieParser());
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 
-app.use(cors({
-  origin: FRONTEND_ORIGIN,
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN,
+    credentials: true,
+  }),
+);
 
 // Routes
 app.use('/api/contact', contactRoutes);
@@ -40,11 +50,13 @@ app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/adminUsers', adminUsersRoutes);
+app.use('/api/hero', heroRoutes);
 app.use('/api/footer', footerRoutes);
 
 // Root test route
-app.get('/', (req, res) => {
-  res.send('Hi from server!');
+app.get("/", (req, res) => {
+  res.send("Hi from server!");
 });
 
 app.listen(PORT, () => {
