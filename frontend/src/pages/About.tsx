@@ -7,30 +7,18 @@ export default function About() {
     return (
         <div className="bg-[#FFF8F1] w-full min-h-screen">
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-20">
-
-        {/* Two-column layout */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-14">
-
-          {/* TEXT COLUMN */}
           <div className="md:max-w-[48%]">
-
-            {/* Title (smaller now) */}
             <h1 className="text-4xl md:text-5xl font-bold text-[#A62626] mb-6">
               {content.about.title}
             </h1>
-
-            {/* A cleaner, subtle divider */}
             <div className="w-20 h-[3px] bg-[#C5A572] mb-8 rounded-full" />
-
-            {/* TEXT CARD */}
             <div className="bg-white shadow-lg rounded-2xl p-8 md:p-10 border border-[#E8E8E8]">
               <p className="whitespace-pre-line text-[#2B2B2B] text-lg leading-relaxed">
                 {content.about.content}
               </p>
             </div>
           </div>
-
-          {/* IMAGE COLUMN */}
           <div className="flex justify-center md:justify-end w-full md:w-auto">
             <img
               src={aboutUs}

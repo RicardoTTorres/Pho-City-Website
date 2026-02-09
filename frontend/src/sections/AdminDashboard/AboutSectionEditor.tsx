@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useContent } from "@/context/ContentContext";
 import { Button } from "@/components/ui/button";
 import AboutIcon from "@/assets/About.svg";
@@ -23,15 +23,23 @@ export function AboutSectionEditor() {
   const [scaledHeight, setScaledHeight] = useState<number>(0);
 
   // measuring preview size
-  useLayoutEffect(() => {
-    if (contentRef.current) {
-      const fullHeight = contentRef.current.offsetHeight;
-      setScaledHeight(fullHeight * SCALE);
-    }
+  useEffect(() => {
+    // Delay ensures the canvas has fully rendered before measuring
+    const timer = setTimeout(() => {
+      if (contentRef.current) {
+        const fullHeight = contentRef.current.offsetHeight;
+        setScaledHeight(fullHeight * SCALE);
+      }
+    }, 20);
+
+    return () => clearTimeout(timer);
   }, [aboutContent]);
 
   //updating changed input/content
-  const handleChange = <K extends keyof typeof aboutContent>(field: K, value: (typeof aboutContent)[K]) => {
+  const handleChange = <K extends keyof typeof aboutContent>(
+    field: K,
+    value: (typeof aboutContent)[K]
+  ) => {
     updateContent({
       about: { ...aboutContent, [field]: value },
     });
@@ -66,14 +74,20 @@ export function AboutSectionEditor() {
       <div className="flex-1 bg-gradient-to-b from-white to-[#FFF7F7] border border-[#FEE2E1] rounded-2xl shadow-md p-6">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal mb-4">
           <div className="bg-[#16A34A] rounded-lg p-1.5 flex items-center justify-center">
-            <img src={AboutIcon} alt="About Icon" className="w-4 h-4 brightness-0 invert" />
+            <img
+              src={AboutIcon}
+              alt="About Icon"
+              className="w-4 h-4 brightness-0 invert"
+            />
           </div>
-          About Section Content
+          About Section Editor
         </h2>
 
         <div className="space-y-4 w-full">
           <div>
-            <label className="block text-sm font-semibold text-brand-charcoal mb-1">Title</label>
+            <label className="block text-sm font-semibold text-brand-charcoal mb-1">
+              Title
+            </label>
             <input
               type="text"
               value={aboutContent.title}
@@ -83,7 +97,9 @@ export function AboutSectionEditor() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-brand-charcoal mb-1">Description</label>
+            <label className="block text-sm font-semibold text-brand-charcoal mb-1">
+              Description
+            </label>
             <textarea
               value={aboutContent.content}
               onChange={(e) => handleChange("content", e.target.value)}
@@ -117,7 +133,11 @@ export function AboutSectionEditor() {
       <div className="w-full md:w-1/2 bg-white rounded-2xl shadow-md p-6 border border-[#FEE2E1] flex flex-col">
         <h3 className="flex items-center gap-2 text-sm font-semibold text-brand-charcoal mb-4">
           <div className="bg-brand-cream rounded-lg p-1.5 flex items-center justify-center">
-            <img src={ImageIcon} alt="Preview" className="w-4 h-4 text-brand-charcoal" />
+            <img
+              src={ImageIcon}
+              alt="Preview"
+              className="w-4 h-4 text-brand-charcoal"
+            />
           </div>
           Live Preview
         </h3>
