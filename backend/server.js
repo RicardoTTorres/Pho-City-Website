@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.js';
 import menuRoutes from './routes/menuRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
+import adminUsersRoutes from './routes/adminUsersRoutes.js';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/api/admin/contact', adminContactRoutes);
 app.use('/api/admin', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/adminUsers', adminUsersRoutes);
 app.use('/api/hero', heroRoutes);
 app.use('/api/footer', footerRoutes);
 

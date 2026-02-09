@@ -54,5 +54,9 @@ export const defaultContent = {
   dashboard: {
     numMenuItems: 7,
     numMenuCategories: 3
+  },
+  adminUsers: {
+    email: "test admin email",
+    password: "test admin password"
   }
 } satisfies RestaurantContent;

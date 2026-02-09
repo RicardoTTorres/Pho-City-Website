@@ -59,4 +59,8 @@ export interface RestaurantContent {
     numMenuItems: number;
     numMenuCategories: number;
   };
+  adminUsers: {
+    email: string;
+    password: string;
+  };
 }
