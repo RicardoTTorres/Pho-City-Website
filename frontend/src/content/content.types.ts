@@ -1,5 +1,14 @@
 // src/content/content.types.ts
 
+export type HeroAPI = {
+  id: number | string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  secondaryCtaText: string;
+  imageUrl: string | null;
+};
+
 export type Weekday =
   | "Monday"
   | "Tuesday"
@@ -54,26 +63,9 @@ export interface RestaurantContent {
     numMenuItems: number;
     numMenuCategories: number;
   };
-  footer: {
-    brand: {
-      name: string;
-      logo: string;
-    };
-    navLinks: {
-      label: string;
-      path: string;
-      external?: boolean;
-    }[];
-    socialLinks: {
-      platform: string;
-      url: string;
-      icon: string;
-    }[];
-    contact: {
-      address: string;
-      cityZip: string;
-      phone: string;
-    };
+  adminUsers: {
+    email: string;
+    password: string;
   };
 }
 
