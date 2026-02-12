@@ -10,10 +10,9 @@ import { menuConfig } from "@/config/menu.config";
 
 export default function MenuPreview(): React.JSX.Element {
   const phoCategory = menuConfig.categories.find((cat) =>
-    cat.name.includes("Pho")
+    cat.name.includes("Pho"),
   );
   const featured = phoCategory ? phoCategory.items.slice(0, 4) : [];
-  //Animation applied inline on motion.div
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
@@ -50,14 +49,14 @@ export default function MenuPreview(): React.JSX.Element {
             </svg>
           </a>
         </div>
-        
+
         {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {featured.map((dish) => (
             <li key={dish.name}>
               <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out border border-gray-100">
                 {/*Image*/}
-                  
+
                 <div className="relative w-full aspect-[4/3] bg-gray-100 flex items-center justify-center">
                   {dish.image ? (
                     <img
@@ -87,7 +86,6 @@ export default function MenuPreview(): React.JSX.Element {
                     <CardTitle className="text-lg font-semibold text-gray-900 text-left leading-tight">
                       {dish.name}
                     </CardTitle>
-                   
                   </div>
                   <CardDescription className="text-gray-600 text-left text-sm">
                     {dish.description}

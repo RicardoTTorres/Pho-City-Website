@@ -3,15 +3,42 @@ import React, { memo } from "react";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { useContent } from "@/context/ContentContext";
+import { defaultContent } from "@/content/content";
 
 export const Footer = memo(function Footer(): ReactElement {
   const { content } = useContent();
-  const config = content.footer;
+  const config = content?.footer ?? defaultContent.footer;
+
+  const safeAssetPath = (value: unknown, fallback: string) => {
+    if (typeof value !== "string") return fallback;
+    const trimmed = value.trim();
+    if (!trimmed) return fallback;
+    const isWebPath =
+      trimmed.startsWith("/") ||
+      trimmed.startsWith("http://") ||
+      trimmed.startsWith("https://");
+    if (!isWebPath) return fallback;
+    if (trimmed.startsWith("src/") || trimmed.startsWith("/src/")) {
+      return fallback;
+    }
+    if (
+      trimmed.includes("wsl.localhost") ||
+      trimmed.startsWith("file://") ||
+      trimmed.includes("\\\\")
+    ) {
+      return fallback;
+    }
+    return trimmed;
+  };
 
   const year = new Date().getFullYear();
-  //const { brand, navLinks, instagram, contact } = config;
   const { brand, navLinks, socialLinks, contact } = config;
   const instagram = (socialLinks ?? []).find((s) => s.platform === "instagram");
+  const instagramIcon = safeAssetPath(
+    instagram?.icon,
+    "/instagram_icon.png",
+  );
+  const brandLogo = safeAssetPath(brand?.logo, "/logo.png");
 
   return (
     <footer className="bg-brand-cream/70 border-t-2 border-brand-red text-[var(--foreground)]">
@@ -19,11 +46,11 @@ export const Footer = memo(function Footer(): ReactElement {
         <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center gap-6 md:gap-8">
           {/* Left: Logo */}
           <div className="flex flex-col items-center">
-            {brand?.logo ? (
+            {brandLogo ? (
               <Link to="/" aria-label="Home">
                 <div className="h-10 md:h-12 w-full flex items-center justify-center">
                   <img
-                    src={brand.logo}
+                    src={brandLogo}
                     alt=""
                     className="h-50 w-50 object-contain shrink-0"
                   />
@@ -35,7 +62,9 @@ export const Footer = memo(function Footer(): ReactElement {
           {/* Center: Nav */}
           <nav aria-label="Footer navigation" className="flex justify-center">
             <ul className="flex flex-wrap justify-center gap-x-3 md:gap-x-5 gap-y-2 text-sm md:text-base font-medium">
-              {(navLinks ?? []).map((link) => (
+              {(navLinks ?? [])
+                .filter((link) => link.visible !== false)
+                .map((link) => (
                 <li key={`${link.label}-${link.path}`}>
                   {link.external ? (
                     <a
@@ -59,7 +88,6 @@ export const Footer = memo(function Footer(): ReactElement {
             </ul>
           </nav>
 
-          {/* Social + Address/Phone */}
           <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
             {instagram?.url ? (
               <a
@@ -69,10 +97,9 @@ export const Footer = memo(function Footer(): ReactElement {
                 aria-label="Pho City Instagram"
                 className="hover:opacity-80 transition"
               >
-                {/* If icon is an image path, this works. If icon is just "instagram", set it to "/instagram_icon.png" in your JSON. */}
-                {instagram.icon ? (
+                {instagramIcon ? (
                   <img
-                    src={instagram.icon}
+                    src={instagramIcon}
                     alt="Instagram"
                     className="w-8 h-8"
                   />

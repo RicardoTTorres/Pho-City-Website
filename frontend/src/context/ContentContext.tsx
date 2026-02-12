@@ -18,6 +18,7 @@ interface ContentContextType {
   resetContent: () => void;
   refreshMenuPublic: () => Promise<void>;
   refreshMenuAdmin: () => Promise<void>;
+  refreshFooter: () => Promise<void>;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -25,8 +26,7 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<RestaurantContent>(defaultContent);
 
-  //Load menu items from backend API when the app starts
-  //Replaces default static menu data in ContentContext with database content
+
   const updateContent = useCallback(
     (newContent: Partial<RestaurantContent>) => {
       setContent((prev) => ({
@@ -63,7 +63,9 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const refreshFooter = useCallback(async () => {
     try {
-      const { footer }: { footer: FooterData } = await getFooter();
+      const data = await getFooter();
+     
+      const footer = (data as { footer?: FooterData }).footer ?? (data as FooterData);
       updateContent({ footer });
     } catch (err) {
       console.error("Footer fetch failed:", err);
@@ -96,21 +98,25 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function fetchAdminUsers() {
       try {
-        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const url = import.meta.env.VITE_API_URL || "http://localhost:5000";
         const res = await fetch(`${url}/api/adminUsers`);
         const data = await res.json();
+   
+        const adminUsers = Array.isArray(data.adminUsers)
+          ? data.adminUsers
+          : [];
 
         updateContent({
-          adminUsers: data.adminUsers
+          adminUsers,
         });
       } catch (err) {
         console.error("Admin users fetch failed:", err);
       }
     }
     fetchAdminUsers();
-  }, []);
+  }, [updateContent]);
 
-  // -> add /api/dashboard/stats
+
   useEffect(() => {
     async function fetchDashboard() {
       try {
@@ -128,21 +134,24 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchDashboard();
   }, []);
 
-  //Load content from localStorage on mount
   useEffect(() => {
     const savedContent = localStorage.getItem("pho-city-content");
     if (savedContent) {
       try {
         const parsedContent = JSON.parse(savedContent);
-        if (!parsedContent.menuPublic && parsedContent.menu) {
-          parsedContent.menuPublic = parsedContent.menu;
-        }
-        if (!parsedContent.menuAdmin && parsedContent.menu) {
-          parsedContent.menuAdmin = parsedContent.menu;
-        }
         setContent((prev) => ({
           ...prev,
           ...parsedContent,
+          menuPublic:
+            parsedContent.menuPublic ??
+            parsedContent.menu ??
+            prev.menuPublic,
+          menuAdmin:
+            parsedContent.menuAdmin ?? parsedContent.menu ?? prev.menuAdmin,
+          footer: parsedContent.footer ?? prev.footer,
+          adminUsers: Array.isArray(parsedContent.adminUsers)
+            ? parsedContent.adminUsers
+            : prev.adminUsers,
         }));
       } catch (error) {
         console.error("Error loading saved content:", error);
@@ -150,7 +159,6 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  //Save content to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("pho-city-content", JSON.stringify(content));
   }, [content]);

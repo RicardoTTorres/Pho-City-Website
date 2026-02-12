@@ -18,7 +18,23 @@ type FooterSectionEditorProps = {
 function pickString(value: unknown, defaultValue: string) {
   if (typeof value !== "string") return defaultValue;
   const trimmed = value.trim();
-  return trimmed ? trimmed : defaultValue;
+  if (!trimmed) return defaultValue;
+  // Only allow absolute web paths or full URLs.
+  const isWebPath =
+    trimmed.startsWith("/") ||
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://");
+  if (!isWebPath) return defaultValue;
+  // Reject filesystem-style paths that break in Vite (e.g., WSL or /src assets).
+  if (
+    trimmed.startsWith("src/") ||
+    trimmed.startsWith("/src/") ||
+    trimmed.includes("wsl.localhost") ||
+    trimmed.startsWith("file://")
+  ) {
+    return defaultValue;
+  }
+  return trimmed;
 }
 
 function normalizeFooter(footer: FooterData): FooterData {
