@@ -84,7 +84,8 @@ CREATE TABLE `hero_section` (
   `hero_main_title` varchar(150) DEFAULT NULL,
   `hero_subtitle` text,
   `hero_button_text` varchar(100) DEFAULT NULL,
-  `hero_image_url` varchar(255) DEFAULT NULL,
+  `hero_secondary_button_text` varchar(255) DEFAULT NULL,
+  `hero_image_url` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`hero_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -95,7 +96,7 @@ CREATE TABLE `hero_section` (
 
 LOCK TABLES `hero_section` WRITE;
 /*!40000 ALTER TABLE `hero_section` DISABLE KEYS */;
-INSERT INTO `hero_section` VALUES (1,'Authentic Vietnamese Cuisine','Experience authentic Vietnamese flavors in the heart of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.','View Our Menu',NULL);
+INSERT INTO `hero_section` VALUES (1,'Authentic Vietnamese Cuisine','Experience authentic Vietnamese flavors in the heart of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.','View Our Menu', 'Call Now',NULL);
 /*!40000 ALTER TABLE `hero_section` ENABLE KEYS */;
 UNLOCK TABLES;
 
