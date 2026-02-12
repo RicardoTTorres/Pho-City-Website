@@ -53,6 +53,32 @@ export interface RestaurantContent {
     phone: string;
     hours: Record<Weekday, string>;
   };
+
+ 
+  footer: {
+    brand: {
+      name: string;
+      logo: string;
+    };
+    navLinks: {
+      label: string;
+      path: string;
+      external?: boolean;
+      visible?: boolean;
+    }[];
+    socialLinks: {
+      platform: string;
+      url: string;
+      icon: string;
+    }[];
+    contact: {
+      address: string;
+      cityZip: string;
+      phone: string;
+    };
+  };
+
+  
   menuPublic: MenuData | null;
   menuAdmin: MenuData | null;
   onlineOrder: {
@@ -70,3 +96,4 @@ export interface RestaurantContent {
 }
 
 export type FooterData = RestaurantContent["footer"];
+
