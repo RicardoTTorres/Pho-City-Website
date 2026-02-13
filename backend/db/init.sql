@@ -125,17 +125,19 @@ INSERT INTO `menu_categories` VALUES (11,'Ala Carte'),(3,'Appetizers'),(5,'Bun R
 UNLOCK TABLES;
 
 --
--- Table structure for table `admin_users`
+-- Table structure for table `admins`
 --
 
-DROP TABLE IF EXISTS `admin_users`;
-CREATE TABLE `admin_users` (
+DROP TABLE IF EXISTS `admins`;
+CREATE TABLE `admins` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`email`)
+  `password_hash` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(50) NOT NULL DEFAULT 'admin',
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `admins_email_unique` (`email`)
 );
-
-INSERT INTO `admin_users` VALUES ("testemail", "testpassword");
 
 --
 -- Table structure for table `menu_items`
