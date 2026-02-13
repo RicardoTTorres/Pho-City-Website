@@ -1,5 +1,5 @@
-//placeholder
-
+# placeholder
 node_modules
 .env
+
 frontend/src/global.d.ts
