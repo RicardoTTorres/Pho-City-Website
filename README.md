@@ -124,33 +124,55 @@ VITE_API_URL="http://localhost:5000"
 
 ```
 Pho-City-Website/
-├── frontend/                               # Vite + React frontend
-│   ├── src/
-│   │   ├── pages/                          # Public pages + CMS page routes
-│   │   │   └── cms/                        # CMS pages (DashboardPage, MenuPage, ContentPage, etc.)
-│   │   ├── sections/                       # Page sections & CMS editors
-│   │   │   └── AdminDashboard/             # CMS editors (Navbar, Menu, About, Hero, Contact, Settings, TrafficOverview)
-│   │   ├── components/                     # Reusable UI + CMS components
-│   │   │   ├── ui/                         # UI primitives (Button, Card, Accordion, etc.)
-│   │   │   └── cms/                        # CMS layout pieces (DashboardNav, CMSHeader)
-│   │   ├── api/                            # Frontend API client (menu.ts, etc.)
-│   │   ├── context/                        # React contexts (ContentContext)
-│   │   ├── config/                         # UI configuration (nav, footer, menu)
-│   │   ├── layouts/                        # Page layout wrappers
-│   │   ├── content/                        # Static content fragments
-│   │   ├── data/                           # Static/seed data helpers
-│   │   ├── menu/                           # Menu-related helpers
-│   │   ├── lib/                            # Shared utilities
-│   │   ├── styles/                         # Global + component styles
-│   │   └── assets/                         # Images and media
-│   └── public/                             # Static assets served directly
+├── backend/                           # Node/Express API service
+│   ├── src/                          # Runtime backend source code
+│   │   ├── server.js                 # Express app bootstrap & middleware setup
+│   │   ├── controllers/              # Request handlers (business logic + DB calls)
+│   │   ├── routes/                   # Express route definitions
+│   │   ├── middleware/               # Reusable request middleware
+│   │   │   └── requireAuth.js        # JWT auth guard for protected endpoints
+│   │   └── db/                       # Database utilities
+│   │       └── connect_db.js         # MySQL connection pool
+│   ├── db/                           # SQL artifacts (migrations, seeds)
+│   ├── package.json
+│   └── package-lock.json
 │
-└── backend/                                # Express/Node API
-    ├── routes/                             # Endpoint routes (about, contact, hero, admin, menu)
-    ├── controllers/                        # Controllers for each domain
-    ├── db/                                 # DB connection + schema (connect_db.js, init.sql)
-    └── server.js                           # API entrypoint + middleware
-
+├── frontend/                          # React/Vite web application
+│   ├── src/
+│   │   ├── app/                      # App shell & composition layer
+│   │   │   ├── App.tsx               # Top-level routing & layout
+│   │   │   ├── analytics/            # Analytics tracking
+│   │   │   └── providers/            # Global React contexts
+│   │   │
+│   │   ├── features/                 # Feature modules
+│   │   │   ├── auth/                 # Authentication
+│   │   │   │   └── pages/AdminLogin.tsx
+│   │   │   ├── cms/                  # Admin CMS
+│   │   │   │   ├── components/       # CMS-specific components
+│   │   │   │   ├── layouts/          # CMS layout wrappers
+│   │   │   │   ├── pages/            # CMS pages
+│   │   │   │   └── sections/         # CMS page sections
+│   │   │   └── public/               # Public-facing site
+│   │   │       ├── components/
+│   │   │       ├── pages/            # Home, About, Menu, Contact
+│   │   │       └── sections/         # Hero, footer, navbar
+│   │   │
+│   │   ├── shared/                   # Cross-feature shared code
+│   │   │   ├── api/                  # API client functions
+│   │   │   ├── assets/               # Images, icons
+│   │   │   ├── components/ui/        # Shared UI components
+│   │   │   ├── config/               # Configuration constants
+│   │   │   ├── content/              # Content models & types
+│   │   │   ├── data/                 # Static/mock data
+│   │   │   ├── lib/                  # Utility functions
+│   │   │   └── menu/                 # Menu data utilities
+│   │   │
+│   │   ├── styles/                   # Global styles
+│   │   └── main.tsx                  # Application entry point
+│   │
+│   ├── public/                       # Static assets
+│   ├── package.json
+│   └── package-lock.json
 ```
 
 <br><br>
