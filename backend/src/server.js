@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import contactRoutes from "./routes/contactRoutes.js";
 import adminContactRoutes from "./routes/adminContactRoutes.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
+import navbarRoutes from "./routes/navbarRoutes.js";
 import footerRoutes from "./routes/footerRoutes.js";
 import authRoutes from "./routes/auth.js";
 import menuRoutes from "./routes/menuRoutes.js";
@@ -20,13 +21,7 @@ const PORT = process.env.PORT || 5000;
 // Logs all requests for debugging purposes
 app.use((req, res, next) => {
   const origin = req.get("Origin") || "(none - same-origin/proxied request)";
-  console.log(
-    "Incoming request:",
-    req.method,
-    req.url,
-    "Origin:",
-    origin,
-  );
+  console.log("Incoming request:", req.method, req.url, "Origin:", origin);
   next();
 });
 
@@ -55,6 +50,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/hero", heroRoutes);
 app.use("/api/footer", footerRoutes);
+app.use("/api", navbarRoutes);
 
 // Root test route
 app.get("/", (req, res) => {

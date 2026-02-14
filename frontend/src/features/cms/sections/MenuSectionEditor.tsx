@@ -1,7 +1,28 @@
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { Pencil, Trash2, Plus } from "lucide-react";
-import type { MenuItem, Category, MenuData } from "@/features/cms/pages/MenuPage";
+import { Pencil, Trash2, Plus, Eye, EyeOff, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import type {
+  MenuItem,
+  Category,
+  MenuData,
+} from "@/features/cms/pages/MenuPage";
 import type { NewItemPayload, NewCategoryPayload } from "@/shared/api/menu";
 
 interface MenuSectionEditorProps {
@@ -14,6 +35,187 @@ interface MenuSectionEditorProps {
   onCreateCategory: (data: NewCategoryPayload) => Promise<void>;
   onUpdateCategory: (id: string, data: NewCategoryPayload) => Promise<void>;
   onDeleteCategory: (id: string) => Promise<void>;
+  onReorderCategories: (categoryIds: string[]) => Promise<void>;
+  onReorderItems: (categoryId: string, itemIds: string[]) => Promise<void>;
+}
+
+// Sortable Item Component
+function SortableMenuItem({
+  item,
+  disabled = false,
+  onEdit,
+  onDelete,
+  onToggleVisible,
+}: {
+  item: MenuItem;
+  disabled?: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleVisible: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id, disabled });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="p-4 bg-white border-b border-gray-200 last:border-b-0"
+    >
+      <div className="flex items-start gap-3">
+        {/* Drag Handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="mt-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="w-5 h-5" />
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-gray-900 truncate">
+                {item.name}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                {item.description}
+              </p>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <div className="font-medium text-gray-900">{item.price}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-3 text-sm">
+            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+              {item.category}
+            </span>
+            <button
+              onClick={onToggleVisible}
+              className="flex items-center gap-1.5 px-2 py-1 rounded transition-colors"
+              aria-label={`Toggle visibility for ${item.name}`}
+            >
+              {item.visible ? (
+                <>
+                  <Eye className="w-4 h-4 text-green-600" />
+                  <span className="text-xs text-green-600">Visible</span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-500">Hidden</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={onEdit}
+              className="flex-1 px-3 py-2 text-sm text-brand-gold hover:text-brand-red border border-brand-gold hover:border-brand-red rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex-1 px-3 py-2 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sortable Category Component
+function SortableCategory({
+  category,
+  onEdit,
+  onDelete,
+}: {
+  category: Category;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="p-4 bg-white border-b border-gray-200 last:border-b-0"
+    >
+      <div className="flex items-center gap-3">
+        {/* Drag Handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="w-5 h-5" />
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 flex items-center justify-between">
+          <div>
+            <h3 className="font-medium text-gray-900">{category.name}</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {category.items?.length || 0} items
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={onEdit}
+              className="px-3 py-2 text-sm text-brand-gold hover:text-brand-red border border-brand-gold hover:border-brand-red rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-3 py-2 text-sm text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-600 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function MenuSectionEditor({
@@ -26,6 +228,8 @@ export function MenuSectionEditor({
   onCreateCategory,
   onUpdateCategory,
   onDeleteCategory,
+  onReorderCategories,
+  onReorderItems,
 }: MenuSectionEditorProps) {
   const [activeTab, setActiveTab] = useState("items");
   const [filteredCategory, setFilteredCategory] = useState("all");
@@ -43,6 +247,15 @@ export function MenuSectionEditor({
   const [categoryFormData, setCategoryFormData] = useState({
     name: "",
   });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+  const disabledItemSensors = useSensors();
 
   const menuItems: MenuItem[] = [];
   menuData.categories.forEach((category) => {
@@ -119,7 +332,9 @@ export function MenuSectionEditor({
       setItemModalOpen(false);
     } catch (error) {
       console.error("Error saving item:", error);
-      alert(`Failed to ${editingItem ? "update" : "add"} item. Please try again.`);
+      alert(
+        `Failed to ${editingItem ? "update" : "add"} item. Please try again.`,
+      );
     }
   };
 
@@ -157,7 +372,9 @@ export function MenuSectionEditor({
       setCategoryModalOpen(false);
     } catch (error) {
       console.error("Error saving category:", error);
-      alert(`Failed to ${editingCategory ? "update" : "add"} category. Please try again.`);
+      alert(
+        `Failed to ${editingCategory ? "update" : "add"} category. Please try again.`,
+      );
     }
   };
 
@@ -169,13 +386,63 @@ export function MenuSectionEditor({
       alert("Failed to delete category. Please try again.");
     }
   };
+  // Handle drag end for items
+  const handleItemDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    if (filteredCategory === "all") return;
+
+    const categoryId = filteredCategory;
+    const itemsInCategory = menuItems.filter((item) => item.categoryId === categoryId);
+
+    const oldIndex = itemsInCategory.findIndex((item) => item.id === active.id);
+    const newIndex = itemsInCategory.findIndex((item) => item.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedItems = arrayMove(itemsInCategory, oldIndex, newIndex);
+    const itemIds = reorderedItems.map((item) => item.id);
+
+    try {
+      await onReorderItems(categoryId, itemIds);
+    } catch (error) {
+      console.error("Error reordering items:", error);
+      alert("Failed to reorder items. Please try again.");
+    }
+  };
+
+  // Handle drag end for categories
+  const handleCategoryDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categories.findIndex((cat) => cat.id === active.id);
+    const newIndex = categories.findIndex((cat) => cat.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedCategories = arrayMove(categories, oldIndex, newIndex);
+    const categoryIds = reorderedCategories.map((cat) => cat.id);
+
+    try {
+      // ✅ Optimistic UI update (optional but recommended) then persist:
+      await onReorderCategories(categoryIds);
+    } catch (error) {
+      console.error("Error reordering categories:", error);
+      alert("Failed to reorder categories. Please try again.");
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-2 border-b border-gray-200">
+    <div className="space-y-4 md:space-y-6">
+      {/* Tabs */}
+      <div className="flex gap-1 sm:gap-2 border-b border-gray-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab("items")}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap ${
             activeTab === "items"
               ? "border-b-2 border-brand-red text-brand-red"
               : "text-gray-600 hover:text-brand-red"
@@ -185,7 +452,7 @@ export function MenuSectionEditor({
         </button>
         <button
           onClick={() => setActiveTab("categories")}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap ${
             activeTab === "categories"
               ? "border-b-2 border-brand-red text-brand-red"
               : "text-gray-600 hover:text-brand-red"
@@ -195,14 +462,16 @@ export function MenuSectionEditor({
         </button>
       </div>
 
+      {/* Menu Items Tab */}
       {activeTab === "items" && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center gap-4">
+        <div className="space-y-3 md:space-y-4">
+          {/* Filters and Add Button */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white p-3 md:p-4 rounded-lg shadow-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               <select
                 value={filteredCategory}
                 onChange={(e) => setFilteredCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                className="w-full sm:w-auto px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
               >
                 <option value="all">All Categories</option>
                 {categories.map((category) => (
@@ -211,76 +480,59 @@ export function MenuSectionEditor({
                   </option>
                 ))}
               </select>
-              <span className="text-sm text-gray-600">{visibleItemsCount} visible</span>
+              <span className="text-xs md:text-sm text-gray-600 whitespace-nowrap">
+                {visibleItemsCount} visible
+              </span>
             </div>
-            <Button onClick={handleAddItem} className="bg-brand-red hover:bg-brand-gold text-white">
+            <Button
+              onClick={handleAddItem}
+              className="w-full sm:w-auto bg-brand-red hover:bg-brand-gold text-white text-sm md:text-base"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Item
             </Button>
           </div>
 
+          {/* Items List */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            {loading ? (
-              <div className="p-8 text-center text-gray-500">Loading menu items...</div>
-            ) : filteredItems.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">No menu items found.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Description</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Visible</th>
-                      <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredItems.map((item, index) => (
-                      <tr key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{item.description}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.price}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <label className="inline-flex items-center gap-2 cursor-pointer select-none">
-                            <input
-                              type="checkbox"
-                              checked={!!item.visible}
-                              onChange={() => handleToggleVisible(item)}
-                              className="h-4 w-4 rounded border-gray-300 text-brand-red focus:ring-brand-red"
-                              aria-label={`Toggle visibility for ${item.name}`}
-                            />
-                            <span className="text-xs text-gray-600">{item.visible ? "Shown" : "Hidden"}</span>
-                          </label>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          <div className="flex justify-end gap-2">
-                            <button onClick={() => handleEditItem(item)} className="text-brand-gold hover:text-brand-red transition-colors">
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => handleDeleteItem(item.id)} className="text-gray-600 hover:text-red-600 transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <DndContext
+              sensors={filteredCategory === "all" ? disabledItemSensors : sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleItemDragEnd}
+            >
+              <SortableContext
+                items={filteredItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="divide-y divide-gray-200">
+                  {filteredItems.map((item) => (
+                    <SortableMenuItem
+                      key={item.id}
+                      item={item}
+                      disabled={filteredCategory === "all"}
+                      onEdit={() => handleEditItem(item)}
+                      onDelete={() => handleDeleteItem(item.id)}
+                      onToggleVisible={() => handleToggleVisible(item)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       )}
 
+      {/* Categories Tab */}
       {activeTab === "categories" && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-brand-red">Categories</h2>
-            <Button onClick={handleAddCategory} className="bg-brand-red hover:bg-brand-gold text-white">
+        <div className="space-y-3 md:space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+            <h2 className="text-xl md:text-2xl font-bold text-brand-red">
+              Categories
+            </h2>
+            <Button
+              onClick={handleAddCategory}
+              className="w-full sm:w-auto bg-brand-red hover:bg-brand-gold text-white text-sm md:text-base"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Category
             </Button>
@@ -288,79 +540,92 @@ export function MenuSectionEditor({
 
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {loading ? (
-              <div className="p-8 text-center text-gray-500">Loading categories...</div>
-            ) : categories.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">No categories found.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Items Count</th>
-                      <th className="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {categories.map((category, index) => (
-                      <tr key={category.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{category.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{category.items?.length || 0}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          <div className="flex justify-end gap-2">
-                            <button onClick={() => handleEditCategory(category)} className="text-brand-gold hover:text-brand-red transition-colors">
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => handleDeleteCategory(category.id)} className="text-gray-600 hover:text-red-600 transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="p-8 text-center text-gray-500">
+                Loading categories...
               </div>
+            ) : categories.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                No categories found.
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleCategoryDragEnd}
+              >
+                <SortableContext
+                  items={categories.map((cat) => cat.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="divide-y divide-gray-200">
+                    {categories.map((category) => (
+                      <SortableCategory
+                        key={category.id}
+                        category={category}
+                        onEdit={() => handleEditCategory(category)}
+                        onDelete={() => handleDeleteCategory(category.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
       )}
 
+      {/* Item Modal */}
       {itemModalOpen && (
-        <div
-          className={`fixed inset-0 bg-black/50 flex ${filteredCategory === "all" ? "items-start pt-6" : "items-center"} justify-center z-50 overflow-y-auto`}
-        >
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-brand-red mb-4">
+        <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-auto mt-2 sm:mt-6 mb-4 max-h-[92vh] overflow-y-auto">
+            <h2 className="text-xl sm:text-2xl font-bold text-brand-red mb-4">
               {editingItem ? "Edit Menu Item" : "Add Menu Item"}
             </h2>
             <form onSubmit={handleSubmitItem} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
                 <input
                   type="text"
                   value={itemFormData.name}
-                  onChange={(e) => setItemFormData({ ...itemFormData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  onChange={(e) =>
+                    setItemFormData({ ...itemFormData, name: e.target.value })
+                  }
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description *
+                </label>
                 <textarea
                   value={itemFormData.description}
-                  onChange={(e) => setItemFormData({ ...itemFormData, description: e.target.value })}
+                  onChange={(e) =>
+                    setItemFormData({
+                      ...itemFormData,
+                      description: e.target.value,
+                    })
+                  }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
+                </label>
                 <select
                   value={itemFormData.categoryId}
-                  onChange={(e) => setItemFormData({ ...itemFormData, categoryId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  onChange={(e) =>
+                    setItemFormData({
+                      ...itemFormData,
+                      categoryId: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   required
                 >
                   <option value="">Select a category</option>
@@ -372,37 +637,47 @@ export function MenuSectionEditor({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price *
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={itemFormData.price}
-                  onChange={(e) => setItemFormData({ ...itemFormData, price: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  onChange={(e) =>
+                    setItemFormData({ ...itemFormData, price: e.target.value })
+                  }
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   required
+                  inputMode="decimal"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image URL (optional)
+                </label>
                 <input
                   type="url"
                   value={itemFormData.image}
-                  onChange={(e) => setItemFormData({ ...itemFormData, image: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  onChange={(e) =>
+                    setItemFormData({ ...itemFormData, image: e.target.value })
+                  }
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  inputMode="url"
                 />
               </div>
-              <div className="flex gap-3 justify-end pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-4">
                 <button
                   type="button"
                   onClick={() => setItemModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-red hover:bg-brand-gold text-white rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-brand-red hover:bg-brand-gold text-white rounded-lg transition-colors font-medium"
                 >
                   {editingItem ? "Update" : "Add"} Item
                 </button>
@@ -412,34 +687,42 @@ export function MenuSectionEditor({
         </div>
       )}
 
+      {/* Category Modal */}
       {categoryModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-brand-red mb-4">
+        <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-auto mt-2 sm:mt-6 mb-4 max-h-[92vh] overflow-y-auto">
+            <h2 className="text-xl sm:text-2xl font-bold text-brand-red mb-4">
               {editingCategory ? "Edit Category" : "Add Category"}
             </h2>
             <form onSubmit={handleSubmitCategory} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category Name *
+                </label>
                 <input
                   type="text"
                   value={categoryFormData.name}
-                  onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                  onChange={(e) =>
+                    setCategoryFormData({
+                      ...categoryFormData,
+                      name: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
                   required
                 />
               </div>
-              <div className="flex gap-3 justify-end pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-4">
                 <button
                   type="button"
                   onClick={() => setCategoryModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-red hover:bg-brand-gold text-white rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-brand-red hover:bg-brand-gold text-white rounded-lg transition-colors font-medium"
                 >
                   {editingCategory ? "Update" : "Add"} Category
                 </button>

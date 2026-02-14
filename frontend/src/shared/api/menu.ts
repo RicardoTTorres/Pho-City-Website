@@ -111,3 +111,25 @@ export async function deleteCategory(id: string): Promise<void> {
   });
   if (!res.ok) throw new Error("Failed to delete category");
 }
+
+export async function reorderCategories(categoryIds: string[]): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/reorder`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ categoryIds }),
+  });
+
+  if (!res.ok) throw new Error("Failed to reorder categories");
+}
+
+export async function reorderItems(categoryId: string, itemIds: string[]): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/${categoryId}/items/reorder`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ itemIds }),
+  });
+
+  if (!res.ok) throw new Error("Failed to reorder items");
+}
