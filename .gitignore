@@ -4,3 +4,4 @@ node_modules
 
 frontend/src/global.d.ts
 git checkout main
+.vscode/settings.json
