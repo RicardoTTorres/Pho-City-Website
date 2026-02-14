@@ -98,7 +98,58 @@ export interface AdminUser {
   role: string;
   created_at: string;
 }
+export type LocalizedString = {
+  en: string;
+  [locale: string]: string;
+};
 
+export type NavbarCta = {
+  enabled: boolean;
+  label: LocalizedString;
+  href: string;
+};
+
+export type NavbarCtas = {
+  pickup: NavbarCta;
+  delivery: NavbarCta;
+};
+
+
+export type NavbarLink = {
+  id: string;
+  label: string | { en: string; [locale: string]: string };
+  href: string;
+  type: "internal" | "external";
+  order: number;
+  enabled: boolean;
+  rolesAllowed?: string[];
+};
+
+export type NavbarBrand = {
+  name: string;
+  logo: string;
+};
+
+export type NavbarData = {
+  version?: number;
+  i18n?: {
+    enabled: boolean;
+    defaultLocale: string;
+    supportedLocales: string[];
+  };
+  brand?: {
+    name: string;
+    logo: string;
+  };
+  links: NavbarLink[];
+  ctas?: NavbarCtas;
+  updatedAt?: string | null;
+  updatedBy?: number | null;
+};
+
+
+
+export type Navbar = NavbarData;
 export type FooterData = RestaurantContent["footer"];
 export type Footer = FooterData;
 

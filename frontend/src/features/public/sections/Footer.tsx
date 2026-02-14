@@ -91,7 +91,7 @@ export const Footer = memo(function Footer(): ReactElement {
         </div>
 
         <div className="mt-6 text-center text-xs text-[var(--muted-foreground)]">
-          © {year} {brand?.name ?? ""}. All rights reserved.
+          © {year} Pho City. All rights reserved.
         </div>
       </div>
     </footer>
