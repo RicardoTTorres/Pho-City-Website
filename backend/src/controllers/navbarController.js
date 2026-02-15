@@ -1,4 +1,6 @@
+// src/controllers/navbarController.js
 import { fetchNavbar, saveNavbar } from "../services/navbarService.js";
+import { logActivity } from "./activityController.js";
 
 function defaultI18n() {
   return { enabled: false, defaultLocale: "en", supportedLocales: ["en"] };
@@ -113,6 +115,12 @@ export async function updateNavbar(req, res) {
     };
 
     const saved = await saveNavbar(updatedNavbar);
+    logActivity(
+      "updated",
+      "navbar",
+      "Updated navbar configuration",
+      req.user?.email,
+    );
 
     return res.status(200).json({ success: true, data: saved });
   } catch (err) {

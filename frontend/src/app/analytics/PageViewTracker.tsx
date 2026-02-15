@@ -1,3 +1,4 @@
+// src/app/analytics/PageViewTracker.tsx
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { postTraffic } from "@/shared/api/traffic";
@@ -14,8 +15,12 @@ export function PageViewTracker() {
     lastPath.current = location.pathname;
 
     const send = async () => {
-        if (location.pathname.startsWith("/cms") || location.pathname.startsWith("/adminLogin")) return;
-        await postTraffic(location.pathname);
+      if (
+        location.pathname.startsWith("/cms") ||
+        location.pathname.startsWith("/adminLogin")
+      )
+        return;
+      await postTraffic(location.pathname);
     };
     send();
   }, [location.pathname]);

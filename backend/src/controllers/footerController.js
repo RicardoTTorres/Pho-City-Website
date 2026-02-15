@@ -1,5 +1,6 @@
-
+// src/controllers/footerController.js
 import { pool } from "../db/connect_db.js";
+import { logActivity } from "./activityController.js";
 
 export async function getFooter(req, res) {
   try {
@@ -25,7 +26,6 @@ export async function getFooter(req, res) {
   }
 }
 
-
 export async function putFooter(req, res) {
   try {
     const { footer } = req.body;
@@ -40,10 +40,15 @@ export async function putFooter(req, res) {
       [JSON.stringify(footer)],
     );
 
+    logActivity(
+      "updated",
+      "footer",
+      "Updated footer configuration",
+      req.user?.email,
+    );
     return res.json({ ok: true, footer });
   } catch (err) {
     console.error("putFooter error:", err);
     return res.status(500).json({ error: "Failed to update footer" });
   }
 }
-

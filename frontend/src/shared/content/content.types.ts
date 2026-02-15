@@ -1,4 +1,4 @@
-// src/content/content.types.ts
+// src/shared/content/content.types.ts
 
 export type HeroAPI = {
   id: number | string;

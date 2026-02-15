@@ -1,4 +1,4 @@
-// src/sections/Navbar.tsx
+// src/features/public/sections/Navbar.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 import { Button } from "@/shared/components/ui/button";

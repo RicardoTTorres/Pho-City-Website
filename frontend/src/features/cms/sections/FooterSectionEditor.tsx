@@ -234,7 +234,7 @@ export default function FooterSectionEditor({
 
   return (
     <div className="space-y-8 p-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal">
           <div className="bg-brand-red rounded-lg p-1.5 flex items-center justify-center">
             <Footprints className="w-3.5 h-3.5 text-white" />
@@ -245,7 +245,7 @@ export default function FooterSectionEditor({
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-red hover:bg-brand-red-hover text-white disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-red hover:bg-brand-red-hover text-white disabled:opacity-50 self-start sm:self-auto"
           type="button"
         >
           <Save size={18} />
@@ -292,30 +292,34 @@ export default function FooterSectionEditor({
               key={index}
               className="bg-white/70 rounded-xl p-4 border shadow-sm flex flex-col gap-3"
             >
-              <div className="flex items-center gap-2 text-gray-600">
-                <GripVertical className="cursor-grab" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <GripVertical className="cursor-grab shrink-0" />
 
-                <Input
-                  value={link.label}
-                  placeholder="Label (e.g. Hours, Careers)"
-                  className="flex-1"
-                  onChange={(e) => updateNav(index, "label", e.target.value)}
-                />
+                  <Input
+                    value={link.label}
+                    placeholder="Label (e.g. Hours, Careers)"
+                    className="flex-1 min-w-0"
+                    onChange={(e) => updateNav(index, "label", e.target.value)}
+                  />
+                </div>
 
-                <Input
-                  value={link.path}
-                  placeholder="/path or https://"
-                  className="flex-1"
-                  onChange={(e) => updateNav(index, "path", e.target.value)}
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={link.path}
+                    placeholder="/path or https://"
+                    className="flex-1 min-w-0"
+                    onChange={(e) => updateNav(index, "path", e.target.value)}
+                  />
 
-                <button
-                  onClick={() => removeNavLink(index)}
-                  className="p-2 text-gray-500 hover:text-red-500"
-                  aria-label="Remove nav link"
-                >
-                  <Trash2 size={18} />
-                </button>
+                  <button
+                    onClick={() => removeNavLink(index)}
+                    className="p-2 text-gray-500 hover:text-red-500 shrink-0"
+                    aria-label="Remove nav link"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex gap-2 ml-8">

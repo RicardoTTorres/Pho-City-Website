@@ -1,3 +1,4 @@
+// src/features/cms/pages/MenuPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSectionEditor } from "@/features/cms/sections/MenuSectionEditor";

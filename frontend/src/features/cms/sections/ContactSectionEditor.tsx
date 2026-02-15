@@ -1,3 +1,4 @@
+// src/features/cms/sections/ContactSectionEditor.tsx
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { MapPin, Phone, Mail, Clock, Mailbox } from "lucide-react";
@@ -20,7 +21,7 @@ type ContactInfo = {
   businessHours: BusinessHour[];
 };
 
-const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
 const DAYS_OF_WEEK = [
   "Monday",
   "Tuesday",
@@ -160,7 +161,12 @@ export function ContactSectionEditor() {
     );
   }
 
-  const addressLine = [contact.address, contact.city, contact.state, contact.zipcode]
+  const addressLine = [
+    contact.address,
+    contact.city,
+    contact.state,
+    contact.zipcode,
+  ]
     .filter(Boolean)
     .join(", ");
 
@@ -248,7 +254,7 @@ export function ContactSectionEditor() {
 
         <div>
           <span className="text-gray-700 font-semibold">Hours</span>
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
             {DAYS_OF_WEEK.map((day) => {
               const row = contact.businessHours.find((h) => h.day === day);
               return (

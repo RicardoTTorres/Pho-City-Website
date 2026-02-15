@@ -1,3 +1,4 @@
+// src/features/cms/pages/UsersPage.tsx
 import { useState } from "react";
 import { mockUsers, type MockUser } from "@/shared/data/mockUsers";
 import { Trash, Users as UsersIcon, X } from "lucide-react";
@@ -24,7 +25,7 @@ export default function UsersPage() {
       email: form.email,
       role: form.role,
     };
-    
+
     console.log("Create user:", newUser);
     setUsers((prev) => [...prev, newUser]);
     setOpen(false);
@@ -55,10 +56,18 @@ export default function UsersPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -100,7 +109,9 @@ export default function UsersPage() {
                 <h3 className="font-medium text-gray-800">{u.name}</h3>
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                    u.role === "Admin" ? "bg-brand-red text-white" : "bg-brand-gold text-white"
+                    u.role === "Admin"
+                      ? "bg-brand-red text-white"
+                      : "bg-brand-gold text-white"
                   }`}
                 >
                   {u.role}
@@ -124,10 +135,15 @@ export default function UsersPage() {
       {/*Modal*/}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpen(false)}
+          />
           <div className="relative bg-white rounded-xl shadow-lg border w-full max-w-md mx-4 p-6 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Add New User</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Add New User
+              </h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -140,11 +156,15 @@ export default function UsersPage() {
 
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, name: e.target.value }))
+                  }
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
                   placeholder="Jane Doe"
                   required
@@ -152,11 +172,15 @@ export default function UsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
                 <input
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, email: e.target.value }))
+                  }
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
                   placeholder="user@example.com"
                   required
@@ -164,11 +188,15 @@ export default function UsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
                 <input
                   type="password"
                   value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, password: e.target.value }))
+                  }
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
                   placeholder="••••••••"
                   required
@@ -176,10 +204,17 @@ export default function UsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
+                </label>
                 <select
                   value={form.role}
-                  onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as MockUser["role"] }))}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      role: e.target.value as MockUser["role"],
+                    }))
+                  }
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
                 >
                   <option value="Admin">Admin</option>

@@ -1,3 +1,4 @@
+// src/routes/heroRoutes.js
 import express from "express";
 import { getHero, updateHero } from "../controllers/heroController.js";
 import { requireAuth } from "../middleware/requireAuth.js";

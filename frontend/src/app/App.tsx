@@ -1,7 +1,7 @@
-
+// src/app/App.tsx
 import { Navbar } from "@/features/public/sections/Navbar";
 import { Footer } from "@/features/public/sections/Footer";
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import Home from "@/features/public/pages/Home";
 import About from "@/features/public/pages/About";
 import Contact from "@/features/public/pages/Contact";
@@ -12,7 +12,6 @@ import DashboardPage from "@/features/cms/pages/DashboardPage";
 import MenuPage from "@/features/cms/pages/MenuPage";
 import ContentPage from "@/features/cms/pages/ContentPage";
 import MediaPage from "@/features/cms/pages/MediaPage";
-import SettingsPage from "@/features/cms/pages/SettingsPage";
 import UsersPage from "@/features/cms/pages/UsersPage";
 import RegisterAdminPage from "@/features/cms/pages/RegisterAdminPage";
 
@@ -37,14 +36,13 @@ export default function App() {
         <Route path="menu" element={<MenuPage />} />
         <Route path="content" element={<ContentPage />} />
         <Route path="media" element={<MediaPage />} />
-        <Route path="settings" element={<SettingsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="registeradmin" element={<RegisterAdminPage />} />
       </Route>
 
       {/* Legacy route redirect */}
       <Route
-        path="/adminpage*"
+        path="/adminpage/*"
         element={<Navigate to="/cms/dashboard" replace />}
       />
     </Routes>

@@ -1,3 +1,4 @@
+// src/server.js
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -13,6 +14,7 @@ import aboutRoutes from "./routes/aboutRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import heroRoutes from "./routes/heroRoutes.js";
 import adminUsersRoutes from "./routes/adminUsersRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 
 const app = express();
@@ -46,6 +48,7 @@ app.use("/api/admin/contact", adminContactRoutes);
 app.use("/api/admin/analytics", requireAuth, analyticsRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/adminUsers", adminUsersRoutes);
+app.use("/api/admin", activityRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/hero", heroRoutes);

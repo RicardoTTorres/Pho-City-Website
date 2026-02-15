@@ -1,3 +1,4 @@
+// src/features/cms/sections/MenuSectionEditor.tsx
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Pencil, Trash2, Plus, Eye, EyeOff, GripVertical } from "lucide-react";
@@ -395,7 +396,9 @@ export function MenuSectionEditor({
     if (filteredCategory === "all") return;
 
     const categoryId = filteredCategory;
-    const itemsInCategory = menuItems.filter((item) => item.categoryId === categoryId);
+    const itemsInCategory = menuItems.filter(
+      (item) => item.categoryId === categoryId,
+    );
 
     const oldIndex = itemsInCategory.findIndex((item) => item.id === active.id);
     const newIndex = itemsInCategory.findIndex((item) => item.id === over.id);
@@ -496,7 +499,9 @@ export function MenuSectionEditor({
           {/* Items List */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <DndContext
-              sensors={filteredCategory === "all" ? disabledItemSensors : sensors}
+              sensors={
+                filteredCategory === "all" ? disabledItemSensors : sensors
+              }
               collisionDetection={closestCenter}
               onDragEnd={handleItemDragEnd}
             >

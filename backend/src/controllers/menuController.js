@@ -1,4 +1,6 @@
+// src/controllers/menuController.js
 import { pool } from "../db/connect_db.js";
+import { logActivity } from "./activityController.js";
 
 export async function getMenu(req, res) {
   try {
@@ -124,6 +126,12 @@ export async function addCategory(req, res) {
     // respond with new category id
     if (result.insertId === undefined)
       throw new Error("MySQL insert statement did not include id");
+    logActivity(
+      "created",
+      "menu_category",
+      `Created category '${name}'`,
+      req.user?.email,
+    );
     res.status(201).json({ id: String(result.insertId) });
   } catch (err) {
     console.error("Error in menu/addCategory:", err);
@@ -157,6 +165,12 @@ export async function editCategory(req, res) {
       return;
     }
 
+    logActivity(
+      "updated",
+      "menu_category",
+      `Renamed category to '${name}'`,
+      req.user?.email,
+    );
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error("Error in menu/editCategory:", err);
@@ -183,6 +197,12 @@ export async function deleteCategory(req, res) {
       return;
     }
 
+    logActivity(
+      "deleted",
+      "menu_category",
+      `Deleted a menu category`,
+      req.user?.email,
+    );
     res.status(204).send();
   } catch (err) {
     console.error("Error in menu/deleteCategory:", err);
@@ -246,6 +266,12 @@ export async function addItem(req, res) {
     // respond with new item id
     if (result.insertId === undefined)
       throw new Error("MySQL insert statement did not include id");
+    logActivity(
+      "created",
+      "menu_item",
+      `Added menu item '${item_name}'`,
+      req.user?.email,
+    );
     res.status(201).json({ id: String(result.insertId) });
   } catch (err) {
     console.error("Error in menu/addItem:", err);
@@ -305,6 +331,12 @@ export async function editItem(req, res) {
       return;
     }
 
+    logActivity(
+      "updated",
+      "menu_item",
+      `Updated menu item #${id}`,
+      req.user?.email,
+    );
     res.status(200).json({ ok: true });
   } catch (err) {
     console.error("Error in menu/editItem:", err);
@@ -331,6 +363,12 @@ export async function deleteItem(req, res) {
       return;
     }
 
+    logActivity(
+      "deleted",
+      "menu_item",
+      `Deleted menu item #${id}`,
+      req.user?.email,
+    );
     res.status(204).send();
   } catch (err) {
     console.error("Error in menu/deleteItem:", err);
@@ -407,6 +445,12 @@ export async function reorderCategories(req, res) {
     );
 
     await conn.commit();
+    logActivity(
+      "updated",
+      "menu_category",
+      "Reordered menu categories",
+      req.user?.email,
+    );
     return res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
@@ -494,6 +538,12 @@ export async function reorderCategoryItems(req, res) {
     );
 
     await conn.commit();
+    logActivity(
+      "updated",
+      "menu_item",
+      "Reordered items in a category",
+      req.user?.email,
+    );
     return res.json({ ok: true });
   } catch (err) {
     await conn.rollback();

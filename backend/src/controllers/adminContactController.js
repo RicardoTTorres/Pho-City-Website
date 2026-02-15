@@ -1,4 +1,6 @@
+// src/controllers/adminContactController.js
 import { pool } from '../db/connect_db.js';
+import { logActivity } from './activityController.js';
 
 export async function getContactInfo(req, res) {
   try {
@@ -103,6 +105,7 @@ export async function updateContactInfo(req, res) {
       );
     }
 
+    logActivity("updated", "contact", "Updated contact info & hours", req.user?.email);
     res.status(200).json({
       message: 'Contact information updated successfully.'
     });

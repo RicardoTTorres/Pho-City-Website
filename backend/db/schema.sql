@@ -74,6 +74,16 @@ CREATE TABLE IF NOT EXISTS `site_settings` (
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `activity_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `action` VARCHAR(20) NOT NULL,
+  `section` VARCHAR(50) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `admin_email` VARCHAR(255) DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_activity_created` (`created_at` DESC)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `traffic_dates` (
   `date` DATE NOT NULL,
   `date_views` INT NOT NULL,

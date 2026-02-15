@@ -1,3 +1,4 @@
+// src/shared/api/footer.ts
 import type { FooterData } from "@/shared/content/content.types";
 
 const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");

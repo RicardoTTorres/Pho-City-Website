@@ -1,3 +1,5 @@
+// src/routes/navbarRoutes.js
+
 import express from "express";
 import { getNavbar, updateNavbar } from "../controllers/navbarController.js";
 import { requireAuth } from "../middleware/requireAuth.js";

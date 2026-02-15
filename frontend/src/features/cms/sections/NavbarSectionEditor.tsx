@@ -1,3 +1,4 @@
+// src/features/cms/sections/NavbarSectionEditor.tsx
 import { useEffect, useMemo, useState, useRef } from "react";
 import {
   Eye,
@@ -218,7 +219,7 @@ export function NavbarSectionEditor() {
 
   return (
     <div className="space-y-8 p-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal">
           <div className="bg-brand-red rounded-lg p-1.5 flex items-center justify-center">
             <Navigation className="w-3.5 h-3.5 text-white" />
@@ -229,7 +230,7 @@ export function NavbarSectionEditor() {
         <button
           onClick={onSave}
           disabled={loading || saving}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-red hover:bg-brand-red-hover text-white disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-red hover:bg-brand-red-hover text-white disabled:opacity-50 self-start sm:self-auto"
           type="button"
         >
           <Save size={18} className={saving ? "animate-spin" : ""} />
@@ -279,59 +280,63 @@ export function NavbarSectionEditor() {
                 key={link.id}
                 className="bg-white/70 rounded-xl p-4 border shadow-sm flex flex-col gap-3"
               >
-                <div className="flex items-center gap-2 text-gray-600">
-                  <GripVertical className="cursor-grab" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="cursor-grab shrink-0" />
 
-                  <input
-                    value={labelToString(link.label)}
-                    placeholder="Label (e.g., Home)"
-                    className="flex-1 border rounded p-2"
-                    onChange={(e) =>
-                      updateLink(link.id, { label: e.target.value })
-                    }
-                  />
+                    <input
+                      value={labelToString(link.label)}
+                      placeholder="Label (e.g., Home)"
+                      className="flex-1 border rounded p-2 min-w-0"
+                      onChange={(e) =>
+                        updateLink(link.id, { label: e.target.value })
+                      }
+                    />
+                  </div>
 
                   <input
                     value={link.href}
                     placeholder="/menu or https://..."
-                    className="flex-1 border rounded p-2"
+                    className="flex-1 border rounded p-2 min-w-0"
                     onChange={(e) =>
                       updateLink(link.id, { href: e.target.value })
                     }
                   />
 
-                  <select
-                    className="border rounded p-2"
-                    value={link.type}
-                    onChange={(e) =>
-                      updateLink(link.id, {
-                        type: e.target.value as "internal" | "external",
-                      })
-                    }
-                  >
-                    <option value="internal">internal</option>
-                    <option value="external">external</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      className="border rounded p-2 flex-1 sm:flex-none"
+                      value={link.type}
+                      onChange={(e) =>
+                        updateLink(link.id, {
+                          type: e.target.value as "internal" | "external",
+                        })
+                      }
+                    >
+                      <option value="internal">internal</option>
+                      <option value="external">external</option>
+                    </select>
 
-                  <button
-                    onClick={() =>
-                      updateLink(link.id, { enabled: !link.enabled })
-                    }
-                    className="p-2 text-gray-600 hover:text-brand-red"
-                    type="button"
-                    title={link.enabled ? "Disable" : "Enable"}
-                  >
-                    {link.enabled ? <Eye size={18} /> : <EyeOff size={18} />}
-                  </button>
+                    <button
+                      onClick={() =>
+                        updateLink(link.id, { enabled: !link.enabled })
+                      }
+                      className="p-2 text-gray-600 hover:text-brand-red"
+                      type="button"
+                      title={link.enabled ? "Disable" : "Enable"}
+                    >
+                      {link.enabled ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </button>
 
-                  <button
-                    onClick={() => removeLink(link.id)}
-                    className="p-2 text-gray-500 hover:text-red-500"
-                    type="button"
-                    title="Delete"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                    <button
+                      onClick={() => removeLink(link.id)}
+                      className="p-2 text-gray-500 hover:text-red-500"
+                      type="button"
+                      title="Delete"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Move Up / Move Down buttons */}

@@ -1,3 +1,4 @@
+// src/middleware/requireAuth.js
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 
