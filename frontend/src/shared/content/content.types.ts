@@ -25,6 +25,8 @@ export interface MenuItem {
   price: string | number;
   image?: string;
   visible?: boolean;
+  featured?: boolean;
+  featuredPosition?: number | null;
 }
 
 export interface MenuCategory {

@@ -67,6 +67,7 @@ export async function getAdminMenu(req, res) {
         item_image_url AS image,
         item_is_visible AS visible,
         is_featured AS featured,
+        featured_position AS featuredPosition,
         category_id
       FROM menu_items
       ORDER BY category_id ASC, position ASC, item_id ASC;
@@ -86,6 +87,7 @@ export async function getAdminMenu(req, res) {
           image: i.image,
           visible: Boolean(i.visible),
           featured: Boolean(i.featured),
+          featuredPosition: i.featuredPosition ?? null,
           categoryId: i.category_id,
         })),
     }));
@@ -220,6 +222,7 @@ export async function addItem(req, res) {
       image: item_image_url,
       visible: item_is_visible,
       featured: is_featured,
+      featuredPosition: featured_position,
       category: category_id,
     } = req.body;
 
@@ -240,6 +243,9 @@ export async function addItem(req, res) {
     );
     const nextPos = Number(maxRow.maxPos) + 1;
 
+    // Clear featured_position when not featured
+    const resolvedFeaturedPosition = is_featured ? featured_position : null;
+
     // remove undefined keys so query will not attempt to set their values to undefined
     const entries = removeUndefined({
       item_name,
@@ -248,6 +254,7 @@ export async function addItem(req, res) {
       item_image_url,
       item_is_visible,
       is_featured,
+      featured_position: resolvedFeaturedPosition,
       category_id,
       position: nextPos,
     });
@@ -294,8 +301,13 @@ export async function editItem(req, res) {
       image: item_image_url,
       visible: item_is_visible,
       featured: is_featured,
+      featuredPosition: featured_position,
       category: category_id,
     } = req.body;
+
+    // Clear featured_position when unfeaturing an item
+    const resolvedFeaturedPosition =
+      is_featured === false || is_featured === 0 ? null : featured_position;
 
     // remove undefined keys so query will only edit provided keys
     const entries = removeUndefined({
@@ -305,6 +317,7 @@ export async function editItem(req, res) {
       item_image_url,
       item_is_visible,
       is_featured,
+      featured_position: resolvedFeaturedPosition,
       category_id,
     });
     const keys = Object.keys(entries);
@@ -551,6 +564,38 @@ export async function reorderCategoryItems(req, res) {
     return res.status(500).json({ error: "Failed to reorder items" });
   } finally {
     conn.release();
+  }
+}
+
+export async function getFeaturedItems(req, res) {
+  try {
+    const [items] = await pool.query(`
+      SELECT
+        item_id AS id,
+        item_name AS name,
+        item_description AS description,
+        item_price AS price,
+        item_image_url AS image,
+        featured_position AS featuredPosition
+      FROM menu_items
+      WHERE is_featured = 1 AND item_is_visible = 1
+      ORDER BY featured_position ASC
+      LIMIT 4;
+    `);
+
+    const formatted = items.map((i) => ({
+      id: String(i.id),
+      name: i.name,
+      description: i.description,
+      price: `$${Number(i.price).toFixed(2)}`,
+      image: i.image ? `/imgs/${i.image}` : null,
+      featuredPosition: i.featuredPosition,
+    }));
+
+    res.json({ items: formatted });
+  } catch (err) {
+    console.error("Featured items fetch error:", err);
+    res.status(500).json({ error: "Error fetching featured items" });
   }
 }
 

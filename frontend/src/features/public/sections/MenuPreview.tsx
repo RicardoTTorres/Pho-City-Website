@@ -1,5 +1,5 @@
 // src/features/public/sections/MenuPreview.tsx
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Card,
@@ -7,14 +7,18 @@ import {
   CardTitle,
   CardDescription,
 } from "@/shared/components/ui/card";
-import { menuConfig } from "@/shared/config/menu.config";
+import { getFeaturedItems, type FeaturedItem } from "@/shared/api/menu";
 
-export default function MenuPreview(): React.JSX.Element {
-  const phoCategory = menuConfig.categories.find((cat) =>
-    cat.name.includes("Pho"),
-  );
-  const featured = phoCategory ? phoCategory.items.slice(0, 4) : [];
-  //Animation applied inline on motion.div
+export default function MenuPreview() {
+  const [featured, setFeatured] = useState<FeaturedItem[]>([]);
+
+  useEffect(() => {
+    getFeaturedItems()
+      .then(setFeatured)
+      .catch((err) => console.error("Failed to load featured items:", err));
+  }, []);
+
+  if (featured.length === 0) return null;
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
@@ -55,7 +59,7 @@ export default function MenuPreview(): React.JSX.Element {
         {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {featured.map((dish) => (
-            <li key={dish.name}>
+            <li key={dish.id}>
               <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out border border-gray-100">
                 {/*Image*/}
 

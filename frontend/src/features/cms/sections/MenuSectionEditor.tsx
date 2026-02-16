@@ -1,7 +1,15 @@
 // src/features/cms/sections/MenuSectionEditor.tsx
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { Pencil, Trash2, Plus, Eye, EyeOff, GripVertical } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Eye,
+  EyeOff,
+  GripVertical,
+  Star,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -47,12 +55,16 @@ function SortableMenuItem({
   onEdit,
   onDelete,
   onToggleVisible,
+  onToggleFeatured,
+  onChangeFeaturedPosition,
 }: {
   item: MenuItem;
   disabled?: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onToggleVisible: () => void;
+  onToggleFeatured: () => void;
+  onChangeFeaturedPosition: (position: number) => void;
 }) {
   const {
     attributes,
@@ -106,23 +118,62 @@ function SortableMenuItem({
             <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
               {item.category}
             </span>
-            <button
-              onClick={onToggleVisible}
-              className="flex items-center gap-1.5 px-2 py-1 rounded transition-colors"
-              aria-label={`Toggle visibility for ${item.name}`}
-            >
-              {item.visible ? (
-                <>
-                  <Eye className="w-4 h-4 text-green-600" />
-                  <span className="text-xs text-green-600">Visible</span>
-                </>
-              ) : (
-                <>
-                  <EyeOff className="w-4 h-4 text-gray-400" />
-                  <span className="text-xs text-gray-500">Hidden</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Featured toggle */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={onToggleFeatured}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded transition-colors"
+                  aria-label={`Toggle featured for ${item.name}`}
+                >
+                  <Star
+                    className={`w-4 h-4 ${item.featured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`}
+                  />
+                  <span
+                    className={`text-xs ${item.featured ? "text-yellow-600" : "text-gray-500"}`}
+                  >
+                    {item.featured ? "Featured" : "Feature"}
+                  </span>
+                </button>
+                {item.featured && (
+                  <select
+                    value={item.featuredPosition ?? ""}
+                    onChange={(e) =>
+                      onChangeFeaturedPosition(Number(e.target.value))
+                    }
+                    className="px-1.5 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-brand-red"
+                    aria-label={`Featured position for ${item.name}`}
+                  >
+                    <option value="" disabled>
+                      Pos
+                    </option>
+                    {[1, 2, 3, 4].map((n) => (
+                      <option key={n} value={n}>
+                        #{n}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              {/* Visibility toggle */}
+              <button
+                onClick={onToggleVisible}
+                className="flex items-center gap-1.5 px-2 py-1 rounded transition-colors"
+                aria-label={`Toggle visibility for ${item.name}`}
+              >
+                {item.visible ? (
+                  <>
+                    <Eye className="w-4 h-4 text-green-600" />
+                    <span className="text-xs text-green-600">Visible</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs text-gray-500">Hidden</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-2 mt-3">
@@ -302,6 +353,9 @@ export function MenuSectionEditor({
     setItemModalOpen(true);
   };
 
+  // Count total featured items across all categories
+  const featuredCount = menuItems.filter((item) => item.featured).length;
+
   const handleToggleVisible = async (item: MenuItem) => {
     try {
       await onUpdateItem(item.id, {
@@ -311,10 +365,58 @@ export function MenuSectionEditor({
         categoryId: item.categoryId,
         image: item.image || "",
         visible: !item.visible,
+        featured: item.featured,
+        featuredPosition: item.featuredPosition,
       });
     } catch (error) {
       console.error("Error updating visibility:", error);
       alert("Failed to update visibility. Please try again.");
+    }
+  };
+
+  const handleToggleFeatured = async (item: MenuItem) => {
+    const willFeature = !item.featured;
+    if (willFeature && featuredCount >= 4) {
+      alert(
+        "Maximum of 4 featured items allowed. Unfeature another item first.",
+      );
+      return;
+    }
+    try {
+      await onUpdateItem(item.id, {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        categoryId: item.categoryId,
+        image: item.image || "",
+        visible: item.visible,
+        featured: willFeature,
+        featuredPosition: willFeature ? item.featuredPosition : null,
+      });
+    } catch (error) {
+      console.error("Error updating featured:", error);
+      alert("Failed to update featured status. Please try again.");
+    }
+  };
+
+  const handleChangeFeaturedPosition = async (
+    item: MenuItem,
+    position: number,
+  ) => {
+    try {
+      await onUpdateItem(item.id, {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        categoryId: item.categoryId,
+        image: item.image || "",
+        visible: item.visible,
+        featured: item.featured,
+        featuredPosition: position,
+      });
+    } catch (error) {
+      console.error("Error updating featured position:", error);
+      alert("Failed to update featured position. Please try again.");
     }
   };
 
@@ -324,6 +426,8 @@ export function MenuSectionEditor({
       const payload: NewItemPayload = {
         ...itemFormData,
         visible: editingItem?.visible ?? true,
+        featured: editingItem?.featured ?? false,
+        featuredPosition: editingItem?.featuredPosition ?? null,
       };
       if (editingItem) {
         await onUpdateItem(editingItem.id, payload);
@@ -431,7 +535,6 @@ export function MenuSectionEditor({
     const categoryIds = reorderedCategories.map((cat) => cat.id);
 
     try {
-      // ✅ Optimistic UI update (optional but recommended) then persist:
       await onReorderCategories(categoryIds);
     } catch (error) {
       console.error("Error reordering categories:", error);
@@ -518,6 +621,10 @@ export function MenuSectionEditor({
                       onEdit={() => handleEditItem(item)}
                       onDelete={() => handleDeleteItem(item.id)}
                       onToggleVisible={() => handleToggleVisible(item)}
+                      onToggleFeatured={() => handleToggleFeatured(item)}
+                      onChangeFeaturedPosition={(pos) =>
+                        handleChangeFeaturedPosition(item, pos)
+                      }
                     />
                   ))}
                 </div>

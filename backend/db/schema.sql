@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `menu_items` (
   `item_is_visible` TINYINT(1) DEFAULT '1',
   `category_id` INT DEFAULT NULL,
   `is_featured` TINYINT(1) DEFAULT '0',
+  `featured_position` TINYINT DEFAULT NULL,
   PRIMARY KEY (`item_id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `menu_items_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `menu_categories` (`category_id`) ON DELETE CASCADE

@@ -1,4 +1,5 @@
 // src/features/public/components/MenuPdfDocument.tsx
+import React from "react";
 import {
   Document,
   Page,
@@ -6,9 +7,19 @@ import {
   View,
   Image,
   StyleSheet,
+  Font,
 } from "@react-pdf/renderer";
 import { parseBilingualName } from "@/utils/menuHelper";
 import type { MenuCategory, Weekday } from "@/shared/content/content.types";
+
+Font.register({
+  family: "NotoSans",
+  fonts: [
+    { src: "/fonts/NotoSans-Regular.ttf", fontWeight: "normal" },
+    { src: "/fonts/NotoSans-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/NotoSans-Italic.ttf", fontStyle: "italic" },
+  ],
+});
 
 const BRAND = {
   red: "#A31D24",
@@ -43,10 +54,10 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 60,
     paddingHorizontal: 40,
-    fontFamily: "Helvetica",
+    fontFamily: "NotoSans",
     color: BRAND.charcoal,
   },
-  // Header
+
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -62,13 +73,15 @@ const styles = StyleSheet.create({
   },
   brandName: {
     fontSize: 22,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     color: BRAND.red,
   },
   subtitle: {
     fontSize: 10,
     color: BRAND.gold,
-    fontFamily: "Helvetica-Oblique",
+    fontFamily: "NotoSans",
+    fontStyle: "italic",
     marginTop: 2,
   },
   divider: {
@@ -76,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: BRAND.gold,
     marginVertical: 8,
   },
-  // Contact bar
+
   contactBar: {
     flexDirection: "row",
     justifyContent: "center",
@@ -87,13 +100,14 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: BRAND.charcoal,
   },
-  // Hours
+
   hoursSection: {
     marginBottom: 12,
   },
   hoursTitle: {
     fontSize: 10,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     color: BRAND.red,
     textAlign: "center",
     marginBottom: 4,
@@ -110,56 +124,78 @@ const styles = StyleSheet.create({
     fontSize: 8,
   },
   hoursDay: {
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     width: 28,
   },
   hoursTime: {
     flex: 1,
   },
-  // Menu
+
   categoryHeader: {
     fontSize: 14,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     color: BRAND.red,
-    marginTop: 14,
-    marginBottom: 6,
+    marginTop: 10,
+    marginBottom: 4,
     paddingBottom: 3,
     borderBottomWidth: 1,
     borderBottomColor: BRAND.gold,
   },
+
   itemRow: {
-    marginBottom: 8,
     paddingLeft: 4,
+    marginBottom: 4,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "stretch",
+    flexGrow: 0,
+    flexShrink: 0,
   },
+
   itemNameRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
+    flexGrow: 0,
+    flexShrink: 0,
   },
   itemEnglish: {
     fontSize: 10,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     color: BRAND.charcoal,
     flex: 1,
   },
   itemPrice: {
     fontSize: 10,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "NotoSans",
+    fontWeight: "bold",
     color: BRAND.red,
     marginLeft: 8,
   },
+
   itemVietnamese: {
     fontSize: 8,
-    fontFamily: "Helvetica-Oblique",
+    fontFamily: "NotoSans",
+    fontStyle: "italic",
     color: BRAND.gold,
-    marginTop: 1,
+    marginTop: 0.5,
+    lineHeight: 1,
+    flexGrow: 0,
+    flexShrink: 0,
   },
+
   itemDescription: {
     fontSize: 8,
     color: "#666666",
     marginTop: 1,
+    lineHeight: 1,
+    flexGrow: 0,
+    flexShrink: 0,
   },
-  // Footer
+
   pageFooter: {
     position: "absolute",
     bottom: 20,
@@ -251,24 +287,32 @@ export function MenuPdfDocument({
           return (
             <View key={category.id || category.name}>
               <Text style={styles.categoryHeader}>{category.name}</Text>
+
               {visibleItems.map((item) => {
                 const { english, vietnamese } = parseBilingualName(item.name);
+
                 return (
-                  <View key={item.id || item.name} style={styles.itemRow} wrap={false}>
+                  <View
+                    key={item.id || item.name}
+                    style={styles.itemRow}
+                    wrap={false}
+                  >
                     <View style={styles.itemNameRow}>
                       <Text style={styles.itemEnglish}>{english}</Text>
                       <Text style={styles.itemPrice}>
                         {formatPrice(item.price)}
                       </Text>
                     </View>
-                    {vietnamese && (
+
+                    {vietnamese ? (
                       <Text style={styles.itemVietnamese}>{vietnamese}</Text>
-                    )}
-                    {item.description && (
+                    ) : null}
+
+                    {item.description ? (
                       <Text style={styles.itemDescription}>
                         {item.description}
                       </Text>
-                    )}
+                    ) : null}
                   </View>
                 );
               })}

@@ -24,6 +24,8 @@ export interface MenuItem extends RawMenuItem {
   categoryId: string;
   price: string;
   visible: boolean;
+  featured: boolean;
+  featuredPosition: number | null;
 }
 
 export interface Category extends Omit<RawCategory, "items"> {
@@ -81,6 +83,8 @@ export default function MenuPage() {
           category: cat.name,
           categoryId: String(cat.id),
           visible: Boolean(item.visible ?? true),
+          featured: Boolean(item.featured ?? false),
+          featuredPosition: item.featuredPosition ?? null,
         };
         if (item.image) {
           formatted.image = item.image;

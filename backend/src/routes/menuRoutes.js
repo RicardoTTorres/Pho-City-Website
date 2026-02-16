@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   getMenu,
   getAdminMenu,
+  getFeaturedItems,
   addCategory,
   editCategory,
   deleteCategory,
@@ -17,6 +18,7 @@ import { requireAuth } from "../middleware/requireAuth.js";
 const router = Router();
 
 router.get("/", getMenu);
+router.get("/featured", getFeaturedItems);
 router.get("/admin", requireAuth, getAdminMenu);
 
 router.post("/categories", requireAuth, addCategory);
