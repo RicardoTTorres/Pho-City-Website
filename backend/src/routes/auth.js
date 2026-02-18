@@ -37,7 +37,7 @@ function signAccess(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 }
 
-async function ensureAdminTableAndSeed() {
+export async function ensureAdminTableAndSeed() {
   await pool.query(ADMIN_TABLE_SQL);
 
   const [rows] = await pool.query(
@@ -57,7 +57,7 @@ async function ensureAdminTableAndSeed() {
   console.log(`Seeded default admin user: ${seedEmail}`);
 }
 
-await ensureAdminTableAndSeed();
+// await ensureAdminTableAndSeed();
 
 router.get("/login", (_req, res) => {
   res.send("Login endpoint is POST /api/admin/login with JSON body.");
