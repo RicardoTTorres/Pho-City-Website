@@ -1,2 +1,0 @@
-# Docs
-Hello World & people

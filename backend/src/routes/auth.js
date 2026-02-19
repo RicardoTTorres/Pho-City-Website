@@ -1,3 +1,4 @@
+// src/routes/auth.js
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -57,7 +58,12 @@ async function ensureAdminTableAndSeed() {
   console.log(`Seeded default admin user: ${seedEmail}`);
 }
 
-await ensureAdminTableAndSeed();
+ensureAdminTableAndSeed().catch((err) => {
+  console.error(
+    "Unable to initialize admins table/seed user. Continuing without startup crash:",
+    err.message || err,
+  );
+});
 
 router.get("/login", (_req, res) => {
   res.send("Login endpoint is POST /api/admin/login with JSON body.");

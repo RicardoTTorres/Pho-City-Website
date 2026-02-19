@@ -1,3 +1,4 @@
+// src/shared/config/nav.config.ts
 export const navConfig = {
   brand: { name: "Pho City", logo: "/logo.png" },
   nav: [

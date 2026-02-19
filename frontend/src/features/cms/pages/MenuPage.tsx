@@ -1,3 +1,4 @@
+// src/features/cms/pages/MenuPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSectionEditor } from "@/features/cms/sections/MenuSectionEditor";
@@ -16,12 +17,15 @@ import type {
   MenuCategory as RawCategory,
   MenuItem as RawMenuItem,
 } from "@/shared/content/content.types";
+import { reorderCategories, reorderItems } from "@/shared/api/menu";
 
 export interface MenuItem extends RawMenuItem {
   category: string;
   categoryId: string;
   price: string;
   visible: boolean;
+  featured: boolean;
+  featuredPosition: number | null;
 }
 
 export interface Category extends Omit<RawCategory, "items"> {
@@ -79,6 +83,8 @@ export default function MenuPage() {
           category: cat.name,
           categoryId: String(cat.id),
           visible: Boolean(item.visible ?? true),
+          featured: Boolean(item.featured ?? false),
+          featuredPosition: item.featuredPosition ?? null,
         };
         if (item.image) {
           formatted.image = item.image;
@@ -90,7 +96,7 @@ export default function MenuPage() {
 
   const formattedMenuData: MenuData = useMemo(
     () => ({ categories: derivedCategories }),
-    [derivedCategories]
+    [derivedCategories],
   );
 
   // CRUD callbacks
@@ -121,15 +127,27 @@ export default function MenuPage() {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?"))
+      return;
     await deleteCategory(id);
+    await refreshMenuAdmin();
+  };
+
+  const handleReorderCategories = async (categoryIds: string[]) => {
+    await reorderCategories(categoryIds);
+    await refreshMenuAdmin();
+  };
+  const handleReorderItems = async (categoryId: string, itemIds: string[]) => {
+    await reorderItems(categoryId, itemIds);
     await refreshMenuAdmin();
   };
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Menu Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Menu Management
+        </h1>
         <p className="text-sm text-gray-500">
           Add, edit, or remove menu items and categories.
         </p>
@@ -143,7 +161,8 @@ export default function MenuPage() {
 
       {!menuLoading && !rawMenuData ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          No admin menu data was returned. Please verify your admin session and try again.
+          No admin menu data was returned. Please verify your admin session and
+          try again.
         </div>
       ) : null}
 
@@ -157,6 +176,8 @@ export default function MenuPage() {
         onCreateCategory={handleCreateCategory}
         onUpdateCategory={handleUpdateCategory}
         onDeleteCategory={handleDeleteCategory}
+        onReorderCategories={handleReorderCategories}
+        onReorderItems={handleReorderItems}
       />
     </div>
   );
