@@ -1,3 +1,4 @@
+// src/features/cms/pages/UserManualPage.tsx
 import {
   Accordion,
   AccordionItem,
@@ -7,7 +8,7 @@ import {
 
 export default function UserManualPage() {
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-3xl mx-auto">
       <h1 className="text-3xl font-semibold mb-2">Need Help?</h1>
       <p className="text-gray-700 mb-6">
         This page will guide you through how to edit your website

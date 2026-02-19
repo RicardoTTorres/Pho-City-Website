@@ -1,3 +1,4 @@
+// src/features/cms/pages/ContentPage.tsx
 import { HeroSectionEditor } from "@/features/cms/sections/HeroSectionEditor";
 import { AboutSectionEditor } from "@/features/cms/sections/AboutSectionEditor";
 import { ContactSectionEditor } from "@/features/cms/sections/ContactSectionEditor";
@@ -61,12 +62,12 @@ export default function ContentPage() {
       </p>
 
       {/*Section Tabs*/}
-      <div className="flex gap-2 border-b border-gray-200 pb-2">
+      <div className="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
         {sections.map((section) => (
           <button
             key={section.id}
             onClick={() => setActiveSection(section.id)}
-            className={`px-4 py-2 rounded-t-lg font-medium transition-colors
+            className={`px-3 sm:px-4 py-2 rounded-t-lg font-medium transition-colors whitespace-nowrap text-sm sm:text-base
               ${
                 activeSection === section.id
                   ? "bg-white text-brand-red border-b-2 border-brand-red"

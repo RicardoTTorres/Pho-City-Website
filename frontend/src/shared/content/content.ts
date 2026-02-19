@@ -1,3 +1,4 @@
+// src/shared/content/content.ts
 import type { RestaurantContent } from "./content.types";
 
 

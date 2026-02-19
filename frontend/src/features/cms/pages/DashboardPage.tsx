@@ -1,40 +1,67 @@
+// src/features/cms/pages/DashboardPage.tsx
 import {
   PlusCircle,
   Edit,
   Image,
   Pencil,
-  CheckCircle2,
   Utensils,
+  Navigation,
+  LayoutTemplate,
+  FileText,
+  Phone,
+  Trash2,
   Reply as ReplyIcon,
   Send,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEditor";
+import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
+
+function getActivityIcon(section: string, action: string) {
+  if (action === "deleted")
+    return <Trash2 size={16} className="text-red-500" />;
+  switch (section) {
+    case "menu_item":
+    case "menu_category":
+      return <Utensils size={16} className="text-gray-500" />;
+    case "navbar":
+      return <Navigation size={16} className="text-gray-500" />;
+    case "hero":
+      return <LayoutTemplate size={16} className="text-gray-500" />;
+    case "footer":
+      return <LayoutTemplate size={16} className="text-gray-500" />;
+    case "about":
+      return <FileText size={16} className="text-gray-500" />;
+    case "contact":
+      return <Phone size={16} className="text-gray-500" />;
+    default:
+      return <Pencil size={16} className="text-gray-500" />;
+  }
+}
+
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const seconds = Math.floor((now - then) / 1000);
+
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
 
 export default function DashboardPage() {
-  //Placeholder data until backend integration
-  const recentActivity = [
-    {
-      icon: <Pencil size={16} className="text-gray-500" />,
-      text: "Edited ‘About Us’ page",
-      time: "2 days ago",
-    },
-    {
-      icon: <CheckCircle2 size={16} className="text-green-600" />,
-      text: "Published seasonal promo banner",
-      time: "1 day ago",
-    },
-    {
-      icon: <Image size={16} className="text-gray-500" />,
-      text: "Uploaded 3 new gallery images",
-      time: "5 hours ago",
-    },
-    {
-      icon: <Utensils size={16} className="text-gray-500" />,
-      text: "Updated menu item ‘Pho Ga’ price",
-      time: "3 hours ago",
-    },
-  ];
+  const [recentActivity, setRecentActivity] = useState<ActivityEntry[]>([]);
+
+  useEffect(() => {
+    fetchRecentActivity()
+      .then(setRecentActivity)
+      .catch((err) => console.error("Failed to load activity:", err));
+  }, []);
 
   const latestMessages: Array<{
     name: string;
@@ -86,7 +113,7 @@ export default function DashboardPage() {
     const subject = m.subject ?? `Re: Your message to Pho City`;
     const body = replyText || "Hi,\n\n";
     const href = `mailto:${m.email}?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${encodeURIComponent(body)}`;
     window.location.href = href;
     cancelReply();
@@ -108,7 +135,7 @@ export default function DashboardPage() {
       </section>
 
       {/*Overview Stats*/}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-700">Total Pages</p>
           <h2 className="text-2xl font-semibold text-gray-600">4</h2>
@@ -129,24 +156,30 @@ export default function DashboardPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Recent Activity
           </h3>
-          <ul className="space-y-3">
-            {recentActivity.map((item, idx) => (
-              <li
-                key={idx}
-                className={idx > 0 ? "border-t border-gray-100 pt-3" : ""}
-              >
-                <div className="flex items-start gap-3 text-sm text-gray-700 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50 transition-colors">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gray-100">
-                    {item.icon}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="truncate">{item.text}</p>
-                    <p className="text-xs text-gray-500">{item.time}</p>
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-gray-400">No recent activity</p>
+          ) : (
+            <ul className="space-y-3">
+              {recentActivity.map((item, idx) => (
+                <li
+                  key={item.id}
+                  className={idx > 0 ? "border-t border-gray-100 pt-3" : ""}
+                >
+                  <div className="flex items-start gap-3 text-sm text-gray-700 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50 transition-colors">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gray-100">
+                      {getActivityIcon(item.section, item.action)}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate">{item.description}</p>
+                      <p className="text-xs text-gray-500">
+                        {timeAgo(item.created_at)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         {/*Latest Messages*/}

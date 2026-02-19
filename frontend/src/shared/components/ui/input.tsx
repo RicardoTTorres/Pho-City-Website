@@ -1,3 +1,4 @@
+// src/shared/components/ui/input.tsx
 import * as React from "react";
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
@@ -14,7 +15,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

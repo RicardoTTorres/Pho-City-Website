@@ -1,3 +1,4 @@
+// src/features/cms/sections/AboutSectionEditor.tsx
 import { useState, useRef, useEffect } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { Button } from "@/shared/components/ui/button";
@@ -38,7 +39,7 @@ export function AboutSectionEditor() {
   //updating changed input/content
   const handleChange = <K extends keyof typeof aboutContent>(
     field: K,
-    value: (typeof aboutContent)[K]
+    value: (typeof aboutContent)[K],
   ) => {
     updateContent({
       about: { ...aboutContent, [field]: value },
@@ -50,7 +51,7 @@ export function AboutSectionEditor() {
     setIsSaving(true);
     setMessage("");
     try {
-      const url = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+      const url = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
       const res = await fetch(`${url}/api/about`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -70,7 +71,7 @@ export function AboutSectionEditor() {
 
   //layout for content editor and preview
   return (
-    <section className="flex flex-col md:flex-row gap-6 w-full px-6 py-6">
+    <section className="flex flex-col md:flex-row gap-6 w-full px-2 sm:px-6 py-4 sm:py-6">
       {/*Left Editor*/}
       <div className="flex-1 bg-gradient-to-b from-white to-[#FFF7F7] border border-[#FEE2E1] rounded-2xl shadow-md p-6">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal mb-4">

@@ -1,3 +1,4 @@
+// src/features/cms/sections/HeroSectionEditor.tsx
 import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import StarIcon from "@/shared/assets/Star.svg";
@@ -46,7 +47,7 @@ export function HeroSectionEditor() {
 
   const handleChange = <K extends keyof LocalHero>(
     field: K,
-    value: LocalHero[K]
+    value: LocalHero[K],
   ) => {
     setHeroContent((prev) => ({ ...prev, [field]: value }));
   };
@@ -72,7 +73,7 @@ export function HeroSectionEditor() {
   };
 
   return (
-    <section className="flex flex-col md:flex-row gap-6 w-full px-4 sm:px-6 py-6">
+    <section className="flex flex-col md:flex-row gap-6 w-full px-2 sm:px-6 py-4 sm:py-6">
       {/*left panel input*/}
       <div className="flex-1 min-w-0 bg-gradient-to-b from-white to-[#FFF7F7] border border-[#FEE2E1] rounded-2xl shadow-md p-4 sm:p-6">
         {/* Header */}
@@ -149,7 +150,7 @@ export function HeroSectionEditor() {
                   onChange={(e) =>
                     handleChange(
                       "imageUrl",
-                      e.target.value ? e.target.value : null
+                      e.target.value ? e.target.value : null,
                     )
                   }
                   className="w-full rounded-lg bg-[#F5F1E8] border-2 border-brand-gold text-brand-charcoal text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"

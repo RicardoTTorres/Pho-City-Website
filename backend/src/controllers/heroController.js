@@ -1,4 +1,6 @@
+// src/controllers/heroController.js
 import { pool } from "../db/connect_db.js";
+import { logActivity } from "./activityController.js";
 
 export const getHero = async (req, res) => {
   try {
@@ -12,7 +14,7 @@ export const getHero = async (req, res) => {
         hero_image_url
        FROM hero_section
        ORDER BY hero_id ASC
-       LIMIT 1`
+       LIMIT 1`,
     );
 
     if (!rows.length) {
@@ -36,9 +38,14 @@ export const getHero = async (req, res) => {
 
 export const updateHero = async (req, res) => {
   try {
-    const { title, subtitle, ctaText, secondaryCtaText,imageUrl } = req.body;
+    const { title, subtitle, ctaText, secondaryCtaText, imageUrl } = req.body;
 
-    if (typeof title !== "string" || typeof subtitle !== "string" || typeof ctaText !== "string" || typeof secondaryCtaText !== "string") {
+    if (
+      typeof title !== "string" ||
+      typeof subtitle !== "string" ||
+      typeof ctaText !== "string" ||
+      typeof secondaryCtaText !== "string"
+    ) {
       return res.status(400).json({ message: "Invalid payload" });
     }
 
@@ -50,7 +57,7 @@ export const updateHero = async (req, res) => {
            hero_secondary_button_text =?,
            hero_image_url = ?
        WHERE hero_id = 1`,
-      [title, subtitle, ctaText, secondaryCtaText, imageUrl ?? null]
+      [title, subtitle, ctaText, secondaryCtaText, imageUrl ?? null],
     );
 
     const [rows] = await pool.query(
@@ -63,10 +70,11 @@ export const updateHero = async (req, res) => {
         hero_image_url
        FROM hero_section
        WHERE hero_id = 1
-       LIMIT 1`
+       LIMIT 1`,
     );
 
     const h = rows[0];
+    logActivity("updated", "hero", "Updated hero section", req.user?.email);
     return res.status(200).json({
       id: h.hero_id,
       title: h.hero_main_title,

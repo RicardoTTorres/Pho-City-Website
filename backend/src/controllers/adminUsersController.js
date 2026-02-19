@@ -1,3 +1,4 @@
+// src/controllers/adminUserController.js
 import { pool } from "../db/connect_db.js";
 
 export async function getAdminUsers(req, res) {

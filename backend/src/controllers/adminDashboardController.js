@@ -1,3 +1,4 @@
+// src/controllers/adminDashboardController.js
 import { pool } from "../db/connect_db.js";
 
 export async function getStats(req, res) {
@@ -17,10 +18,9 @@ export async function getStats(req, res) {
     res.json({
       dashboard: {
         numMenuItems,
-        numMenuCategories
-      }
+        numMenuCategories,
+      },
     });
-
   } catch (err) {
     console.error("Error fetching dashboard stats:", err);
     res.status(500).json({ error: "Failed to load dashboard stats" });
