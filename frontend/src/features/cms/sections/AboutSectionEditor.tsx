@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import AboutIcon from "@/shared/assets/About.svg";
 import ImageIcon from "@/shared/assets/ImageIcon.svg";
 import aboutUs from "@/shared/assets/aboutUs.png";
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 
 //using the constants to try and imitate the live preview of about page
 const CANVAS_WIDTH = 1600;
@@ -109,6 +110,13 @@ export function AboutSectionEditor() {
             />
           </div>
 
+          <ImageUpload
+            section="about"
+            currentUrl={aboutContent.imageUrl || null}
+            onUploaded={(url) => handleChange("imageUrl", url)}
+            label="About Image (optional)"
+          />
+
           <div className="pt-4 flex justify-center">
             <Button
               onClick={handleSave}
@@ -198,7 +206,7 @@ export function AboutSectionEditor() {
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <img
-                  src={aboutUs}
+                  src={aboutContent.imageUrl || aboutUs}
                   alt="About Us"
                   style={{
                     width: IMAGE_WIDTH_PIXELS,

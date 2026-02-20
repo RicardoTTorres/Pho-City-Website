@@ -6,9 +6,10 @@ export interface MenuItemProps {
   name: string;
   price: number;
   description: string;
+  image?: string | null | undefined;
 }
 
-export function MenuItem({ name, price, description }: MenuItemProps) {
+export function MenuItem({ name, price, description, image }: MenuItemProps) {
   const { english, vietnamese } = parseBilingualName(name);
   const safePrice = Number.isFinite(price) ? price : 0;
 
@@ -23,9 +24,16 @@ export function MenuItem({ name, price, description }: MenuItemProps) {
         "font-sans",
       ].join(" ")}
     >
+      {image && (
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-40 object-cover rounded-xl mb-3"
+        />
+      )}
       <header className="flex items-start gap-4 mb-3">
         <div className="flex-1 min-w-0">
-          {/* English first: allow wrapping (no truncate) */}
+          {/* English first: allow wrapping */}
           <h3 className="text-l font-bold text-red-900 leading-snug break-words line-clamp-3">
             {english}
           </h3>

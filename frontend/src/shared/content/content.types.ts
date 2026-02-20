@@ -49,6 +49,7 @@ export interface RestaurantContent {
   about: {
     title: string;
     content: string;
+    imageUrl?: string;
   };
   contact: {
     address: string;

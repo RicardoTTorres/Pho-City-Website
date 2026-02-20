@@ -1,6 +1,7 @@
 // src/features/cms/sections/MenuSectionEditor.tsx
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import {
   Pencil,
   Trash2,
@@ -17,7 +18,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -26,6 +26,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import type { DragEndEvent } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type {
   MenuItem,
@@ -356,6 +357,10 @@ export function MenuSectionEditor({
   // Count total featured items across all categories
   const featuredCount = menuItems.filter((item) => item.featured).length;
 
+  const featuredItems = menuItems
+    .filter((item) => item.featured)
+    .sort((a, b) => (a.featuredPosition ?? 99) - (b.featuredPosition ?? 99));
+
   const handleToggleVisible = async (item: MenuItem) => {
     try {
       await onUpdateItem(item.id, {
@@ -571,6 +576,80 @@ export function MenuSectionEditor({
       {/* Menu Items Tab */}
       {activeTab === "items" && (
         <div className="space-y-3 md:space-y-4">
+          {/* Featured Items Panel */}
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="flex items-center gap-2 font-semibold text-gray-800">
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                Featured on Homepage
+              </h3>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                {featuredCount} / 4 slots filled
+              </span>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((slot) => {
+                const item = featuredItems.find(
+                  (i) => i.featuredPosition === slot,
+                );
+                return item ? (
+                  <div
+                    key={slot}
+                    className="border border-yellow-200 bg-yellow-50 rounded-lg p-3 flex flex-col gap-2"
+                  >
+                    <span className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full self-start">
+                      #{slot}
+                    </span>
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-20 object-cover rounded-md"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm truncate">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {item.category}
+                      </p>
+                      <p className="text-xs font-medium text-gray-700 mt-0.5">
+                        {item.price}
+                      </p>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => handleEditItem(item)}
+                        className="flex-1 px-2 py-1.5 text-xs text-brand-gold hover:text-brand-red border border-brand-gold hover:border-brand-red rounded transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleToggleFeatured(item)}
+                        className="flex-1 px-2 py-1.5 text-xs text-gray-500 hover:text-red-500 border border-gray-300 hover:border-red-400 rounded transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Star className="w-3 h-3" />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={slot}
+                    className="border border-dashed border-gray-200 bg-gray-50 rounded-lg p-3 flex flex-col items-center justify-center gap-1 min-h-[120px]"
+                  >
+                    <span className="text-xs font-bold text-gray-300">
+                      #{slot}
+                    </span>
+                    <span className="text-xs text-gray-400">Empty slot</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Filters and Add Button */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white p-3 md:p-4 rounded-lg shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -765,20 +844,14 @@ export function MenuSectionEditor({
                   inputMode="decimal"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL (optional)
-                </label>
-                <input
-                  type="url"
-                  value={itemFormData.image}
-                  onChange={(e) =>
-                    setItemFormData({ ...itemFormData, image: e.target.value })
-                  }
-                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
-                  inputMode="url"
-                />
-              </div>
+              <ImageUpload
+                section="menu"
+                currentUrl={itemFormData.image || null}
+                onUploaded={(url) =>
+                  setItemFormData({ ...itemFormData, image: url })
+                }
+                label="Image (optional)"
+              />
               <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-4">
                 <button
                   type="button"
