@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   deploy:
-    runs-on: [self-hosted, pho-city]
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - name: Pull latest code
