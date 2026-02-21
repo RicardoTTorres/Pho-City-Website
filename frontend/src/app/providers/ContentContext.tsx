@@ -16,6 +16,7 @@ import type {
 } from "@/shared/content/content.types";
 import { defaultContent } from "@/shared/content/content";
 import { getFooter } from "@/shared/api/footer";
+import { getDashboardStats } from "@/shared/api/dashboard/stats";
 
 interface ContentContextType {
   content: RestaurantContent;
@@ -159,22 +160,20 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchAdminUsers();
   }, [apiUrl, isCmsRoute, updateContent]);
 
-  // -> add /api/dashboard/stats
+  // api/dashboard/stats
   useEffect(() => {
     if (!isCmsRoute) return;
 
     async function fetchDashboard() {
       try {
-        const res = await fetch(`${apiUrl}/api/admin/dashboard/stats`, {
-          credentials: "include",
-        });
-        const data = await res.json();
+        const data = await getDashboardStats(apiUrl);
+        console.log("Dashboard stats response:", data);
 
         updateContent({
           dashboard: data.dashboard,
         });
       } catch (err) {
-        console.error("About fetch failed:", err);
+        console.error("Dashboard fetch failed:", err);
       }
     }
     fetchDashboard();

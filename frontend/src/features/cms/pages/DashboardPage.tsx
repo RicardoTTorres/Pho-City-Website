@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEditor";
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
+import { useContent } from "@/app/providers/ContentContext";
 
 function getActivityIcon(section: string, action: string) {
   if (action === "deleted")
@@ -56,6 +57,9 @@ function timeAgo(dateStr: string): string {
 
 export default function DashboardPage() {
   const [recentActivity, setRecentActivity] = useState<ActivityEntry[]>([]);
+
+  const { content } = useContent();
+  const dashboard = content.dashboard;
 
   useEffect(() => {
     fetchRecentActivity()
@@ -142,11 +146,11 @@ export default function DashboardPage() {
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-700">Menu Items</p>
-          <h2 className="text-2xl font-semibold text-gray-600">120</h2>
+          <h2 className="text-2xl font-semibold text-gray-600">{dashboard?.numMenuItems ?? "—"}</h2>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-700">Images Uploaded</p>
-          <h2 className="text-2xl font-semibold text-gray-600">3</h2>
+          <h2 className="text-2xl font-semibold text-gray-600">{dashboard?.numImages ?? "—"}</h2>
         </div>
       </section>
 
