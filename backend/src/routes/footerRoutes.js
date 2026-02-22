@@ -1,4 +1,4 @@
-
+// src/routes/footerRoutes.js
 
 import express from "express";
 import { getFooter, putFooter } from "../controllers/footerController.js";

@@ -1,11 +1,14 @@
+// src/features/public/components/ContactForm.tsx
 import { useState, type FormEvent } from "react";
 
 export const ContactForm = () => {
-  const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+  const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -13,8 +16,8 @@ export const ContactForm = () => {
 
     try {
       const res = await fetch(`${API_URL}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message }),
       });
 
@@ -74,10 +77,10 @@ export const ContactForm = () => {
           type="submit"
           disabled={status === "loading"}
           className={`w-full font-semibold py-4 rounded-lg text-white transition-all duration-300 shadow-md ${
-                       status === "loading"
-                         ? "bg-brand-gold cursor-wait"
-                         : "bg-brand-red hover:bg-brand-redHover hover:shadow-lg hover:scale-[1.02]"
-                     }`}
+            status === "loading"
+              ? "bg-brand-gold cursor-wait"
+              : "bg-brand-red hover:bg-brand-redHover hover:shadow-lg hover:scale-[1.02]"
+          }`}
         >
           {status === "loading" ? "Sending..." : "Send Message"}
         </button>
@@ -85,12 +88,12 @@ export const ContactForm = () => {
 
       {status === "success" && (
         <p className="text-center text-green-600 font-semibold mt-6 bg-green-50 py-3 rounded-lg">
-           Message sent successfully!
+          Message sent successfully!
         </p>
       )}
       {status === "error" && (
         <p className="text-center text-red-600 font-semibold mt-6 bg-red-50 py-3 rounded-lg">
-           Failed to send message. Please try again.
+          Failed to send message. Please try again.
         </p>
       )}
     </div>

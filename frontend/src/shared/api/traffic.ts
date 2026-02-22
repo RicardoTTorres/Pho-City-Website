@@ -1,3 +1,4 @@
+// src/shared/api/traffic.ts
 const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
 
 export type TrafficData = {

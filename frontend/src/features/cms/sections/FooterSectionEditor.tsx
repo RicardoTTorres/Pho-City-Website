@@ -1,8 +1,7 @@
 // src/sections/cms/FooterSectionEditor.tsx
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Trash2, GripVertical, Plus, Footprints } from "lucide-react";
+import { Trash2, GripVertical, Plus, Footprints, Save } from "lucide-react";
 import { Input } from "@/shared/components/ui/input";
-import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import type { FooterData } from "@/shared/content/content.types";
 
@@ -90,6 +89,7 @@ export default function FooterSectionEditor({
   const [cityZip, setCityZip] = useState(initialFooter.contact.cityZip);
   const [phone, setPhone] = useState(initialFooter.contact.phone);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const [saveError, setSaveError] = useState<string | null>(null);
   const dirtyRef = useRef(false);
@@ -155,6 +155,8 @@ export default function FooterSectionEditor({
     };
 
     try {
+      setSaving(true);
+
       await onSave(payloadFooter);
       dirtyRef.current = false;
       setFooterLogo(payloadFooter.brand.logo);
@@ -169,6 +171,8 @@ export default function FooterSectionEditor({
     } catch (err) {
       console.error("Footer update failed:", err);
       setSaveError("Failed to save footer changes.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -230,43 +234,51 @@ export default function FooterSectionEditor({
 
   return (
     <div className="space-y-8 p-4">
-      <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal mb-4">
-        <div className="bg-brand-red rounded-lg p-1.5 flex items-center justify-center">
-          <Footprints className="w-3.5 h-3.5 text-white" />
-        </div>
-        Footer Section Editor
-      </h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-charcoal">
+          <div className="bg-brand-red rounded-lg p-1.5 flex items-center justify-center">
+            <Footprints className="w-3.5 h-3.5 text-white" />
+          </div>
+          Footer Section Editor
+        </h2>
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-red hover:bg-brand-red-hover text-white disabled:opacity-50 self-start sm:self-auto"
+          type="button"
+        >
+          <Save size={18} />
+          {saving ? "Saving..." : "Save"}
+        </button>
+      </div>
+
+      {saveSuccess && (
+        <p className="text-sm text-green-600 mt-2 text-right">{saveSuccess}</p>
+      )}
+
+      {saveError ? (
+        <p className="text-sm text-red-600 mt-2 text-right">{saveError}</p>
+      ) : null}
 
       {/* BRAND */}
       <div className="space-y-3">
-        <p className="font-medium text-gray-700">Footer Brand</p>
+        <p className="font-medium text-gray-700">Footer Logo</p>
 
-        <div className="space-y-2 bg-white/70 p-4 rounded-xl border shadow-sm">
-          <div
-            className="w-40 h-20 border rounded-xl bg-white/70 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-brand-red transition"
-            onClick={() => setOpenMediaPicker(true)}
-          >
-            {footerLogo ? (
-              <img
-                src={footerLogo}
-                alt="Footer Logo"
-                className="w-full h-full object-contain rounded-xl"
-              />
-            ) : (
-              <span className="text-gray-500 text-sm">Select Image</span>
-            )}
-          </div>
-
-          <div>
-            <Label>Brand Name</Label>
-            <Input
-              value={brandName}
-              onChange={(e) => {
-                setBrandName(e.target.value);
-                markDirty();
-              }}
+        <div
+          className="w-40 h-20 border rounded-xl bg-white/70 flex items-center justify-center cursor-pointer
+          hover:ring-2 hover:ring-brand-red transition"
+          onClick={() => setOpenMediaPicker(true)}
+        >
+          {footerLogo ? (
+            <img
+              src={footerLogo}
+              alt="Logo Preview"
+              className="w-full h-full object-contain rounded-xl"
             />
-          </div>
+          ) : (
+            <span className="text-gray-500 text-sm">Select Image</span>
+          )}
         </div>
       </div>
 
@@ -280,30 +292,34 @@ export default function FooterSectionEditor({
               key={index}
               className="bg-white/70 rounded-xl p-4 border shadow-sm flex flex-col gap-3"
             >
-              <div className="flex items-center gap-2 text-gray-600">
-                <GripVertical className="cursor-grab" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <GripVertical className="cursor-grab shrink-0" />
 
-                <Input
-                  value={link.label}
-                  placeholder="Label (e.g. Hours, Careers)"
-                  className="flex-1"
-                  onChange={(e) => updateNav(index, "label", e.target.value)}
-                />
+                  <Input
+                    value={link.label}
+                    placeholder="Label (e.g. Hours, Careers)"
+                    className="flex-1 min-w-0"
+                    onChange={(e) => updateNav(index, "label", e.target.value)}
+                  />
+                </div>
 
-                <Input
-                  value={link.path}
-                  placeholder="/path or https://"
-                  className="flex-1"
-                  onChange={(e) => updateNav(index, "path", e.target.value)}
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={link.path}
+                    placeholder="/path or https://"
+                    className="flex-1 min-w-0"
+                    onChange={(e) => updateNav(index, "path", e.target.value)}
+                  />
 
-                <button
-                  onClick={() => removeNavLink(index)}
-                  className="p-2 text-gray-500 hover:text-red-500"
-                  aria-label="Remove nav link"
-                >
-                  <Trash2 size={18} />
-                </button>
+                  <button
+                    onClick={() => removeNavLink(index)}
+                    className="p-2 text-gray-500 hover:text-red-500 shrink-0"
+                    aria-label="Remove nav link"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex gap-2 ml-8">
@@ -400,18 +416,6 @@ export default function FooterSectionEditor({
           </div>
         </div>
       </div>
-
-      <Button
-        className="w-full mt-6 bg-brand-red hover:bg-brand-red-hover text-white"
-        onClick={handleSave}
-      >
-        Save Footer Changes
-      </Button>
-      {saveSuccess && (
-        <p className="text-sm text-green-600 mt-2 text-center">{saveSuccess}</p>
-      )}
-
-      {saveError ? <p className="text-sm text-red-600">{saveError}</p> : null}
     </div>
   );
 }

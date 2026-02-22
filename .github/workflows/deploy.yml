@@ -1,0 +1,32 @@
+name: Deploy Pho City
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: [self-hosted, X64, Linux]
+
+   steps:
+      - name: Pull latest code
+        run: |
+          cd /home/ubuntu/Pho-City-Website
+          git pull origin main
+
+      - name: Install backend dependencies
+        run: |
+          cd /home/ubuntu/Pho-City-Website/backend
+          npm install
+
+      - name: Restart backend
+        run: pm2 restart pho-city-api
+
+      - name: Build frontend
+        run: |
+          cd /home/ubuntu/Pho-City-Website/frontend
+          npm install
+          npm run build
+
+      - name: Reload nginx
+        run: sudo systemctl reload nginx

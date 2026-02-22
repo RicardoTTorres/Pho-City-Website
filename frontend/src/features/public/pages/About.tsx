@@ -1,11 +1,12 @@
+// src/features/public/pages/About.tsx
 import { useContent } from "@/app/providers/ContentContext";
 import aboutUs from "@/shared/assets/aboutUs.png";
 
 export default function About() {
-    const { content } = useContent();
-  
-    return (
-        <div className="bg-[#FFF8F1] w-full min-h-screen">
+  const { content } = useContent();
+
+  return (
+    <div className="bg-[#FFF8F1] w-full min-h-screen">
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-20">
         <div className="flex flex-col md:flex-row items-center justify-between gap-14">
           <div className="md:max-w-[48%]">
@@ -32,8 +33,6 @@ export default function About() {
           </div>
         </div>
       </section>
-  
-      
-      </div>
-    );
-  }
+    </div>
+  );
+}

@@ -1,3 +1,4 @@
+// src/shared/data/mockUsers.ts
 export type MockUser = {
   id: number;
   name: string;

@@ -1,4 +1,6 @@
+//src/controllers/aboutController.js
 import { pool } from "../db/connect_db.js";
+import { logActivity } from "./activityController.js";
 
 export async function getAbout(req, res) {
   const [[about]] = await pool.query(`
@@ -29,7 +31,8 @@ export async function updateAbout(req, res) {
       [title, content || null],
     );
 
-    res.status(200).json({ message: "About section updated successfully!" });
+    logActivity("updated", "about", "Updated about section", req.user?.email);
+    res.json({ message: "About section updated successfully!" });
   } catch (error) {
     console.error("Error updating About section:", error);
     res.status(500).json({ message: "Internal Server Error" });

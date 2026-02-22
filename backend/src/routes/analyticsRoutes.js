@@ -1,3 +1,4 @@
+// src/routes/analyticsRoutes.js
 import { Router } from "express";
 import { getTraffic, postTraffic } from "../controllers/analyticsController.js";
 import { requireAuth } from "../middleware/requireAuth.js";

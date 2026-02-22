@@ -179,29 +179,50 @@ Pho-City-Website/
 
 # Backend API:
 
-| Route                             | Description                              |
-| --------------------------------- | ---------------------------------------- |
-| **About**                         |                                          |
-| `GET /api/about`                  | Get about page contents                  |
-| `PUT /api/about`                  | Edit about page contents                 |
-| **Contact**                       |                                          |
-| `GET /api/contact`                | Get contact page contents                |
-| `PUT /api/contact`                | Edit contact page contents               |
-| `POST /api/contact`               | Send message from contact page           |
-| **Hero**                          |                                          |
-| `GET /api/hero`                   | Get hero section contents                |
-| `PUT /api/hero`                   | Edit hero section contents               |
-| **Dashboard**                     |                                          |
-| `GET /api/admin/dashboard/stats`  | Get stats for dashboard page             |
-| **Menu**                          |                                          |
-| `GET /api/menu`                   | Get all public menu data                 |
-| `GET /api/menu/admin`             | Get all menu data including hidden items |
-| `POST /api/menu/categories`       | Create new category                      |
-| `PUT /api/menu/categories/:id`    | Edit category                            |
-| `DELETE /api/menu/categories/:id` | Delete category                          |
-| `POST /api/menu/items`            | Create new menu item                     |
-| `PUT /api/menu/items/:id`         | Edit menu item                           |
-| `DELETE /api/menu/items/:id`      | Delete menu item                         |
+| Route                                                | Description                              |
+| ---------------------------------------------------- | ---------------------------------------- |
+| **About**                                            |                                          |
+| `GET /api/about`                                     | Get about page contents                  |
+| `PUT /api/about`                                     | Edit about page contents                 |
+| **Auth**                                             |                                          |
+| `POST /api/admin/login`                              | Admin login                              |
+| `POST /api/admin/logout`                             | Admin logout                             |
+| `GET /api/admin/me`                                  | Get current authenticated user           |
+| `GET /api/admin/verify`                              | Verify auth token                        |
+| `POST /api/admin/update-password`                    | Update admin password                    |
+| **Contact**                                          |                                          |
+| `POST /api/contact`                                  | Send message from contact page           |
+| `GET /api/admin/contact`                             | Get contact page contents                |
+| `PUT /api/admin/contact`                             | Edit contact page contents               |
+| **Hero**                                             |                                          |
+| `GET /api/hero`                                      | Get hero section contents                |
+| `PUT /api/hero`                                      | Edit hero section contents               |
+| **Navbar**                                           |                                          |
+| `GET /api/navbar`                                    | Get navbar configuration                 |
+| `PUT /api/admin/navbar`                              | Edit navbar configuration                |
+| **Footer**                                           |                                          |
+| `GET /api/footer`                                    | Get footer configuration                 |
+| `PUT /api/footer`                                    | Edit footer configuration                |
+| **Dashboard**                                        |                                          |
+| `GET /api/admin/dashboard/stats`                     | Get stats for dashboard page             |
+| **Menu**                                             |                                          |
+| `GET /api/menu`                                      | Get all public menu data                 |
+| `GET /api/menu/admin`                                | Get all menu data including hidden items |
+| `POST /api/menu/categories`                          | Create new category                      |
+| `PUT /api/menu/categories/:id`                       | Edit category                            |
+| `DELETE /api/menu/categories/:id`                    | Delete category                          |
+| `PUT /api/menu/categories/reorder`                   | Reorder categories                       |
+| `POST /api/menu/items`                               | Create new menu item                     |
+| `PUT /api/menu/items/:id`                            | Edit menu item                           |
+| `DELETE /api/menu/items/:id`                         | Delete menu item                         |
+| `PUT /api/menu/categories/:categoryId/items/reorder` | Reorder items within a category          |
+| **Analytics**                                        |                                          |
+| `GET /api/admin/analytics/traffic`                   | Get traffic analytics data               |
+| `POST /api/analytics/traffic`                        | Record a traffic visit                   |
+| **Admin Users**                                      |                                          |
+| `GET /api/adminUsers`                                | Get list of admin users                  |
+| **Activity**                                         |                                          |
+| `GET /api/admin/activity`                            | Get recent admin activity log            |
 
 <br><br>
 
