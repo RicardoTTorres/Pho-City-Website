@@ -142,3 +142,13 @@ VALUES (
   ) ON DUPLICATE KEY
 UPDATE `footer_json` =
 VALUES(`footer_json`);
+CREATE TABLE IF NOT EXISTS `gmail_accounts` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(255) UNIQUE NOT NULL,
+  `access_token` TEXT,
+  `refresh_token` TEXT,
+  `scope` TEXT,
+  `token_type` VARCHAR(50),
+  `expiry_date` BIGINT,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
