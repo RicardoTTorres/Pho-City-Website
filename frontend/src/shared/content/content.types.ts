@@ -89,7 +89,7 @@ export interface RestaurantContent {
   };
   dashboard: {
     numMenuItems: number;
-    numMenuCategories: number;
+    numImages: number;
   };
   adminUsers: AdminUser[];
 }
