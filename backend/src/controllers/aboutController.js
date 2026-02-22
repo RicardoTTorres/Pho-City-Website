@@ -14,7 +14,7 @@ export async function getAbout(req, res) {
 
 export async function updateAbout(req, res) {
   try {
-    const { title, content, about_page_url } = req.body;
+    const { title, content} = req.body;
 
     if (!title || !content) {
       return res
@@ -24,12 +24,12 @@ export async function updateAbout(req, res) {
 
     await pool.query(
       `UPDATE about_section
-       SET about_title = ?, about_description = ?, about_page_url = ?
+       SET about_title = ?, about_description = ?
        WHERE about_id = 1`,
-      [title, content, about_page_url || null],
+      [title, content || null],
     );
 
-    res.json({ message: "About section updated successfully!" });
+    res.status(200).json({ message: "About section updated successfully!" });
   } catch (error) {
     console.error("Error updating About section:", error);
     res.status(500).json({ message: "Internal Server Error" });
