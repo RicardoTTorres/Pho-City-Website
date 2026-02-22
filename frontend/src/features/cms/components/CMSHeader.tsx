@@ -1,5 +1,6 @@
-import { Search, Settings, User, LogOut, Sun, Moon } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+// src/features/cms/components/CMSHeader.tsx
+import { Search, Settings, LogOut, Sun, Moon, Menu } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type CMSHeaderProps = {
@@ -7,6 +8,7 @@ export type CMSHeaderProps = {
   showSearch?: boolean;
   toggleTheme: () => void;
   theme: string;
+  onMenuToggle?: () => void;
 };
 
 export function CMSHeader({
@@ -14,8 +16,9 @@ export function CMSHeader({
   showSearch: forcedSearch,
   toggleTheme,
   theme,
+  onMenuToggle,
 }: CMSHeaderProps) {
-  const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+  const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -30,9 +33,7 @@ export function CMSHeader({
       "/cms": { t: "Dashboard", s: false },
       "/cms/dashboard": { t: "Dashboard", s: false },
       "/cms/menu": { t: "Menu", s: true },
-      "/cms/content": { t: "Content", s: true },
       "/cms/media": { t: "Media Library", s: true },
-      "/cms/settings": { t: "Settings", s: false },
       "/cms/usermanual": { t: "User-manual", s: true },
     };
 
@@ -71,7 +72,7 @@ export function CMSHeader({
     try {
       await fetch(`${API_URL}/api/admin/logout`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
     } catch {
       // ignore network errors on logout
@@ -88,10 +89,23 @@ export function CMSHeader({
           border border-gray-100 dark:border-[#3A3A3A]
           shadow-sm rounded-xl px-4 py-3 transition-colors"
       >
-        {/* Title */}
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100 truncate">
-          {title}
-        </h1>
+        {/* Mobile menu button + Title */}
+        <div className="flex items-center gap-2 min-w-0">
+          {onMenuToggle && (
+            <button
+              onClick={onMenuToggle}
+              className="md:hidden p-2 rounded-lg
+                         hover:bg-gray-100 dark:hover:bg-[#3A3A3A]
+                         text-gray-600 dark:text-gray-100 transition"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={20} />
+            </button>
+          )}
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100 truncate">
+            {title}
+          </h1>
+        </div>
 
         {/* Search Bar */}
         {showSearch && (
@@ -165,16 +179,6 @@ export function CMSHeader({
               </div>
 
               <div className="h-px bg-gray-100 dark:bg-[#3A3A3A]" />
-
-              <Link
-                to="/cms/settings"
-                className="flex items-center gap-2 px-3 py-2 text-sm 
-                           text-gray-700 dark:text-gray-200 
-                           hover:bg-gray-50 dark:hover:bg-[#3A3A3A]"
-                onClick={() => setMenuOpen(false)}
-              >
-                <User size={16} /> Profile
-              </Link>
 
               <button
                 onClick={() => {

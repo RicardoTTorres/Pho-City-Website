@@ -1,3 +1,4 @@
+// src/features/cms/pages/RegisterAdminPage.tsx
 import { useState } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 
@@ -22,18 +23,19 @@ export default function RegisterAdminPage() {
         className="w-full rounded-lg pl-10 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-brand-red bg-brand-cream border-2 border-brand-gold text-brand-charcoal text-xs"
       />
 
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
-          const alreadyExists = content.adminUsers.some((user) => user.email === email);
-          if (alreadyExists)
-          {
+          const alreadyExists = content.adminUsers.some(
+            (user) => user.email === email,
+          );
+          if (alreadyExists) {
             alert("email already exists in admin users");
-          }
-          else
-          {
+          } else {
             alert("email is not currently in admin users");
           }
-        }}>
+        }}
+      >
         Register Admin Account
       </button>
     </div>

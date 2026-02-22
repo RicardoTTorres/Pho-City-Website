@@ -1,4 +1,4 @@
-//src/context/ContentContext.tsx
+//src/app/providers/ContentContext.tsx
 import React, {
   createContext,
   useContext,
@@ -35,18 +35,22 @@ function isValidMenuPayload(value: unknown): value is MenuData {
   return categories.every((category) => {
     if (typeof category !== "object" || category === null) return false;
     const menuCategory = category as { id?: unknown; name?: unknown };
-    return menuCategory.id !== undefined && typeof menuCategory.name === "string";
+    return (
+      menuCategory.id !== undefined && typeof menuCategory.name === "string"
+    );
   });
 }
 
 function isLikelyDatabaseMenu(value: MenuData): boolean {
-  return value.categories.some((category) => /^[0-9]+$/.test(String(category.id)));
+  return value.categories.some((category) =>
+    /^[0-9]+$/.test(String(category.id)),
+  );
 }
 
 export function ContentProvider({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const [content, setContent] = useState<RestaurantContent>(defaultContent);
-  const apiUrl = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+  const apiUrl = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const isCmsRoute = pathname.startsWith("/cms");
 
   //Load menu items from backend API when the app starts

@@ -1,13 +1,15 @@
+// src/features/cms/layouts/CMSLayout.tsx
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { DashboardNav } from "@/features/cms/components/DashboardNav";
 import { CMSHeader } from "@/features/cms/components/CMSHeader";
 
 export function CMSLayout() {
-  const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
+  const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
   // ---- DARK MODE STATE ----
@@ -29,11 +31,19 @@ export function CMSLayout() {
         });
         const data = await res.json().catch(() => ({ ok: false }));
         if (!res.ok || !data?.ok) {
-          if (active) navigate("/adminlogin", { replace: true, state: { from: location.pathname } });
+          if (active)
+            navigate("/adminlogin", {
+              replace: true,
+              state: { from: location.pathname },
+            });
           return;
         }
       } catch {
-        if (active) navigate("/adminlogin", { replace: true, state: { from: location.pathname } });
+        if (active)
+          navigate("/adminlogin", {
+            replace: true,
+            state: { from: location.pathname },
+          });
         return;
       } finally {
         if (active) setCheckingSession(false);
@@ -72,16 +82,23 @@ export function CMSLayout() {
       <DashboardNav
         collapsed={collapsed}
         setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
       {/* Main Content */}
       <main
-        className={`transition-all duration-300 ease-in-out pt-4 pr-4 pb-4 min-h-screen
-          ${collapsed ? "ml-[6rem]" : "ml-[18rem]"}
+        className={`transition-all duration-300 ease-in-out pt-4 px-4 pb-4 min-h-screen
+          md:pl-4 md:pr-4
+          ${collapsed ? "md:ml-[6rem]" : "md:ml-[18rem]"}
         `}
       >
         {/* Header */}
-        <CMSHeader theme={theme} toggleTheme={toggleTheme} />
+        <CMSHeader
+          theme={theme}
+          toggleTheme={toggleTheme}
+          onMenuToggle={() => setMobileOpen(true)}
+        />
 
         {/* Main Card */}
         <div

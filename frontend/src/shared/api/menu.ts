@@ -1,3 +1,4 @@
+// src/shared/api/menu.ts
 import type { MenuData } from "@/shared/content/content.types";
 
 const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
@@ -5,11 +6,12 @@ const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
 export type NewItemPayload = {
   name: string;
   description: string;
-  price: string; 
-  categoryId: string; 
+  price: string;
+  categoryId: string;
   image?: string;
   visible?: boolean;
   featured?: boolean;
+  featuredPosition?: number | null;
 };
 
 export type NewCategoryPayload = {
@@ -22,6 +24,22 @@ const toNumberPrice = (price: string) => {
   if (!Number.isFinite(n)) throw new Error("Invalid price");
   return n;
 };
+
+export type FeaturedItem = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  image: string | null;
+  featuredPosition: number | null;
+};
+
+export async function getFeaturedItems(): Promise<FeaturedItem[]> {
+  const res = await fetch(`${API_URL}/api/menu/featured`);
+  if (!res.ok) throw new Error("Failed to fetch featured items");
+  const data = await res.json();
+  return data.items ?? [];
+}
 
 export async function getMenu(): Promise<MenuData> {
   const res = await fetch(`${API_URL}/api/menu`);
@@ -52,6 +70,7 @@ export async function createItem(payload: NewItemPayload): Promise<void> {
       image: payload.image,
       visible: payload.visible ?? true,
       featured: payload.featured,
+      featuredPosition: payload.featuredPosition,
       category: payload.categoryId,
     }),
   });
@@ -70,6 +89,7 @@ export async function updateItem(id: string, payload: NewItemPayload): Promise<v
       image: payload.image,
       visible: payload.visible ?? true,
       featured: payload.featured,
+      featuredPosition: payload.featuredPosition,
       category: payload.categoryId,
     }),
   });
@@ -110,4 +130,26 @@ export async function deleteCategory(id: string): Promise<void> {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to delete category");
+}
+
+export async function reorderCategories(categoryIds: string[]): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/reorder`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ categoryIds }),
+  });
+
+  if (!res.ok) throw new Error("Failed to reorder categories");
+}
+
+export async function reorderItems(categoryId: string, itemIds: string[]): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/${categoryId}/items/reorder`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ itemIds }),
+  });
+
+  if (!res.ok) throw new Error("Failed to reorder items");
 }

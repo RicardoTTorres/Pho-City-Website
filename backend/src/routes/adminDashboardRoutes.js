@@ -1,3 +1,4 @@
+// src/routes/adminDashboardRoutes.js
 import { Router } from "express";
 import { getStats } from "../controllers/adminDashboardController.js";
 import { requireAuth } from "../middleware/requireAuth.js";
