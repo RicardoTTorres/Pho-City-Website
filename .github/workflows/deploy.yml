@@ -6,9 +6,9 @@ on:
       - main
 jobs:
   deploy:
-    runs-on: [pho-city-ec2]
+    runs-on: [self-hosted, X64, Linux]
 
-    steps:
+   steps:
       - name: Pull latest code
         run: |
           cd /home/ubuntu/Pho-City-Website
