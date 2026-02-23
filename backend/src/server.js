@@ -18,7 +18,7 @@ import activityRoutes from "./routes/activityRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-
+import { ensureAdminTableAndSeed } from "./routes/auth.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -34,11 +34,24 @@ app.use(cookieParser());
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: (origin, cb) => {
+      // allow curl/postman or same-origin requests (no Origin header)
+      if (!origin) return cb(null, true);
+
+      if (allowedOrigins.length === 0) return cb(null, true); // fallback: don't block
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+
+      return cb(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
-  }),
+  })
 );
 
 // Routes
@@ -64,6 +77,17 @@ app.get("/", (req, res) => {
   res.send("Hi from server!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await ensureAdminTableAndSeed();
+
+    app.listen(process.env.PORT || 5000, () => {
+      console.log("Server running...");
+    });
+  } catch (err) {
+    console.error("Startup error:", err);
+  }
+}
+
+startServer();
+

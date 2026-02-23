@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
-    runs-on: [self-hosted, pho-city]
+    runs-on: [self-hosted, X64, Linux]
 
     steps:
       - name: Pull latest code
