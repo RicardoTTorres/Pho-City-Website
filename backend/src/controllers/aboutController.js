@@ -16,7 +16,7 @@ export async function getAbout(req, res) {
 
 export async function updateAbout(req, res) {
   try {
-    const { title, content, about_page_url } = req.body;
+    const { title, content} = req.body;
 
     if (!title || !content) {
       return res
@@ -26,9 +26,9 @@ export async function updateAbout(req, res) {
 
     await pool.query(
       `UPDATE about_section
-       SET about_title = ?, about_description = ?, about_page_url = ?
+       SET about_title = ?, about_description = ?
        WHERE about_id = 1`,
-      [title, content, about_page_url || null],
+      [title, content || null],
     );
 
     logActivity("updated", "about", "Updated about section", req.user?.email);
