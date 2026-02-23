@@ -3,11 +3,25 @@ import { Button } from "@/shared/components/ui/button"
 
 const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
 
+type MailMessage = {
+    id: string,
+    threadId: string,
+    fromEmail: string,
+    fromName: string | undefined,
+    fromSelf: boolean,
+    date: string,
+    subject: string,
+    snippet: string
+};
+type MailThread = {
+    id: string, messages: MailMessage[]
+};
+
 export default function MessagesPage() {
     const [ isError, setIsError ] = useState<boolean>(false);
     const [ authenticated, setAuthenticated ] = useState<boolean>();
     const [ email, setEmail ] = useState<string>();
-    const [ threadsData, setThreadsData ] = useState<any>();
+    const [ threadsData, setThreadsData ] = useState<MailThread[]>();
 
     async function fetchState() {
         try {
