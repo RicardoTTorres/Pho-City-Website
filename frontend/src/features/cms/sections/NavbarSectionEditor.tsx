@@ -13,7 +13,7 @@ import {
 // import { MediaPickerModal } from "@/components/MediaPickerModal";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
-
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import { getNavbar, putNavbar } from "@/shared/api/navbar";
 import type { NavbarData, NavbarLink } from "@/shared/content/content.types";
 
@@ -29,7 +29,7 @@ function ensureDefaults(data: NavbarData): NavbarData {
       defaultLocale: "en",
       supportedLocales: ["en"],
     },
-    brand: data.brand ?? { name: "Pho City", logo: "" },
+    brand: { name: data.brand?.name ?? "Pho City", logo: data.brand?.logo || "/logo.png" },
     links: Array.isArray(data.links) ? data.links : [],
     ctas: data.ctas ?? {
       pickup: { enabled: false, label: { en: "Pickup" }, href: "" },
@@ -42,8 +42,6 @@ function ensureDefaults(data: NavbarData): NavbarData {
 }
 
 export function NavbarSectionEditor() {
-  const [logo] = useState<string | null>(null);
-  const [, setOpenMediaPicker] = useState(false);
 
   // API-driven state
   const [navbar, setNavbar] = useState<NavbarData>(() =>
@@ -248,23 +246,25 @@ export function NavbarSectionEditor() {
 
       {/* LOGO SECTION */}
       <div className="space-y-3">
-        <p className="font-medium text-gray-700">Navbar Logo</p>
+       
 
-        <input
-          className="w-full border rounded p-2"
-          placeholder="Logo URL (e.g. /logo.png)"
-          value={navbar.brand?.logo ?? ""}
-          onChange={(e) => {
+        <ImageUpload
+          section="brand"
+          currentUrl={navbar.brand?.logo}
+          label="Logo Image"
+          onUploaded={(url) => {
             setNavbar((prev) => ({
               ...prev,
               brand: {
                 name: prev.brand?.name ?? "Pho City",
-                logo: e.target.value,
+                logo: url,
               },
             }));
             markDirty();
           }}
         />
+
+       
       </div>
 
       {/* LINKS SECTION */}
@@ -527,17 +527,6 @@ export function NavbarSectionEditor() {
         </div>
       </div>
 
-      {/* FUTURE */}
-      {/*
-      <MediaPickerModal
-        open={openMediaPicker}
-        onClose={() => setOpenMediaPicker(false)}
-        onSelect={(url) => {
-          setLogo(url);
-          setOpenMediaPicker(false);
-        }}
-      />
-      */}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { Button } from "@/shared/components/ui/button";
 import AboutIcon from "@/shared/assets/About.svg";
 import ImageIcon from "@/shared/assets/ImageIcon.svg";
 import aboutUs from "@/shared/assets/aboutUs.png";
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
+import { updateAbout, type AboutUpdatePayload } from "@/shared/api/about";
 
 //using the constants to try and imitate the live preview of about page
 const CANVAS_WIDTH = 1600;
@@ -51,16 +53,8 @@ export function AboutSectionEditor() {
     setIsSaving(true);
     setMessage("");
     try {
-      const url = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${url}/api/about`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(aboutContent),
-      });
-      if (!res.ok) throw new Error("Failed to update About section.");
-      const data = await res.json();
-      setMessage(data.message || "About section updated successfully!");
+      const data = await updateAbout(aboutContent)
+      setMessage("About section updated successfully!");
     } catch (err) {
       console.error(err);
       setMessage("Error saving changes.");
@@ -108,6 +102,13 @@ export function AboutSectionEditor() {
               className="w-full rounded-lg bg-[#F5F1E8] border-2 border-brand-gold text-brand-charcoal text-sm px-3 py-2 h-64 resize-none focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
             />
           </div>
+
+          <ImageUpload
+            section="about"
+            currentUrl={aboutContent.imageUrl || null}
+            onUploaded={(url) => handleChange("imageUrl", url)}
+            label="About Image (optional)"
+          />
 
           <div className="pt-4 flex justify-center">
             <Button
@@ -198,7 +199,7 @@ export function AboutSectionEditor() {
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <img
-                  src={aboutUs}
+                  src={aboutContent.imageUrl || aboutUs}
                   alt="About Us"
                   style={{
                     width: IMAGE_WIDTH_PIXELS,

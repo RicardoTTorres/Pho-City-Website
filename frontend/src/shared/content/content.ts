@@ -121,7 +121,7 @@ export const defaultContent = {
 
   dashboard: {
     numMenuItems: 7,
-    numMenuCategories: 3,
+    numImages: 3,
   },
 
 

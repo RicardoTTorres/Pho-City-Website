@@ -75,7 +75,7 @@ export function TrafficOverviewEditor() {
             />
             <YAxis />
             <Tooltip
-              labelFormatter={(label) => timestampToDate(Number(label))}
+              labelFormatter={(label: string | number) => timestampToDate(Number(label))}
             />
             <Line
               type="monotone"

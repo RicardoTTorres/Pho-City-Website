@@ -16,6 +16,8 @@ import heroRoutes from "./routes/heroRoutes.js";
 import adminUsersRoutes from "./routes/adminUsersRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
 import mailRoutes from "./routes/mailRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 import { ensureAdminTableAndSeed } from "./routes/auth.js";
 const app = express();
@@ -69,6 +71,8 @@ app.use("/api/hero", heroRoutes);
 app.use("/api/footer", footerRoutes);
 app.use("/api", navbarRoutes);
 app.use("/api/admin/mail", mailRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Root test route
 app.get("/", (req, res) => {
@@ -87,5 +91,20 @@ async function startServer() {
   }
 }
 
-startServer();
+// added
+
+if (process.env.NODE_ENV !== "test") {
+  startServer();
+} else {
+  await ensureAdminTableAndSeed();
+}
+
+export default app;
+
+// added for testing 
+
+
+
+// commented out for testing 
+// startServer();
 

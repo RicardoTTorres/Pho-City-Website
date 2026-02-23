@@ -49,6 +49,7 @@ export interface RestaurantContent {
   about: {
     title: string;
     content: string;
+    imageUrl?: string;
   };
   contact: {
     address: string;
@@ -89,7 +90,7 @@ export interface RestaurantContent {
   };
   dashboard: {
     numMenuItems: number;
-    numMenuCategories: number;
+    numImages: number;
   };
   adminUsers: AdminUser[];
 }

@@ -10,13 +10,14 @@ export async function getAbout(req, res) {
     about: {
       title: about.about_title,
       content: about.about_description,
+      imageUrl: about.about_image_url || null,
     },
   });
 }
 
 export async function updateAbout(req, res) {
   try {
-    const { title, content, about_page_url } = req.body;
+    const { title, content, about_page_url, imageUrl } = req.body;
 
     if (!title || !content) {
       return res
@@ -26,9 +27,9 @@ export async function updateAbout(req, res) {
 
     await pool.query(
       `UPDATE about_section
-       SET about_title = ?, about_description = ?, about_page_url = ?
+       SET about_title = ?, about_description = ?, about_page_url = ?, about_image_url = ?
        WHERE about_id = 1`,
-      [title, content, about_page_url || null],
+      [title, content, about_page_url || null, imageUrl || null],
     );
 
     logActivity("updated", "about", "Updated about section", req.user?.email);

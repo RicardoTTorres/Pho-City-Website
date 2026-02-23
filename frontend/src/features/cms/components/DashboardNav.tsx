@@ -7,7 +7,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
-  Mail
+  Mail,
+  Settings,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { navConfig } from "@/shared/config/nav.config";
@@ -33,7 +34,8 @@ export function DashboardNav({
     { name: "Menu", path: "/cms/menu", icon: Utensils },
     { name: "Content", path: "/cms/content", icon: FileText },
     { name: "Media", path: "/cms/media", icon: Image },
-    { name: "Messages", path: "/cms/messages", icon: Mail }
+    { name: "Messages", path: "/cms/messages", icon: Mail },
+    { name: "Settings", path: "/cms/settings", icon: Settings },
   ] as const;
 
   const tabs =
@@ -41,7 +43,7 @@ export function DashboardNav({
       ? [
           { name: "Dashboard", path: "/cms/dashboard", icon: LayoutDashboard },
           { name: "Users", path: "/cms/users", icon: Users },
-          ...baseTabs.slice(1),
+          ...baseTabs.slice(1), // Menu, Content, Media, Settings
         ]
       : baseTabs;
 

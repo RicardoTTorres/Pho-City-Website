@@ -37,7 +37,7 @@ export async function getMenu(req, res) {
           name: i.name,
           description: i.description,
           price: `$${Number(i.price).toFixed(2)}`,
-          image: i.image ? `/imgs/${i.image}` : null,
+          image: i.image || null,
         })),
     }));
 
@@ -588,7 +588,7 @@ export async function getFeaturedItems(req, res) {
       name: i.name,
       description: i.description,
       price: `$${Number(i.price).toFixed(2)}`,
-      image: i.image ? `/imgs/${i.image}` : null,
+      image: i.image || null,
       featuredPosition: i.featuredPosition,
     }));
 
