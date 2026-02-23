@@ -1,6 +1,7 @@
 // src/shared/components/ui/ImageUpload.tsx
 import { useRef, useState } from "react";
 import { uploadImage } from "@/shared/api/upload";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -21,6 +22,7 @@ export function ImageUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,16 +76,37 @@ export function ImageUpload({
         className="hidden"
       />
 
-      <button
-        type="button"
-        disabled={uploading}
-        onClick={() => inputRef.current?.click()}
-        className="px-4 py-2 text-sm font-medium rounded-lg border border-brand-gold bg-[#F5F1E8] text-brand-charcoal hover:bg-brand-gold/20 transition-colors disabled:opacity-50"
-      >
-        {uploading ? "Uploading..." : "Choose Image"}
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="px-4 py-2 text-sm font-medium rounded-lg border border-brand-gold bg-[#F5F1E8] text-brand-charcoal hover:bg-brand-gold/20 transition-colors disabled:opacity-50"
+        >
+          {uploading ? "Uploading..." : "Upload New"}
+        </button>
+
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => setPickerOpen(true)}
+          className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          Library
+        </button>
+      </div>
 
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+
+      <MediaPickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(url) => {
+          onUploaded(url);
+          setPickerOpen(false);
+        }}
+        defaultSection={section}
+      />
     </div>
   );
 }

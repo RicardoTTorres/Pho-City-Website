@@ -7,6 +7,7 @@ import {
   uploadImage,
 } from "@/shared/api/upload";
 import type { MediaItem, MediaSection } from "@/shared/api/upload";
+import { Portal } from "@/shared/components/ui/Portal";
 
 const SECTIONS: MediaSection[] = ["menu", "hero", "about", "brand"];
 
@@ -219,6 +220,7 @@ export default function MediaPage() {
       </section>
       {/* Delete confirmation modal */}
       {pendingDelete && (
+        <Portal>
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 space-y-4">
             <h3 className="font-semibold text-gray-900">Delete image?</h3>
@@ -258,6 +260,7 @@ export default function MediaPage() {
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </div>
   );

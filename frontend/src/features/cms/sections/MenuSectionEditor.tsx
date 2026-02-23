@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { ImageUpload } from "@/shared/components/ui/ImageUpload";
+import { Portal } from "@/shared/components/ui/Portal";
 import {
   Pencil,
   Trash2,
@@ -767,8 +768,9 @@ export function MenuSectionEditor({
 
       {/* Item Modal */}
       {itemModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-auto mt-2 sm:mt-6 mb-4 max-h-[92vh] overflow-y-auto">
+        <Portal>
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[92vh] overflow-y-auto">
             <h2 className="text-xl sm:text-2xl font-bold text-brand-red mb-4">
               {editingItem ? "Edit Menu Item" : "Add Menu Item"}
             </h2>
@@ -870,12 +872,14 @@ export function MenuSectionEditor({
             </form>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Category Modal */}
       {categoryModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-auto mt-2 sm:mt-6 mb-4 max-h-[92vh] overflow-y-auto">
+        <Portal>
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[92vh] overflow-y-auto">
             <h2 className="text-xl sm:text-2xl font-bold text-brand-red mb-4">
               {editingCategory ? "Edit Category" : "Add Category"}
             </h2>
@@ -915,6 +919,7 @@ export function MenuSectionEditor({
             </form>
           </div>
         </div>
+        </Portal>
       )}
     </div>
   );

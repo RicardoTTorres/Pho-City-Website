@@ -16,6 +16,7 @@ import heroRoutes from "./routes/heroRoutes.js";
 import adminUsersRoutes from "./routes/adminUsersRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/hero", heroRoutes);
 app.use("/api/footer", footerRoutes);
 app.use("/api", navbarRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Root test route
 app.get("/", (req, res) => {
