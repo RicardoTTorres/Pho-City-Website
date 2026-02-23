@@ -247,17 +247,77 @@ export async function sendUserMessage(req, res) {
  */
 export async function getThreads(req, res) {
     try {
+        const count = Math.min(req.query.count || 20, 40);
         const gmail = await getGmailClient();
-
+        const clientEmail = await getContactEmail();
         const response = await gmail.users.threads.list({
             userId: "me",
-            maxResults: 20,
+            maxResults: count,
+        });
+        const fullThreads = await Promise.all(
+            response.data.threads.map(t =>
+                gmail.users.threads.get({
+                    userId: "me",
+                    id: t.id,
+                    format: "metadata",
+                    metadataHeaders: ["Subject", "From", "Date", "Reply-To"]
+                })
+            )
+        );
+        const formatted = fullThreads.map((thread) => {
+            return {
+                id: thread.data.id,
+                messages: thread.data.messages.map((m) => parseMessage(m, clientEmail))
+            };
         });
 
-        res.json(response.data);
+        res.json(formatted);
 
     } catch (err) {
         console.error("Error getting threads:", err);
         res.status(500).json({ error: "Error getting threads "});
+    }
+}
+
+function parseMessage(message, clientEmail) {
+    let from;
+    let fromName;
+    let fromEmail;
+    let replyTo;
+    let date;
+    let subject;
+
+    for (const {name, value} of message.payload.headers) {
+        if (name == "Date") date = value;
+        else if (name == "From") from = value;
+        else if (name == "Reply-To") replyTo = value;
+        else if (name == "Subject") subject = value;
+    }
+    if (from && from.endsWith(">") && from.includes("<")) {
+        from = from.substring(0, from.length - 1);
+        const splits = from.split("<");
+        fromEmail = splits.pop();
+        fromName = splits.join("<");
+        fromName = fromName.substring(0, fromName.length - 1);
+    } else {
+        fromEmail = from;
+    }
+    if (replyTo) {
+        fromEmail = replyTo;
+        if (fromName && fromName.endsWith(" via Contact Form")) {
+            fromName = fromName.substring(0, fromName.length - " via Contact Form".length);
+        }
+    }
+    date = new Date(date).toISOString();
+
+    return {
+        id: message.id,
+        threadId: message.threadId,
+        fromEmail,
+        fromName,
+        fromSelf: (fromEmail == clientEmail),
+        date,
+        subject,
+        snippet: message.snippet
     }
 }
