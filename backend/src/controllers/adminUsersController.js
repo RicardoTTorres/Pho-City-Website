@@ -1,6 +1,7 @@
 // src/controllers/adminUsersController.js
-import bcrypt from "bcrypt";
+
 import { pool } from "../db/connect_db.js";
+import bcrypt from "bcrypt";
 
 const ALLOWED_ROLES = new Set(["admin", "editor"]);
 

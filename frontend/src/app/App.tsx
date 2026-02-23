@@ -14,6 +14,7 @@ import ContentPage from "@/features/cms/pages/ContentPage";
 import MediaPage from "@/features/cms/pages/MediaPage";
 import UsersPage from "@/features/cms/pages/UsersPage";
 import RegisterAdminPage from "@/features/cms/pages/RegisterAdminPage";
+import MessagesPage from "@/features/cms/pages/MessagesPage";
 import SettingsPage from "@/features/cms/pages/SettingsPage";
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="media" element={<MediaPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="registeradmin" element={<RegisterAdminPage />} />
+        <Route path="messages" element={<MessagesPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 

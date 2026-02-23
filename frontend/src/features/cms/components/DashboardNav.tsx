@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  Mail,
   Settings,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -33,6 +34,7 @@ export function DashboardNav({
     { name: "Menu", path: "/cms/menu", icon: Utensils },
     { name: "Content", path: "/cms/content", icon: FileText },
     { name: "Media", path: "/cms/media", icon: Image },
+    { name: "Messages", path: "/cms/messages", icon: Mail },
     { name: "Settings", path: "/cms/settings", icon: Settings },
   ] as const;
 
