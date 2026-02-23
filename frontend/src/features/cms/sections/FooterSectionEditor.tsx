@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Trash2, GripVertical, Plus, Footprints, Save } from "lucide-react";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import type { FooterData } from "@/shared/content/content.types";
 
 const DEFAULT_LOGO = "/logo.png";
@@ -70,7 +71,6 @@ export default function FooterSectionEditor({
   const initialFooter = useMemo(() => normalizeFooter(footer), [footer]);
 
   const [brandName, setBrandName] = useState(initialFooter.brand.name);
-  const [, setOpenMediaPicker] = useState(false);
   const [footerLogo, setFooterLogo] = useState(initialFooter.brand.logo);
 
   const [navLinks, setNavLinks] = useState([...initialFooter.navLinks]);
@@ -263,23 +263,17 @@ export default function FooterSectionEditor({
 
       {/* BRAND */}
       <div className="space-y-3">
-        <p className="font-medium text-gray-700">Footer Logo</p>
+        
 
-        <div
-          className="w-40 h-20 border rounded-xl bg-white/70 flex items-center justify-center cursor-pointer
-          hover:ring-2 hover:ring-brand-red transition"
-          onClick={() => setOpenMediaPicker(true)}
-        >
-          {footerLogo ? (
-            <img
-              src={footerLogo}
-              alt="Logo Preview"
-              className="w-full h-full object-contain rounded-xl"
-            />
-          ) : (
-            <span className="text-gray-500 text-sm">Select Image</span>
-          )}
-        </div>
+        <ImageUpload
+          section="brand"
+          currentUrl={footerLogo}
+          label="Logo Image"
+          onUploaded={(url) => {
+            setFooterLogo(url);
+            markDirty();
+          }}
+        />
       </div>
 
       {/*NAV LINKS*/}

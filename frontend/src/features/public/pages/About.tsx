@@ -22,7 +22,7 @@ export default function About() {
           </div>
           <div className="flex justify-center md:justify-end w-full md:w-auto">
             <img
-              src={aboutUs}
+              src={content.about.imageUrl || aboutUs}
               alt="About Pho City"
               className="
                 w-[420px] md:w-[520px]

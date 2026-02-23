@@ -13,6 +13,7 @@ async function parseJson(res: Response) {
 }
 
 export async function getNavbar(): Promise<NavbarData> {
+  
   const res = await fetch(`${API_URL}/api/navbar`, {
     credentials: "include",
   });

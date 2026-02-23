@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `about_section` (
   `about_title` VARCHAR(150) DEFAULT NULL,
   `about_description` TEXT,
   `about_page_url` VARCHAR(255) DEFAULT NULL,
+  `about_image_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`about_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `contact_info` (
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `hero_section` (
   `hero_subtitle` TEXT,
   `hero_button_text` VARCHAR(100) DEFAULT NULL,
   `hero_secondary_button_text` VARCHAR(255) DEFAULT NULL,
-  `hero_image_url` VARCHAR(100) DEFAULT NULL,
+  `hero_image_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`hero_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `menu_categories` (
@@ -44,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `menu_items` (
   `item_name` VARCHAR(100) NOT NULL,
   `item_description` TEXT,
   `item_price` DECIMAL(6, 2) DEFAULT NULL,
-  `item_image_url` VARCHAR(255) DEFAULT NULL,
+  `item_image_url` VARCHAR(512) DEFAULT NULL,
   `item_is_visible` TINYINT(1) DEFAULT '1',
   `category_id` INT DEFAULT NULL,
   `is_featured` TINYINT(1) DEFAULT '0',

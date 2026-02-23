@@ -11,6 +11,12 @@ export function CMSLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [search, setSearch] = useState("");
+
+  // clear search on page change
+  useEffect(() => {
+    setSearch("");
+  }, [location.pathname]);
 
   // ---- DARK MODE STATE ----
   const [theme, setTheme] = useState("light");
@@ -98,6 +104,8 @@ export function CMSLayout() {
           theme={theme}
           toggleTheme={toggleTheme}
           onMenuToggle={() => setMobileOpen(true)}
+          searchValue={search}
+          onSearchChange={setSearch}
         />
 
         {/* Main Card */}
@@ -107,7 +115,7 @@ export function CMSLayout() {
                      border border-gray-200 dark:border-[#3A3A3A]
                      min-h-full p-6 transition-colors"
         >
-          <Outlet />
+          <Outlet context={{ search }} />
         </div>
       </main>
     </div>

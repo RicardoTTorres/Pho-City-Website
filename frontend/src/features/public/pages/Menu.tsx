@@ -1,18 +1,12 @@
 // src/features/public/pages/Menu.tsx
+
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSidebar } from "@/features/public/components/MenuSidebar";
 import { MenuItem as MenuItemCard } from "@/shared/components/ui/MenuItem";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { MenuPdfDocument } from "@/features/public/components/MenuPdfDocument";
-import { Download } from "lucide-react";
-import type { Weekday } from "@/shared/content/content.types";
 
 export default function Menu() {
   const { content } = useContent();
-
-  const contactHours = (content.contact?.hours ?? {}) as Record<Weekday, string>;
-  const footerData = content.footer;
 
   const allCategories = useMemo(
     () => content.menuPublic?.categories ?? [],
@@ -175,36 +169,6 @@ export default function Menu() {
 
         {/* Main Content */}
         <main className="flex-1">
-          {allCategories.length > 0 && (
-            <div className="flex justify-end mb-6">
-              <PDFDownloadLink
-                document={
-                  <MenuPdfDocument
-                    categories={allCategories}
-                    restaurantName={footerData?.brand?.name ?? "Pho City"}
-                    address={footerData?.contact?.address ?? ""}
-                    cityZip={footerData?.contact?.cityZip ?? ""}
-                    phone={footerData?.contact?.phone ?? content.contact?.phone ?? ""}
-                    hours={contactHours}
-                    logoUrl={`${window.location.origin}/logo.png`}
-                  />
-                }
-                fileName="pho-city-menu.pdf"
-              >
-                {({ loading }) => (
-                  <button
-                    type="button"
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 rounded-lg bg-brand-red px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-brand-red-hover disabled:opacity-60"
-                  >
-                    <Download className="h-4 w-4" />
-                    {loading ? "Preparing..." : "Download Menu"}
-                  </button>
-                )}
-              </PDFDownloadLink>
-            </div>
-          )}
-
           {allCategories.map((category) => (
             <section
               key={category.id || category.name}
@@ -232,6 +196,7 @@ export default function Menu() {
                         name={item.name}
                         price={Number.isFinite(priceNumber) ? priceNumber : 0}
                         description={item.description || ""}
+                        image={item.image}
                       />
                     );
                   })}

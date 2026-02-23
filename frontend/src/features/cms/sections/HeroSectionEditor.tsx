@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import StarIcon from "@/shared/assets/Star.svg";
 import ImageIcon from "@/shared/assets/ImageIcon.svg";
 import { getHero, updateHero } from "@/shared/api/hero";
+import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 
 type LocalHero = {
   title: string;
@@ -140,22 +141,12 @@ export function HeroSectionEditor() {
                   className="w-full rounded-lg bg-[#F5F1E8] border-2 border-brand-gold text-brand-charcoal text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-brand-charcoal mb-1">
-                  Hero Image URL (optional)
-                </label>
-                <input
-                  type="text"
-                  value={heroContent.imageUrl ?? ""}
-                  onChange={(e) =>
-                    handleChange(
-                      "imageUrl",
-                      e.target.value ? e.target.value : null,
-                    )
-                  }
-                  className="w-full rounded-lg bg-[#F5F1E8] border-2 border-brand-gold text-brand-charcoal text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
-                />
-              </div>
+              <ImageUpload
+                section="hero"
+                currentUrl={heroContent.imageUrl}
+                onUploaded={(url) => handleChange("imageUrl", url)}
+                label="Hero Image (optional)"
+              />
             </div>
 
             {/* Save button */}
