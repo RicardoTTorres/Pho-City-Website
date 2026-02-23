@@ -1,14 +1,17 @@
 // src/features/public/sections/Hero.tsx
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { getHero } from "@/shared/api/hero";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { MenuPdfDocument } from "@/features/public/components/MenuPdfDocument";
 import { useContent } from "@/app/providers/ContentContext";
+import { fetchPublicSettings } from "@/shared/api/settings";
 import { Download } from "lucide-react";
 import type { Weekday } from "@/shared/content/content.types";
+
+const LazyPdfButton = lazy(
+  () => import("@/features/public/components/PdfDownloadButton"),
+);
 
 type HeroState = {
   title: string;
@@ -29,11 +32,22 @@ const FALLBACK_HERO: HeroState = {
 
 export function Hero(): ReactElement {
   const [hero, setHero] = useState<HeroState>(FALLBACK_HERO);
+  const [pdfRequested, setPdfRequested] = useState(false);
+  const [pdfLabel, setPdfLabel] = useState("Download Menu");
   const { content } = useContent();
 
   const menuCategories = content.menuPublic?.categories ?? [];
-  const contactHours = (content.contact?.hours ?? {}) as Record<Weekday, string>;
+  const contactHours = (content.contact?.hours ?? {}) as Record<
+    Weekday,
+    string
+  >;
   const footerData = content.footer;
+
+  useEffect(() => {
+    fetchPublicSettings()
+      .then(({ pdfLabel: label }) => setPdfLabel(label))
+      .catch(() => {/* keep default */});
+  }, []);
 
   useEffect(() => {
     getHero()
@@ -86,32 +100,44 @@ export function Hero(): ReactElement {
             </Button>
 
             {menuCategories.length > 0 ? (
-              <PDFDownloadLink
-                document={
-                  <MenuPdfDocument
+              pdfRequested ? (
+                <Suspense
+                  fallback={
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      disabled
+                      className="shadow-lg ring-1 ring-brand-red/20 inline-flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Preparing...
+                    </Button>
+                  }
+                >
+                  <LazyPdfButton
                     categories={menuCategories}
                     restaurantName={footerData?.brand?.name ?? "Pho City"}
                     address={footerData?.contact?.address ?? ""}
                     cityZip={footerData?.contact?.cityZip ?? ""}
-                    phone={footerData?.contact?.phone ?? content.contact?.phone ?? ""}
+                    phone={
+                      footerData?.contact?.phone ?? content.contact?.phone ?? ""
+                    }
                     hours={contactHours}
                     logoUrl={`${window.location.origin}/logo.png`}
+                    menuLabel={pdfLabel}
                   />
-                }
-                fileName="pho-city-menu.pdf"
-              >
-                {({ loading }) => (
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    disabled={loading}
-                    className="shadow-lg ring-1 ring-brand-red/20 inline-flex items-center gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    {loading ? "Preparing..." : "Download Menu"}
-                  </Button>
-                )}
-              </PDFDownloadLink>
+                </Suspense>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => setPdfRequested(true)}
+                  className="shadow-lg ring-1 ring-brand-red/20 inline-flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {pdfLabel}
+                </Button>
+              )
             ) : (
               <Button
                 variant="secondary"

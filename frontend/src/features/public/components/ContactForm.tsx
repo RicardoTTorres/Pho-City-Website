@@ -18,7 +18,7 @@ export const ContactForm = () => {
       const res = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message, _honeypot: "" }),
       });
 
       if (res.ok) {
@@ -46,6 +46,8 @@ export const ContactForm = () => {
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 h-full">
+        {/* Honeypot field — hidden from users, filled by bots */}
+        <input type="text" name="_honeypot" tabIndex={-1} aria-hidden="true" className="hidden" />
         <input
           type="text"
           placeholder="Your Name"
