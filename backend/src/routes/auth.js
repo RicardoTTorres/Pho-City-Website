@@ -26,16 +26,21 @@ const seedEmail = process.env.ADMIN_DEFAULT_EMAIL || "admin@phocity.com";
 const seedPassword = process.env.ADMIN_DEFAULT_PASSWORD || "changeme";
 
 const isProd = process.env.NODE_ENV === "production";
+const authTtlDays = Number(process.env.AUTH_TOKEN_TTL_DAYS) || 30;
+const authTtlMs = authTtlDays * 24 * 60 * 60 * 1000;
+const authTtlJwt = `${authTtlDays}d`;
 const cookieOptions = {
   httpOnly: true,
   secure: isProd,
-  sameSite: "lax",
+  // In production, frontend/backend can be on different domains.
+  // SameSite=None is required for credentialed cross-site requests.
+  sameSite: isProd ? "none" : "lax",
   path: "/",
-  maxAge: 1000 * 60 * 60 * 2,
+  maxAge: authTtlMs,
 };
 
 function signAccess(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: authTtlJwt });
 }
 
 export async function ensureAdminTableAndSeed() {
@@ -107,13 +112,13 @@ router.get("/verify", (req, res) => {
   try {
     const token = req.cookies?.auth;
     if (!token || isTokenBlacklisted(token)) {
-      return res.status(200).json({ ok: false });
+      return res.status(403).json({ ok: false });
     }
 
     jwt.verify(token, JWT_SECRET);
     return res.status(200).json({ ok: true });
   } catch (_err) {
-    return res.status(200).json({ ok: false });
+    return res.status(403).json({ ok: false });
   }
 });
 
@@ -163,7 +168,7 @@ router.post("/logout", (req, res) => {
   res.clearCookie("auth", {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
     path: "/",
   });
   return res.json({ ok: true });
