@@ -89,5 +89,20 @@ async function startServer() {
   }
 }
 
-startServer();
+// added
+
+if (process.env.NODE_ENV !== "test") {
+  startServer();
+} else {
+  await ensureAdminTableAndSeed();
+}
+
+export default app;
+
+// added for testing 
+
+
+
+// commented out for testing 
+// startServer();
 
