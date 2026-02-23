@@ -1,4 +1,5 @@
 // src/features/cms/pages/MenuPage.tsx
+import { useOutletContext } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSectionEditor } from "@/features/cms/sections/MenuSectionEditor";
@@ -18,6 +19,9 @@ import type {
   MenuItem as RawMenuItem,
 } from "@/shared/content/content.types";
 import { reorderCategories, reorderItems } from "@/shared/api/menu";
+
+//this is the search value coming from CMSLayout
+type CMSOutletContext = { search: string };
 
 export interface MenuItem extends RawMenuItem {
   category: string;
@@ -42,6 +46,11 @@ export default function MenuPage() {
   const rawMenuData: RawMenuData | null = content.menuAdmin;
   const [menuLoading, setMenuLoading] = useState(true);
   const [menuError, setMenuError] = useState<string | null>(null);
+
+  //Get global search value from CMSLayout using Outlet context
+  const { search } = useOutletContext<CMSOutletContext>();
+  //query used for case filtering
+  const q = search.trim().toLowerCase();
 
   useEffect(() => {
     let active = true;
@@ -94,6 +103,21 @@ export default function MenuPage() {
     }));
   }, [rawMenuData]);
 
+  //search filter query on derived categories/items
+  const filteredCategories: Category[] = useMemo(() => {
+  if (!q) return derivedCategories;
+
+  return derivedCategories
+    .map((cat) => {
+      const items = (cat.items ?? []).filter((item) => {
+        const haystack = `${item.name} ${item.description ?? ""}`.toLowerCase();
+        return haystack.includes(q);
+      });
+      return { ...cat, items };
+    })
+    .filter((cat) => (cat.items?.length ?? 0) > 0);
+}, [derivedCategories, q]);
+
   const formattedMenuData: MenuData = useMemo(
     () => ({ categories: derivedCategories }),
     [derivedCategories],
@@ -141,7 +165,8 @@ export default function MenuPage() {
     await reorderItems(categoryId, itemIds);
     await refreshMenuAdmin();
   };
-
+  
+  const categoriesToShow = q ? filteredCategories : derivedCategories;
   return (
     <div className="space-y-6">
       <header>
@@ -166,9 +191,10 @@ export default function MenuPage() {
         </div>
       ) : null}
 
+
       <MenuSectionEditor
-        menuData={formattedMenuData}
-        categories={derivedCategories}
+        menuData={{ categories: categoriesToShow }}
+        categories={categoriesToShow}
         loading={menuLoading}
         onCreateItem={handleCreateItem}
         onUpdateItem={handleUpdateItem}

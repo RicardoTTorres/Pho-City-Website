@@ -9,6 +9,8 @@ export type CMSHeaderProps = {
   toggleTheme: () => void;
   theme: string;
   onMenuToggle?: () => void;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 };
 
 export function CMSHeader({
@@ -17,6 +19,8 @@ export function CMSHeader({
   toggleTheme,
   theme,
   onMenuToggle,
+  searchValue,
+  onSearchChange,
 }: CMSHeaderProps) {
   const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const location = useLocation();
@@ -117,6 +121,8 @@ export function CMSHeader({
               <input
                 type="search"
                 placeholder="Search..."
+                value={searchValue ?? ""}
+                onChange={(e) => onSearchChange?.(e.target.value)}
                 className="w-full bg-white/70 dark:bg-[#2A2A2A] 
                            dark:text-gray-100 border border-gray-200 dark:border-[#3A3A3A]
                            rounded-lg pl-9 pr-3 py-2 text-sm shadow-inner 
