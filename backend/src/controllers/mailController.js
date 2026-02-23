@@ -192,3 +192,72 @@ export async function finishAuth(req, res) {
         });
     }
 };
+
+/**
+ * Send message from contact page
+ */
+export async function sendUserMessage(req, res) {
+    try {
+        const { name, email, message } = req.body;
+
+        if (!name || !email || !message) {
+            return res.status(400).json({
+                success: false,
+                error: "All fields are required"
+            });
+        }
+
+        const gmail = await getGmailClient();
+        const clientEmail = await getContactEmail();
+        const msg = [
+            `To: ${clientEmail}`,
+            `From: "${name} via Contact Form" <${clientEmail}>`,
+            `Reply-To: ${email}`,
+            `Subject: Message from ${name}`,
+            `Content-Type: text/plain; charset=utf-8`,
+            ``,
+            `Message from ${name} (${email}) via Pho City Website Contact Form:`,
+            ``,
+            message,
+        ].join("\n");
+
+        const encodedMessage = Buffer.from(msg)
+            .toString("base64")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
+
+        await gmail.users.messages.send({
+            userId: 'me',
+            requestBody: {
+                raw: encodedMessage
+            },
+        });
+
+        res.status(200).json({ success: true, message: "Email sent!" })
+
+    } catch (err) {
+        console.error("Error sending user message:", err);
+        res.status(500).json({ success: false, error: "Error sending user message" });
+    }
+}
+
+/**
+ * get recent threads
+ */
+export async function getThreads(req, res) {
+    try {
+        const gmail = await getGmailClient();
+
+        const response = await gmail.users.threads.list({
+            userId: "me",
+            maxResults: 20,
+        });
+
+        res.json(response.data);
+
+    } catch (err) {
+        console.error("Error getting threads:", err);
+        res.status(500).json({ error: "Error getting threads "});
+    }
+}

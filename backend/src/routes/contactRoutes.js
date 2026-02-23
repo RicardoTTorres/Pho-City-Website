@@ -1,9 +1,9 @@
 // src/routes/contactRoutes.js
 import express from "express";
-import { handleContactForm } from "../controllers/contactController.js";
+import { sendUserMessage } from "../controllers/mailController.js";
 
 const router = express.Router();
 
-router.post("/", handleContactForm);
+router.post("/", sendUserMessage);
 
 export default router;
