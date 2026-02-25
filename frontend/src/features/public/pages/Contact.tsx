@@ -1,5 +1,5 @@
 // src/features/public/pages/Contact.tsx
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { ContactForm } from "@/features/public/components/ContactForm";
 import { useContent } from "@/app/providers/ContentContext";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
@@ -7,6 +7,8 @@ import type { Weekday } from "@/shared/content/content.types";
 
 export default function Contact() {
   const { content } = useContent();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const daysOfWeek: Weekday[] = [
     "Monday",
     "Tuesday",
@@ -21,11 +23,9 @@ export default function Contact() {
     <section className="min-h-screen flex items-center justify-center px-4 py-16 bg-gradient-to-b from-brand-cream to-brand-gold/10">
       <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl w-full items-stretch">
         {/*Left Column: Unified Contact Info + Map Card*/}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl ring-1 ring-brand-gold/30 p-8 flex flex-col h-full"
+        <div
+          className={`bg-white/80 backdrop-blur-md rounded-2xl shadow-xl ring-1 ring-brand-gold/30 p-8 flex flex-col h-full transition-all duration-500 ${mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
+          style={{ transitionDelay: mounted ? "200ms" : "0ms" }}
         >
           {/*Contact Information Header*/}
           <div className="mb-6">
@@ -97,17 +97,15 @@ export default function Contact() {
               title="Pho City Location - 6175 Stockton Blvd #200, Sacramento, CA 95824"
             ></iframe>
           </div>
-        </motion.div>
+        </div>
 
         {/*Right Column: Contact Form*/}
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex h-full"
+        <div
+          className={`flex h-full transition-all duration-500 ${mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+          style={{ transitionDelay: mounted ? "300ms" : "0ms" }}
         >
           <ContactForm />
-        </motion.div>
+        </div>
       </div>
     </section>
   );
