@@ -33,11 +33,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cookieParser());
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
-
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
   .split(",")
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
 app.use(
@@ -52,7 +50,7 @@ app.use(
       return cb(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
-  })
+  }),
 );
 
 // Routes
@@ -101,10 +99,7 @@ if (process.env.NODE_ENV !== "test") {
 
 export default app;
 
-// added for testing 
+// added for testing
 
-
-
-// commented out for testing 
+// commented out for testing
 // startServer();
-
