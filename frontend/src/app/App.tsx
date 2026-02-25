@@ -1,21 +1,34 @@
 // src/app/App.tsx
+import { lazy, Suspense } from "react";
 import { Navbar } from "@/features/public/sections/Navbar";
 import { Footer } from "@/features/public/sections/Footer";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import Home from "@/features/public/pages/Home";
 import About from "@/features/public/pages/About";
 import Contact from "@/features/public/pages/Contact";
-import AdminLogin from "@/features/auth/pages/AdminLogin";
 import Menu from "@/features/public/pages/Menu";
-import { CMSLayout } from "@/features/cms/layouts/CMSLayout";
-import DashboardPage from "@/features/cms/pages/DashboardPage";
-import MenuPage from "@/features/cms/pages/MenuPage";
-import ContentPage from "@/features/cms/pages/ContentPage";
-import MediaPage from "@/features/cms/pages/MediaPage";
-import UsersPage from "@/features/cms/pages/UsersPage";
-import RegisterAdminPage from "@/features/cms/pages/RegisterAdminPage";
-import MessagesPage from "@/features/cms/pages/MessagesPage";
-import SettingsPage from "@/features/cms/pages/SettingsPage";
+
+// CMS + auth — only loaded when the user navigates to /cms/* or /adminlogin
+const AdminLogin = lazy(() => import("@/features/auth/pages/AdminLogin"));
+const CMSLayout = lazy(() =>
+  import("@/features/cms/layouts/CMSLayout").then((m) => ({ default: m.CMSLayout })),
+);
+const DashboardPage = lazy(() => import("@/features/cms/pages/DashboardPage"));
+const MenuPage = lazy(() => import("@/features/cms/pages/MenuPage"));
+const ContentPage = lazy(() => import("@/features/cms/pages/ContentPage"));
+const MediaPage = lazy(() => import("@/features/cms/pages/MediaPage"));
+const UsersPage = lazy(() => import("@/features/cms/pages/UsersPage"));
+const RegisterAdminPage = lazy(() => import("@/features/cms/pages/RegisterAdminPage"));
+const MessagesPage = lazy(() => import("@/features/cms/pages/MessagesPage"));
+const SettingsPage = lazy(() => import("@/features/cms/pages/SettingsPage"));
+
+function CMSFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-brand-cream">
+      <div className="h-8 w-8 rounded-full border-4 border-brand-red border-t-transparent animate-spin" />
+    </div>
+  );
+}
 
 export default function App() {
   return (
@@ -29,10 +42,24 @@ export default function App() {
       </Route>
 
       {/* Admin routes without navbar/footer */}
-      <Route path="/adminlogin" element={<AdminLogin />} />
+      <Route
+        path="/adminlogin"
+        element={
+          <Suspense fallback={<CMSFallback />}>
+            <AdminLogin />
+          </Suspense>
+        }
+      />
 
       {/* CMS routes with CMSLayout (floating sidebar) */}
-      <Route path="/cms" element={<CMSLayout />}>
+      <Route
+        path="/cms"
+        element={
+          <Suspense fallback={<CMSFallback />}>
+            <CMSLayout />
+          </Suspense>
+        }
+      >
         <Route index element={<Navigate to="/cms/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="menu" element={<MenuPage />} />

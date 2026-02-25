@@ -1,7 +1,6 @@
 // src/features/public/sections/MenuPreview.tsx
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { getFeaturedItems, type FeaturedItem } from "@/shared/api/menu";
 import { Card } from "@/shared/components/ui/card";
 import { parseBilingualName } from "@/utils/menuHelper";
@@ -18,6 +17,19 @@ function preloadImages(items: FeaturedItem[]) {
 export default function MenuPreview() {
   const [featured, setFeatured] = useState<FeaturedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry?.isIntersecting) setInView(true); },
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     getFeaturedItems()
@@ -33,12 +45,10 @@ export default function MenuPreview() {
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        viewport={{ once: true }}
-        className="mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8"
+      <div
+        ref={sectionRef}
+        className={`mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-500 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
+        style={{ transitionDelay: inView ? "100ms" : "0ms" }}
       >
         {/*Header row*/}
         <div className="flex items-baseline justify-between mb-8">
@@ -138,7 +148,7 @@ export default function MenuPreview() {
             );
           })}
         </ul>
-      </motion.div>
+      </div>
     </section>
   );
 }
