@@ -4,7 +4,6 @@ import { useContent } from "@/app/providers/ContentContext";
 import { Button } from "@/shared/components/ui/button";
 import AboutIcon from "@/shared/assets/About.svg";
 import ImageIcon from "@/shared/assets/ImageIcon.svg";
-import aboutUs from "@/shared/assets/aboutUs.png";
 import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import { updateAbout, type AboutUpdatePayload } from "@/shared/api/about";
 
@@ -53,7 +52,7 @@ export function AboutSectionEditor() {
     setIsSaving(true);
     setMessage("");
     try {
-      const data = await updateAbout(aboutContent)
+      const data = await updateAbout(aboutContent);
       setMessage("About section updated successfully!");
     } catch (err) {
       console.error(err);
@@ -199,7 +198,7 @@ export function AboutSectionEditor() {
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <img
-                  src={aboutContent.imageUrl || aboutUs}
+                  src={aboutContent.imageUrl}
                   alt="About Us"
                   style={{
                     width: IMAGE_WIDTH_PIXELS,
