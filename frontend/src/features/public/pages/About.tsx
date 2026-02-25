@@ -1,6 +1,5 @@
 // src/features/public/pages/About.tsx
 import { useContent } from "@/app/providers/ContentContext";
-import aboutUs from "@/shared/assets/aboutUs.png";
 
 export default function About() {
   const { content } = useContent();
@@ -22,7 +21,7 @@ export default function About() {
           </div>
           <div className="flex justify-center md:justify-end w-full md:w-auto">
             <img
-              src={content.about.imageUrl || aboutUs}
+              src={content.about.imageUrl}
               alt="About Pho City"
               className="
                 w-[420px] md:w-[520px]

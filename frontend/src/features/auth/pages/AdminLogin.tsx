@@ -121,14 +121,11 @@ export default function AdminLogin() {
           </button>
           {/*Demo Credentials*/}
           <div className="mt-6 p-3 text-center text-sm text-brand-charcoal w-full rounded-[10px] bg-gradient-to-r from-brand-gold/10 to-brand-gold/10">
-            <p className="mb-1 font-semibold text-xs">Demo Credentials</p>
-            <p className="mb-1 text-xs">Email: admin@phocity.com</p>
-            <p className="mb-1 text-xs">Password: changeme</p>
             <a
               href="/"
               className="text-brand-gold hover:underline text-xs inline-block mt-1"
             >
-              ← Return to Restaurant Website
+              ← Return to main site
             </a>
           </div>
         </div>

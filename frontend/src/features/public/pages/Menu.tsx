@@ -109,8 +109,8 @@ export default function Menu() {
           />
 
           {/* Slide-out panel */}
-          <div className="absolute left-0 top-0 h-full w-[85vw] max-w-sm bg-brand-cream border-r border-brand-gold/30 shadow-xl">
-            <div className="p-6 flex items-start justify-between">
+          <div className="absolute left-0 top-0 h-full w-[85vw] max-w-sm bg-brand-cream border-r border-brand-gold/30 shadow-xl flex flex-col">
+            <div className="p-6 flex items-start justify-between shrink-0">
               <div>
                 <h2 className="text-brand-red font-bold mb-1">Categories</h2>
                 <div className="h-1 w-16 bg-gradient-to-r from-brand-gold to-brand-red rounded-full" />
@@ -139,7 +139,7 @@ export default function Menu() {
               </button>
             </div>
 
-            <nav className="px-3 pb-6">
+            <nav className="px-3 pb-6 overflow-y-auto flex-1">
               <MenuSidebar
                 categories={allCategories}
                 activeCategory={activeCategory}
@@ -152,13 +152,13 @@ export default function Menu() {
 
       <div className="flex gap-4 lg:gap-8 max-w-7xl mx-auto px-4 py-8">
         {/* Desktop sidebar only */}
-        <aside className="hidden lg:block w-64 sticky top-24 h-fit bg-gradient-to-b from-brand-cream to-brand-gold/10 border-r border-brand-gold/30 rounded-lg shadow-sm">
-          <div className="p-6">
+        <aside className="hidden lg:flex flex-col w-64 sticky top-24 max-h-[calc(100vh-7rem)] bg-gradient-to-b from-brand-cream to-brand-gold/10 border-r border-brand-gold/30 rounded-lg shadow-sm">
+          <div className="p-6 shrink-0">
             <h2 className="text-brand-red font-bold mb-1">Categories</h2>
             <div className="h-1 w-16 bg-gradient-to-r from-brand-gold to-brand-red rounded-full"></div>
           </div>
 
-          <nav className="px-3 pb-4">
+          <nav className="px-3 pb-4 overflow-y-auto flex-1">
             <MenuSidebar
               categories={allCategories}
               activeCategory={activeCategory}

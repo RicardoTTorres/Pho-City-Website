@@ -1,3 +1,4 @@
+// src/services/navbarService.js
 import { pool } from "../db/connect_db.js";
 
 const SITE_SETTINGS_ID = 1;
