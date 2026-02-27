@@ -18,7 +18,6 @@ const MenuPage = lazy(() => import("@/features/cms/pages/MenuPage"));
 const ContentPage = lazy(() => import("@/features/cms/pages/ContentPage"));
 const MediaPage = lazy(() => import("@/features/cms/pages/MediaPage"));
 const UsersPage = lazy(() => import("@/features/cms/pages/UsersPage"));
-const RegisterAdminPage = lazy(() => import("@/features/cms/pages/RegisterAdminPage"));
 const MessagesPage = lazy(() => import("@/features/cms/pages/MessagesPage"));
 const SettingsPage = lazy(() => import("@/features/cms/pages/SettingsPage"));
 
@@ -66,7 +65,7 @@ export default function App() {
         <Route path="content" element={<ContentPage />} />
         <Route path="media" element={<MediaPage />} />
         <Route path="users" element={<UsersPage />} />
-        <Route path="registeradmin" element={<RegisterAdminPage />} />
+        <Route path="registeradmin" element={<Navigate to="/cms/users" replace />} />
         <Route path="messages" element={<MessagesPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>

@@ -5,6 +5,7 @@ import StarIcon from "@/shared/assets/Star.svg";
 import ImageIcon from "@/shared/assets/ImageIcon.svg";
 import { getHero, updateHero } from "@/shared/api/hero";
 import { ImageUpload } from "@/shared/components/ui/ImageUpload";
+import { Download } from "lucide-react";
 
 type LocalHero = {
   title: string;
@@ -64,7 +65,8 @@ export function HeroSectionEditor() {
         secondaryCtaText: heroContent.secondaryCtaText,
         imageUrl: heroContent.imageUrl,
       });
-      setMessage("Hero section updated successfully!");
+      setMessage("Hero section saved!");
+      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       console.error("Failed to save hero:", err);
       setMessage("Error saving changes.");
@@ -130,7 +132,7 @@ export function HeroSectionEditor() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-brand-charcoal mb-1">
-                  Secondary Button Text
+                  PDF Download Button Label
                 </label>
                 <input
                   type="text"
@@ -140,6 +142,9 @@ export function HeroSectionEditor() {
                   }
                   className="w-full rounded-lg bg-[#F5F1E8] border-2 border-brand-gold text-brand-charcoal text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
                 />
+                <p className="text-xs text-gray-400 mt-1">
+                  Text shown on the PDF download button in the hero section.
+                </p>
               </div>
               <ImageUpload
                 section="hero"
@@ -219,8 +224,9 @@ export function HeroSectionEditor() {
                     <Button
                       variant="secondary"
                       size="lg"
-                      className="shadow-lg ring-1 ring-brand-red/20"
+                      className="shadow-lg ring-1 ring-brand-red/20 inline-flex items-center gap-2"
                     >
+                      <Download className="h-4 w-4" />
                       {heroContent.secondaryCtaText}
                     </Button>
                   </div>

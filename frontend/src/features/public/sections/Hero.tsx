@@ -4,8 +4,6 @@ import { Button } from "@/shared/components/ui/button";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { getHero } from "@/shared/api/hero";
-import { useContent } from "@/app/providers/ContentContext";
-import { fetchPublicSettings } from "@/shared/api/settings";
 import PdfDownloadButton from "@/features/public/components/PdfDownloadButton";
 
 type HeroState = {
@@ -27,16 +25,6 @@ const FALLBACK_HERO: HeroState = {
 
 export function Hero(): ReactElement {
   const [hero, setHero] = useState<HeroState>(FALLBACK_HERO);
-  const [pdfLabel, setPdfLabel] = useState("Download Menu");
-  const { content } = useContent();
-
-  const menuCategories = content.menuPublic?.categories ?? [];
-
-  useEffect(() => {
-    fetchPublicSettings()
-      .then(({ pdfLabel: label }) => setPdfLabel(label))
-      .catch(() => {/* keep default */});
-  }, []);
 
   useEffect(() => {
     getHero()
@@ -88,18 +76,7 @@ export function Hero(): ReactElement {
               </Link>
             </Button>
 
-            {menuCategories.length > 0 ? (
-              <PdfDownloadButton menuLabel={pdfLabel} />
-            ) : (
-              <Button
-                variant="secondary"
-                size="lg"
-                asChild
-                className="shadow-lg ring-1 ring-brand-red/20"
-              >
-                <a href="tel:+19167542143"> {hero.secondaryCtaText}</a>
-              </Button>
-            )}
+            <PdfDownloadButton menuLabel={hero.secondaryCtaText} />
           </div>
         </div>
       </div>

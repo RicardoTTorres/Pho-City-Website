@@ -207,7 +207,8 @@ export function NavbarSectionEditor() {
       setNavbar(normalized);
 
       dirtyRef.current = false;
-      setStatus("Navbar saved successfully!");
+      setStatus("Navbar section saved!");
+      setTimeout(() => setStatus(null), 3000);
     } catch (e: any) {
       setStatus(e?.message ?? "Failed to save navbar changes");
     } finally {
@@ -237,7 +238,9 @@ export function NavbarSectionEditor() {
       </div>
 
       {status && (
-        <div className="text-sm text-green-600 mt-2 text-right">{status}</div>
+        <div className={`text-sm mt-2 text-right ${status.includes("Failed") || status.includes("Error") ? "text-red-500" : "text-green-600"}`}>
+          {status}
+        </div>
       )}
 
       {loading ? (
@@ -269,7 +272,7 @@ export function NavbarSectionEditor() {
 
       {/* LINKS SECTION */}
       <div className="space-y-4">
-        <p className="font-medium text-gray-700">Navigation Links</p>
+        <p className="text-sm font-semibold text-brand-charcoal">Navigation Links</p>
 
         <div className="space-y-4">
           {links
@@ -370,7 +373,7 @@ export function NavbarSectionEditor() {
       </div>
       {/* CTA BUTTONS SECTION */}
       <div className="space-y-4">
-        <p className="font-medium text-gray-700">Order Button Settings</p>
+        <p className="text-sm font-semibold text-brand-charcoal">Order Button Settings</p>
 
         <div className="space-y-6 bg-white/70 p-4 rounded-xl border shadow-sm">
           {/* PICKUP */}

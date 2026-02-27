@@ -13,6 +13,11 @@ import {
   reorderCategories,
   reorderCategoryItems,
 } from "../controllers/menuController.js";
+import {
+  getAllCustomizations,
+  upsertCustomization,
+  deleteCustomization,
+} from "../controllers/customizationController.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { generateMenuPdf } from "../services/menuPdfService.js";
 
@@ -52,5 +57,10 @@ router.put(
   requireAuth,
   reorderCategoryItems,
 );
+
+// Customization accordion routes
+router.get("/customizations", getAllCustomizations);
+router.put("/categories/:id/customization", requireAuth, upsertCustomization);
+router.delete("/categories/:id/customization", requireAuth, deleteCustomization);
 
 export default router;

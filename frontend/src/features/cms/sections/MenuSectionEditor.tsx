@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import { Portal } from "@/shared/components/ui/Portal";
+import { CustomizationsTab } from "@/features/cms/sections/CustomizationsTab";
 import {
   Pencil,
   Trash2,
@@ -285,7 +286,7 @@ export function MenuSectionEditor({
   onReorderCategories,
   onReorderItems,
 }: MenuSectionEditorProps) {
-  const [activeTab, setActiveTab] = useState("items");
+  const [activeTab, setActiveTab] = useState<"items" | "categories" | "customizations">("items");
   const [filteredCategory, setFilteredCategory] = useState("all");
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -552,26 +553,23 @@ export function MenuSectionEditor({
     <div className="space-y-4 md:space-y-6">
       {/* Tabs */}
       <div className="flex gap-1 sm:gap-2 border-b border-gray-200 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab("items")}
-          className={`px-3 sm:px-4 py-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap ${
-            activeTab === "items"
-              ? "border-b-2 border-brand-red text-brand-red"
-              : "text-gray-600 hover:text-brand-red"
-          }`}
-        >
-          Menu Items
-        </button>
-        <button
-          onClick={() => setActiveTab("categories")}
-          className={`px-3 sm:px-4 py-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap ${
-            activeTab === "categories"
-              ? "border-b-2 border-brand-red text-brand-red"
-              : "text-gray-600 hover:text-brand-red"
-          }`}
-        >
-          Categories
-        </button>
+        {(["items", "categories", "customizations"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-3 sm:px-4 py-2 font-medium text-sm sm:text-base transition-colors whitespace-nowrap ${
+              activeTab === tab
+                ? "border-b-2 border-brand-red text-brand-red"
+                : "text-gray-600 hover:text-brand-red"
+            }`}
+          >
+            {tab === "items"
+              ? "Menu Items"
+              : tab === "categories"
+                ? "Categories"
+                : "Customizations"}
+          </button>
+        ))}
       </div>
 
       {/* Menu Items Tab */}
@@ -763,6 +761,13 @@ export function MenuSectionEditor({
               </DndContext>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Customizations Tab */}
+      {activeTab === "customizations" && (
+        <div className="space-y-4">
+          <CustomizationsTab categories={categories} />
         </div>
       )}
 

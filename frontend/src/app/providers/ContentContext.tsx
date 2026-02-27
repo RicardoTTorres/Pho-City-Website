@@ -125,6 +125,39 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   }, [isCmsRoute, refreshFooter, refreshMenuAdmin, refreshMenuPublic]);
 
   useEffect(() => {
+    async function fetchContact() {
+      try {
+        const res = await fetch(`${apiUrl}/api/contact`);
+        const data = await res.json();
+
+        const hours = {} as Record<string, string>;
+        if (Array.isArray(data.businessHours)) {
+          for (const h of data.businessHours) {
+            if (h.closed) {
+              hours[h.day] = "Closed";
+            } else {
+              const open = h.open ? String(h.open).slice(0, 5) : "";
+              const close = h.close ? String(h.close).slice(0, 5) : "";
+              hours[h.day] = open && close ? `${open} - ${close}` : "";
+            }
+          }
+        }
+
+        updateContent({
+          contact: {
+            address: data.fullAddress ?? data.address ?? "",
+            phone: data.phone ?? "",
+            hours,
+          },
+        });
+      } catch (err) {
+        console.error("Contact fetch failed:", err);
+      }
+    }
+    fetchContact();
+  }, [apiUrl, updateContent]);
+
+  useEffect(() => {
     async function fetchAbout() {
       try {
         const res = await fetch(`${apiUrl}/api/about`);

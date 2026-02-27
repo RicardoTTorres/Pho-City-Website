@@ -153,3 +153,50 @@ export async function reorderItems(categoryId: string, itemIds: string[]): Promi
 
   if (!res.ok) throw new Error("Failed to reorder items");
 }
+
+export type CustomizationItem = {
+  id?: number;
+  name: string;
+  price: string; // free text, e.g. "+$1.50" or "" for no price
+};
+
+export type CustomizationSection = {
+  id?: number;
+  title: string;
+  items: CustomizationItem[];
+};
+
+export type CategoryCustomization = {
+  enabled: boolean;
+  sections: CustomizationSection[];
+};
+
+export type CustomizationMap = Record<string, CategoryCustomization>;
+
+export async function getAllCustomizations(): Promise<CustomizationMap> {
+  const res = await fetch(`${API_URL}/api/menu/customizations`);
+  if (!res.ok) throw new Error("Failed to fetch customizations");
+  const data = await res.json();
+  return data.customizations ?? {};
+}
+
+export async function upsertCustomization(
+  categoryId: string,
+  payload: CategoryCustomization,
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/${categoryId}/customization`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to save customization");
+}
+
+export async function removeCustomization(categoryId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/categories/${categoryId}/customization`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to delete customization");
+}

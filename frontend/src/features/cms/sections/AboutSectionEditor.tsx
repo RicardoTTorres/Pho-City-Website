@@ -53,7 +53,8 @@ export function AboutSectionEditor() {
     setMessage("");
     try {
       const data = await updateAbout(aboutContent);
-      setMessage("About section updated successfully!");
+      setMessage("About section saved!");
+      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       console.error(err);
       setMessage("Error saving changes.");

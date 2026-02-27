@@ -164,7 +164,7 @@ export default function FooterSectionEditor({
         payloadFooter.socialLinks[0]?.icon ?? DEFAULT_INSTAGRAM_ICON,
       );
       setNavLinks([...normalizedNavLinks]);
-      setSaveSuccess("Footer saved successfully!");
+      setSaveSuccess("Footer section saved!");
       setTimeout(() => setSaveSuccess(null), 3000);
 
       setSaveError(null);
@@ -278,7 +278,7 @@ export default function FooterSectionEditor({
 
       {/*NAV LINKS*/}
       <div className="space-y-4">
-        <p className="font-medium text-gray-700">Footer Navigation Links</p>
+        <p className="text-sm font-semibold text-brand-charcoal">Footer Navigation Links</p>
 
         <div className="space-y-4">
           {navLinks.map((link, index) => (
@@ -344,7 +344,7 @@ export default function FooterSectionEditor({
 
       {/* INSTAGRAM */}
       <div className="space-y-4">
-        <p className="font-medium text-gray-700">Instagram</p>
+        <p className="text-sm font-semibold text-brand-charcoal">Instagram</p>
 
         <div className="space-y-3 bg-white/70 p-4 rounded-xl border shadow-sm">
           <div>
@@ -373,7 +373,7 @@ export default function FooterSectionEditor({
 
       {/* CONTACT */}
       <div className="space-y-4">
-        <p className="font-medium text-gray-700">Contact Information</p>
+        <p className="text-sm font-semibold text-brand-charcoal">Contact Information</p>
 
         <div className="space-y-3 bg-white/70 p-4 rounded-xl border shadow-sm">
           <div>

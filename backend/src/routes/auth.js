@@ -2,6 +2,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import rateLimit from "express-rate-limit";
 import { pool } from "../db/connect_db.js";
 import {
   blacklistToken,
@@ -9,6 +11,27 @@ import {
   JWT_SECRET,
   requireAuth,
 } from "../middleware/requireAuth.js";
+
+// 10 attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts. Please try again in 15 minutes." },
+});
+
+// 5 reset requests per hour per IP (prevents email spam)
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many reset requests. Please try again in an hour." },
+});
+
+// In-memory OTP store for password resets (email -> { code, expiresAt })
+const resetOtps = new Map();
 
 const router = express.Router();
 
@@ -69,7 +92,7 @@ router.get("/login", (_req, res) => {
   res.send("Login endpoint is POST /api/admin/login with JSON body.");
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email || !password) {
@@ -157,6 +180,81 @@ router.post("/update-password", requireAuth, async (req, res) => {
     return res.json({ ok: true, updated: true });
   } catch (err) {
     console.error("update-password error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post("/forgot-password", forgotPasswordLimiter, async (req, res) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ error: "Email required" });
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT id FROM admins WHERE email = ? LIMIT 1",
+      [normalizedEmail],
+    );
+
+    // Always return ok to avoid exposing which emails exist
+    if (!rows.length) return res.json({ ok: true });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    resetOtps.set(normalizedEmail, { code, expiresAt: Date.now() + 15 * 60 * 1000 });
+
+    // Log for dev environments without email configured
+    console.log(`[Password Reset] OTP for ${normalizedEmail}: ${code}`);
+
+    if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
+      });
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: normalizedEmail,
+        subject: "Pho City Admin — Password Reset Code",
+        text: `Your password reset code is: ${code}\n\nThis code expires in 15 minutes. If you did not request this, ignore this email.`,
+      });
+    }
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("forgot-password error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { email, code, newPassword } = req.body || {};
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const entry = resetOtps.get(normalizedEmail);
+
+  if (!entry || entry.code !== String(code) || Date.now() > entry.expiresAt) {
+    return res.status(400).json({ error: "Invalid or expired reset code" });
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    const [result] = await pool.query(
+      "UPDATE admins SET password_hash = ? WHERE email = ?",
+      [passwordHash, normalizedEmail],
+    );
+
+    if (result.affectedRows < 1) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    resetOtps.delete(normalizedEmail);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("reset-password error:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });

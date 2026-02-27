@@ -4,6 +4,11 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSidebar } from "@/features/public/components/MenuSidebar";
 import { MenuItem as MenuItemCard } from "@/shared/components/ui/MenuItem";
+import { MenuCustomizationAccordion } from "@/shared/components/ui/MenuCustomizationAccordion";
+import {
+  getAllCustomizations,
+  type CustomizationMap,
+} from "@/shared/api/menu";
 
 export default function Menu() {
   const { content } = useContent();
@@ -16,6 +21,11 @@ export default function Menu() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const [customizations, setCustomizations] = useState<CustomizationMap>({});
+
+  useEffect(() => {
+    getAllCustomizations().then(setCustomizations).catch(() => {});
+  }, []);
 
   // Set initial active category
   useEffect(() => {
@@ -181,6 +191,17 @@ export default function Menu() {
                 </h1>
                 <div className="h-1 w-20 bg-gradient-to-r from-brand-gold to-brand-red rounded-full mx-auto"></div>
               </div>
+
+              {/* Customization accordion — sits between title and items */}
+              {(() => {
+                const cust = customizations[String(category.id)];
+                return cust?.enabled && cust.sections.length > 0 ? (
+                  <MenuCustomizationAccordion
+                    customization={cust}
+                    categoryName={category.name}
+                  />
+                ) : null;
+              })()}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(category.items ?? [])

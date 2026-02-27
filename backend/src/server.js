@@ -1,6 +1,7 @@
 // src/server.js
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import contactRoutes from "./routes/contactRoutes.js";
@@ -22,6 +23,14 @@ import { requireAuth } from "./middleware/requireAuth.js";
 import { ensureAdminTableAndSeed } from "./routes/auth.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Security headers — clickjacking (X-Frame-Options), MIME sniffing (X-Content-Type-Options), etc.
+// CSP is omitted here because the React SPA handles its own inline scripts/styles.
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 
 // Logs all requests for debugging purposes
 app.use((req, res, next) => {

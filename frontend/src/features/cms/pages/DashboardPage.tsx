@@ -14,9 +14,11 @@ import {
   Send,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEditor";
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
+import { PUBLIC_ROUTES } from "@/shared/config/publicRoutes";
 
 function getActivityIcon(section: string, action: string) {
   if (action === "deleted")
@@ -127,22 +129,31 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/*Quick Actions*/}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button className="flex items-center justify-center gap-2 bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition">
+        <Link
+          to="/cms/content"
+          className="flex items-center justify-center gap-2 bg-gray-800 text-white p-3 rounded-lg hover:bg-gray-700 transition"
+        >
           <Edit size={18} /> Edit Content
-        </button>
-        <button className="flex items-center justify-center gap-2 bg-brand-red text-white p-3 rounded-lg hover:bg-brand-redHover transition">
+        </Link>
+        <Link
+          to="/cms/menu"
+          className="flex items-center justify-center gap-2 bg-brand-red text-white p-3 rounded-lg hover:bg-brand-redHover transition"
+        >
           <PlusCircle size={18} /> Add Menu Item
-        </button>
-        <button className="flex items-center justify-center gap-2 bg-brand-gold text-white p-3 rounded-lg hover:bg-yellow-600 transition">
+        </Link>
+        <Link
+          to="/cms/media"
+          className="flex items-center justify-center gap-2 bg-brand-gold text-white p-3 rounded-lg hover:bg-yellow-600 transition"
+        >
           <Image size={18} /> Upload Image
-        </button>
+        </Link>
       </section>
 
       {/*Overview Stats*/}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-700">Total Pages</p>
-          <h2 className="text-2xl font-semibold text-gray-600">4</h2>
+          <h2 className="text-2xl font-semibold text-gray-600">{PUBLIC_ROUTES.length}</h2>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border">
           <p className="text-sm text-gray-700">Menu Items</p>
