@@ -79,15 +79,13 @@ export function MenuCustomizationAccordion({
                 {/* Items */}
                 <ul className="space-y-1.5">
                   {section.items.map((item, ii) => (
-                    <li key={ii} className="flex items-start justify-between gap-2">
-                      <span className="flex items-baseline gap-1.5 min-w-0">
-                        <span className="w-1 h-1 rounded-full bg-amber-400 flex-shrink-0 mt-[5px]" />
-                        <span className="text-xs text-slate-700 leading-snug">
-                          {item.name}
-                        </span>
+                    <li key={ii} className="flex items-baseline gap-2">
+                      <span className="w-1 h-1 rounded-full bg-amber-400 flex-shrink-0 mt-[5px]" />
+                      <span className="text-sm font-bold text-red-900 leading-snug">
+                        {item.name}
                       </span>
                       {item.price ? (
-                        <span className="text-[10px] font-semibold text-amber-600 whitespace-nowrap flex-shrink-0">
+                        <span className="text-sm font-bold text-amber-600 whitespace-nowrap">
                           {item.price}
                         </span>
                       ) : null}
