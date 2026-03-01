@@ -58,9 +58,20 @@ export const defaultContent = {
   },
 
   about: {
-    title: "About Pho City",
-    content:
-      "Welcome to Pho City, Sacramento's go-to destination for authentic Vietnamese flavors! We proudly serve a wide range of dishes with dine-in, takeout, and delivery options to fit your lifestyle. Our menu features vegan and vegetarian choices, ensuring something for everyone.\n\nAs an Asian and women-owned restaurant, we celebrate culture, inclusivity, and community. We also support our veterans with a military discount as a token of gratitude.\n\nAt Pho City, every dish is crafted with tradition, passion, and care.",
+    heroTitle:          "About Pho City",
+    heroIntro:          "Welcome to Pho City, Sacramento's go-to destination for authentic Vietnamese flavors! We proudly serve a wide range of dishes with dine-in, takeout, and delivery options to fit your lifestyle. Our menu features vegan and vegetarian choices, ensuring something for everyone.",
+    heroImage:          null,
+    beginningTitle:     "How It All Began",
+    beginningBody:      "Pho City was founded with a simple mission: to bring the warmth and authenticity of Vietnamese home cooking to Sacramento. What started as a small family kitchen has grown into a beloved community gathering place.",
+    foodTitle:          "Our Food",
+    foodBody:           "Every dish on our menu is crafted from family recipes passed down through generations. From our slow-simmered pho broth to our fresh spring rolls, we use only the finest ingredients to honor the traditions of Vietnamese cuisine.",
+    foodImage:          null,
+    commitmentTitle:    "Our Commitment",
+    commitmentBody:     "As an Asian and women-owned restaurant, we celebrate culture, inclusivity, and community. We proudly support our veterans with a military discount as a token of our gratitude.",
+    closingText:        "At Pho City, every dish is crafted with tradition, passion, and care.",
+    previewHeading:     "Our Story",
+    previewBody:        "For more than 10 years, Phở City has been a welcoming place for families and friends to gather over authentic Vietnamese cuisine. Rooted in tradition and built on family recipes, we are proud to serve Sacramento.",
+    previewButtonLabel: "Learn More",
   },
 
   contact: {

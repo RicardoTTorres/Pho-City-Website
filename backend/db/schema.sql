@@ -6,6 +6,32 @@ CREATE TABLE IF NOT EXISTS `about_section` (
   `about_image_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`about_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `about_page_content` (
+  `id`                   INT NOT NULL AUTO_INCREMENT,
+  `hero_title`           VARCHAR(150) DEFAULT NULL,
+  `hero_intro`           TEXT,
+  `hero_image_url`       VARCHAR(512) DEFAULT NULL,
+  `beginning_title`      VARCHAR(150) DEFAULT NULL,
+  `beginning_body`       TEXT,
+  `food_title`           VARCHAR(150) DEFAULT NULL,
+  `food_body`            TEXT,
+  `commitment_title`     VARCHAR(150) DEFAULT NULL,
+  `commitment_body`      TEXT,
+  `closing_text`         TEXT,
+  `preview_heading`      VARCHAR(150) DEFAULT NULL,
+  `preview_body`         TEXT,
+  `preview_button_label` VARCHAR(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_heading` ALTER TABLE `about_page_content`
+ADD COLUMN `preview_heading` VARCHAR(150) DEFAULT NULL;VARCHAR(150) DEFAULT NULL;
+ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_body`         TEXT;
+ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_button_label` VARCHAR(100) DEFAULT NULL;
+INSERT INTO `about_page_content` (`hero_title`, `hero_intro`, `hero_image_url`)
+SELECT `about_title`, `about_description`, `about_image_url`
+FROM   `about_section`
+WHERE  NOT EXISTS (SELECT 1 FROM `about_page_content`)
+LIMIT  1;
 CREATE TABLE IF NOT EXISTS `contact_info` (
   `contact_id` INT NOT NULL AUTO_INCREMENT,
   `contact_address` VARCHAR(255) DEFAULT NULL,

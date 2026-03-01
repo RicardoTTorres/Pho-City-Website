@@ -39,6 +39,23 @@ export interface MenuData {
   categories: MenuCategory[];
 }
 
+export interface AboutPageContent {
+  heroTitle: string;
+  heroIntro: string;
+  heroImage?: string | null;
+  beginningTitle: string;
+  beginningBody: string;
+  foodTitle: string;
+  foodBody: string;
+  foodImage?: string | null;
+  commitmentTitle: string;
+  commitmentBody: string;
+  closingText: string;
+  previewHeading?: string;
+  previewBody?: string;
+  previewButtonLabel?: string;
+}
+
 export interface RestaurantContent {
   hero: {
     title: string;
@@ -46,11 +63,7 @@ export interface RestaurantContent {
     ctaText: string;
     backgroundImage?: string;
   };
-  about: {
-    title: string;
-    content: string;
-    imageUrl?: string;
-  };
+  about: AboutPageContent;
   contact: {
     address: string;
     phone: string;

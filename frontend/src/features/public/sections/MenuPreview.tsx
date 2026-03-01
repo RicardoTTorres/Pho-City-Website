@@ -50,12 +50,14 @@ export default function MenuPreview() {
         className={`mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-500 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
         style={{ transitionDelay: inView ? "100ms" : "0ms" }}
       >
-        {/*Header row*/}
+        {/* Header row */}
         <div className="flex items-baseline justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900"></h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-brand-charcoal">
+            House Favorites
+          </h2>
           <a
             href="/menu"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition"
+            className="text-sm font-medium text-brand-charcoal/60 hover:text-brand-charcoal flex items-center gap-1 transition"
           >
             Browse full menu
             <svg
@@ -75,29 +77,33 @@ export default function MenuPreview() {
           </a>
         </div>
 
-        {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {loading &&
-            Array.from({ length: 4 }).map((_, i) => (
-              <li key={`skeleton-${i}`}>
-                <div className="rounded-xl bg-white border border-gray-100 overflow-hidden animate-pulse">
-                  <div className="w-full aspect-[4/3] bg-gray-200" />
-                  <div className="p-6 space-y-3">
-                    <div className="h-5 bg-gray-200 rounded w-3/4" />
-                    <div className="h-4 bg-gray-200 rounded w-full" />
-                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+            Array.from({ length: 4 }).map((_, i) => {
+              const skeletonAspect = i % 2 === 0 ? "aspect-[4/3]" : "aspect-square";
+              return (
+                <li key={`skeleton-${i}`}>
+                  <div className="rounded-xl bg-white border border-gray-100 overflow-hidden animate-pulse">
+                    <div className={`w-full bg-gray-200 ${skeletonAspect}`} />
+                    <div className="p-6 space-y-3">
+                      <div className="h-5 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-full" />
+                      <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          {featured.map((dish) => {
+                </li>
+              );
+            })}
+
+          {featured.map((dish, index) => {
             const { english, vietnamese } = parseBilingualName(dish.name);
+            const imgAspect = index % 2 === 0 ? "aspect-[4/3]" : "aspect-square";
 
             return (
               <li key={dish.id}>
                 <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out border border-gray-100 font-sans">
                   {/*Image*/}
-                  <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden flex items-center justify-center">
+                  <div className={`relative w-full bg-gray-100 overflow-hidden flex items-center justify-center ${imgAspect}`}>
                     {dish.image ? (
                       <img
                         src={dish.image}

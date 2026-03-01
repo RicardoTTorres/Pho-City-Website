@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
+import { MapPin } from "lucide-react";
 import { getHero } from "@/shared/api/hero";
-import PdfDownloadButton from "@/features/public/components/PdfDownloadButton";
+
+const DIRECTIONS_URL =
+  "https://www.google.com/maps/dir/?api=1&destination=Ph%C3%B4+City+Vietnamese+Cuisine+6175+Stockton+Blvd+%23200+Sacramento+CA+95824&travelmode=driving";
 
 type HeroState = {
   title: string;
   subtitle: string;
   ctaText: string;
-  secondaryCtaText: string;
   imageUrl: string | null;
 };
 
@@ -19,7 +21,6 @@ const FALLBACK_HERO: HeroState = {
   subtitle:
     "Experience Authentic Vietnamese flavors in the heat of Sacramento. From traditional pho to modern Vietnamese fusion, every dish is crafted with passion and tradition.",
   ctaText: "View Our Menu",
-  secondaryCtaText: "Call Now",
   imageUrl: "/hero_pho_bowl.jpg",
 };
 
@@ -33,8 +34,6 @@ export function Hero(): ReactElement {
           title: h.title || FALLBACK_HERO.title,
           subtitle: h.subtitle || FALLBACK_HERO.subtitle,
           ctaText: h.ctaText || FALLBACK_HERO.ctaText,
-          secondaryCtaText:
-            h.secondaryCtaText || FALLBACK_HERO.secondaryCtaText,
           imageUrl: h.imageUrl ?? FALLBACK_HERO.imageUrl,
         });
       })
@@ -76,7 +75,22 @@ export function Hero(): ReactElement {
               </Link>
             </Button>
 
-            <PdfDownloadButton menuLabel={hero.secondaryCtaText} />
+            <Button
+              size="lg"
+              variant="secondary"
+              asChild
+              className="shadow-lg ring-1 ring-white/20 inline-flex items-center gap-2"
+            >
+              <a
+                href={DIRECTIONS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Get directions to Pho City"
+              >
+                <MapPin className="h-4 w-4" />
+                Directions
+              </a>
+            </Button>
           </div>
         </div>
       </div>
