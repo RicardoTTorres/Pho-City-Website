@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button"
+import { Reply as ReplyIcon } from "lucide-react";
+import JavascriptTimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+JavascriptTimeAgo.addDefaultLocale(en);
+const timeAgo = new JavascriptTimeAgo('en-US');
 
 const API_URL = import.meta.env.DEV ? "" : (import.meta.env.VITE_API_URL || "");
 
@@ -22,6 +28,7 @@ export default function MessagesPage() {
     const [ authenticated, setAuthenticated ] = useState<boolean>();
     const [ email, setEmail ] = useState<string>();
     const [ threadsData, setThreadsData ] = useState<MailThread[]>();
+    const [ openThread, setOpenThread ] = useState<MailThread>();
 
     async function fetchState() {
         try {
@@ -78,21 +85,78 @@ export default function MessagesPage() {
 
     } else {
         return (
-            <>
-                <h1>Fetch Results</h1>
-                <p>This is a temporary screen to demonstrate the response from getThreads</p>
-                {threadsData.map((thread) => (
-                    <div className="my-10">
-                        <h2>Thread ID: {thread.id}</h2>
-                        {thread.messages.map((message) => (
-                            <div className="my-4">
-                                <h3>Message ID: {message.id}</h3>
-                                {Object.entries(message).map(([key, value]) => (<p>{key}: {String(value)}</p>))}
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                    {threadsData.map((thread) => (
+                        <ThreadPreview thread={thread} selected={thread.id === openThread?.id} onClick={() => setOpenThread(thread)} />
+                    ))}
+                </div>
+                <div className="bg-white p-4 rounded-lg shadow-sm border">
+                {openThread?.messages ? <div className="space-y-3">
+                    {openThread.messages.map((message) => (
+                        <MessageView message={message}/>
+                    ))}
+                    <button className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+                        <ReplyIcon size={20} /> Reply
+                    </button>
+                </div> : <div className="text-center m-6 text-gray-400">No Conversation Selected</div>}
+                </div>
+            </div>
         );
     }
+}
+
+function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onClick: () => void, selected?: boolean }) {
+    const message = thread.messages[0];
+    if (message === undefined) return null;
+    return (
+              <article
+                key={thread.id}
+                className={
+                    selected ?
+                    "bg-brand-red/10 p-4 rounded-lg shadow-sm border" :
+                    "bg-white p-4 rounded-lg shadow-sm border hover:bg-gray-100 transition"}
+                onClick={onClick}
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="min-w-0 flex flex-row gap-3 items-center">
+                    <div className={`rounded-xl w-1.5 h-1.5 bg-${"brand-red"}`}></div>
+                    <h4 className="font-semibold text-sm text-gray-800 truncate">
+                      {message.fromName || message.fromEmail}
+                    </h4>
+                    {thread.messages.length > 1 && <span className="text-sm text-gray-500">{thread.messages.length}</span>}
+                  </div>
+                  <span className="text-xs text-gray-500">{timeAgo.format(new Date(message.date))}</span>
+                </div>
+
+                <div className="text-gray-700 text-sm flex flex-row gap-3 items-center">
+                  <div className={`rounded-xl w-1.5 h-1.5`}></div>
+                  {message.snippet}
+                </div>
+              </article>
+    );
+}
+
+function MessageView({ message }: { message: MailMessage }) {
+    return (
+              <article
+                key={message.id}
+                className="bg-white p-4 rounded-lg border border-gray-200"
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="min-w-0 flex flex-row gap-3 items-center">
+                    <h4 className="font-semibold text-sm text-gray-800 truncate">
+                      {message.fromName || message.fromEmail}
+                    </h4>
+                  </div>
+                  <span className="text-xs text-gray-500">{
+                    new Intl.DateTimeFormat("en-us", { dateStyle: 'short', timeStyle: 'short' }).format(new Date(message.date))
+                  }</span>
+                </div>
+
+                <div className="text-gray-700 text-sm flex flex-row gap-3 items-center">
+                  {message.snippet}
+                </div>
+              </article>
+    );
 }

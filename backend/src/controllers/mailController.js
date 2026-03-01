@@ -286,6 +286,7 @@ function parseMessage(message, clientEmail) {
     let replyTo;
     let date;
     let subject;
+    let snippet = message.snippet;
 
     for (const {name, value} of message.payload.headers) {
         if (name == "Date") date = value;
@@ -306,6 +307,12 @@ function parseMessage(message, clientEmail) {
         fromEmail = replyTo;
         if (fromName && fromName.endsWith(" via Contact Form")) {
             fromName = fromName.substring(0, fromName.length - " via Contact Form".length);
+            if (snippet.startsWith("Message from ")) {
+                const splits = snippet.split(" via Pho City Website Contact Form: ");
+                if (splits.length > 1) {
+                    snippet = splits.slice(1).join(" via Pho City Website Contact Form: ");
+                }
+            }
         }
     }
     date = new Date(date).toISOString();
@@ -318,6 +325,6 @@ function parseMessage(message, clientEmail) {
         fromSelf: (fromEmail == clientEmail),
         date,
         subject,
-        snippet: message.snippet
+        snippet
     }
 }
