@@ -67,6 +67,7 @@ export interface RestaurantContent {
   contact: {
     address: string;
     phone: string;
+    email: string;
     hours: Record<Weekday, string>;
   };
 

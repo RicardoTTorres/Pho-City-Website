@@ -131,7 +131,7 @@ export default function MenuPreview() {
                   </div>
 
                   {/*Text*/}
-                  <div className="pt-4 pb-5 px-6 flex-1 flex flex-col justify-between">
+                  <div className="pt-4 pb-5 px-6 flex-1 flex flex-col justify-start">
                     <div>
                       <h3 className="text-l font-bold text-red-900 leading-snug break-words line-clamp-3">
                         {english}

@@ -77,6 +77,7 @@ export const defaultContent = {
   contact: {
     address: "6175 Stockton Blvd #200, Sacramento, CA 95824",
     phone: "(916) 754-2143",
+    email: "info@phocity.com",
     hours: {
       Monday: "9:00 AM - 8:00 PM",
       Tuesday: "Closed",

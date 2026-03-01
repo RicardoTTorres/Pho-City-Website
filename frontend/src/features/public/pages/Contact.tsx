@@ -62,7 +62,7 @@ export default function Contact() {
                 <p className="font-semibold text-brand-red text-lg mb-1">
                   Email
                 </p>
-                <p className="text-gray-700">info@phocity.com</p>
+                <p className="text-gray-700">{content.contact.email}</p>
               </div>
             </div>
 
