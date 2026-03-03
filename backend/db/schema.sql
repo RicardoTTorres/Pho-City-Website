@@ -153,3 +153,24 @@ CREATE TABLE IF NOT EXISTS `gmail_accounts` (
   `expiry_date` BIGINT,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `gmail_threads` (
+  `email` VARCHAR(255) NOT NULL,
+  `thread_id` VARCHAR(255) NOT NULL,
+  `history_id` INT,
+  PRIMARY KEY (`email`, `thread_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `gmail_messages` (
+  `email` VARCHAR(255) NOT NULL,
+  `message_id` VARCHAR(255) NOT NULL,
+  `thread_id` VARCHAR(255),
+  `history_id` INT,
+  `is_preview` BOOLEAN NOT NULL,
+  `is_unread` BOOLEAN NOT NULL,
+  `snippet` TEXT,
+  `body` TEXT,
+  `date` DATETIME,
+  `subject` TEXT,
+  `from_name` TEXT,
+  `from_email` VARCHAR(255),
+  PRIMARY KEY (`email`, `message_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
