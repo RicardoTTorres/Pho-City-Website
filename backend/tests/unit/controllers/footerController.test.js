@@ -45,4 +45,19 @@ describe("getFooter", () => {
 
         expect(res.json).toHaveBeenCalledWith({ footer: footerObj});
     });
+
+    it("", async () => {
+        const footerObj = {
+            brand: { logo: "/logo.png", name: ""}
+        };
+
+        const footerString = JSON.stringify(footerObj);
+
+        pool.query.mockResolvedValueOnce([[{ footer_json: footerString }]]);
+
+        const { req, res} = mockReqRes();
+        await getFooter(req, res);
+
+        expect(res.json).toHaveBeenCalledWith({ footer: footerObj});
+    });
 });
