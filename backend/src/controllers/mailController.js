@@ -106,9 +106,10 @@ export async function finishAuth(req, res) {
  */
 export async function getThreads(req, res) {
     try {
-        const count = Math.min(req.query.count || 20, 40);
+        const maxResults = Math.min(req.query?.maxResults || 20, 40);
+        const pageToken = req.query?.pageToken;
         const gmail = await Gmail.create();
-        const {threads} = await gmail.fetchThreads({maxResults: count});
+        const threads = await gmail.fetchThreads({maxResults, pageToken});
         res.json(threads);
 
     } catch (err) {
@@ -122,7 +123,7 @@ export async function getThreads(req, res) {
  */
 export async function getThread(req, res) {
     try {
-        const {id} = req.body;
+        const {id} = req.params;
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
         }
@@ -132,6 +133,63 @@ export async function getThread(req, res) {
 
     } catch (err) {
         console.error("Error getting thread:", err);
-        res.status(500).json({ error: "Error getting thread"} );
+        res.status(500).json({ error: "Error getting thread" });
+    }
+}
+
+/**
+ * Mark thread as read
+ */
+export async function markRead(req, res) {
+    try {
+        const {id} = req.params;
+        if (!id) {
+            return res.status(400).json({ error: "Missing required field id" });
+        }
+        const gmail = await Gmail.create();
+        await gmail.markRead(id);
+        res.status(200).json({ ok: true });
+
+    } catch (err) {
+        console.error("Error marking thread as read:", err);
+        res.status(500).json({ error: "Error marking thread as read" });
+    }
+}
+
+/**
+ * Mark thread as unread
+ */
+export async function markUnread(req, res) {
+    try {
+        const {id} = req.params;
+        if (!id) {
+            return res.status(400).json({ error: "Missing required field id" });
+        }
+        const gmail = await Gmail.create();
+        await gmail.markUnread(id);
+        res.status(200).json({ ok: true });
+
+    } catch (err) {
+        console.error("Error marking thread as unread:", err);
+        res.status(500).json({ error: "Error marking thread as unread" });
+    }
+}
+
+/**
+ * Mark thread as unread
+ */
+export async function reply(req, res) {
+    try {
+        const {id} = req.params;
+        if (!id) {
+            return res.status(400).json({ error: "Missing required field id" });
+        }
+        const gmail = await Gmail.create();
+        // TODO
+        res.status(200).json({ ok: true });
+
+    } catch (err) {
+        console.error("Error replying to thread:", err);
+        res.status(500).json({ error: "Error replying to thread" });
     }
 }

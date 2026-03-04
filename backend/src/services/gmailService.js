@@ -180,7 +180,11 @@ export default class Gmail {
 
         // Get messages from cache
         const [rows] = await pool.query(
-            "SELECT * FROM gmail_messages WHERE email=? AND thread_id=?",
+            `
+            SELECT * FROM gmail_messages
+            WHERE email=? AND thread_id=?
+            ORDER BY date ASC
+            `,
             [this.email, id]
         );
         
@@ -226,7 +230,8 @@ export default class Gmail {
 
         return {
             id,
-            messages
+            messages,
+            isUnread: messages.map(m => m.isUnread).reduce((x, y) => x || y)
         }
     }
 
@@ -257,6 +262,26 @@ export default class Gmail {
             requestBody: {
                 raw: encodedMessage
             },
+        });
+    }
+
+    async markRead(threadId) {
+        await this.gmail.users.threads.modify({
+            id: threadId,
+            userId: "me",
+            requestBody: {
+                removeLabelIds: ['UNREAD']
+            }
+        });
+    }
+    
+    async markUnread(threadId) {
+        await this.gmail.users.threads.modify({
+            id: threadId,
+            userId: "me",
+            requestBody: {
+                addLabelIds: ['UNREAD']
+            }
         });
     }
 }
