@@ -70,4 +70,14 @@ describe("getFooter", () => {
         expect(res.status).toHaveBeenCalledWith(404);
         expect(res.json).toHaveBeenCalledWith({ error: "Footer settings not found" });
     });
+
+    it("returns 500 when database fails query", async () => {
+        pool.query.mockRejectedValueOnce(new Error("DB failure"))
+
+        const { req, res} = mockReqRes();
+        await getFooter(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch footer" });
+    });
 });
