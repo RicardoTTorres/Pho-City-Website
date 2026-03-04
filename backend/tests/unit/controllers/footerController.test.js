@@ -60,4 +60,14 @@ describe("getFooter", () => {
 
         expect(res.json).toHaveBeenCalledWith({ footer: footerObj});
     });
+
+    it("returns 404 when footer settings are not found in the database", async () => {
+        pool.query.mockResolvedValueOnce([[], []]);
+
+        const { req, res } = mockReqRes();
+        await getFooter(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ error: "Footer settings not found" });
+    });
 });
