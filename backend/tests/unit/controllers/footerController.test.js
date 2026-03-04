@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 
 describe("getFooter", () => {
-    it("returns footer when database returns footer json object", async () => {
+    it("returns footer when database returns footer data as JavaScript object", async () => {
         const footerObj = {
             brand: { logo: "/logo.png", name: "" },
             contact: { phone: "(916) 754-2143", address: "6175 Stockton Blvd #200", cityZip: "Sacramento, CA 95824" },
@@ -46,7 +46,7 @@ describe("getFooter", () => {
         expect(res.json).toHaveBeenCalledWith({ footer: footerObj});
     });
 
-    it("", async () => {
+    it("returns footer when database returns footer data as JSON string", async () => {
         const footerObj = {
             brand: { logo: "/logo.png", name: ""}
         };
