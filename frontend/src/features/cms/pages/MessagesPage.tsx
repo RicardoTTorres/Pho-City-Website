@@ -6,7 +6,7 @@ import { Reply as ReplyIcon } from "lucide-react";
 import {
   type MailMessage, type MailThread,
   getState, getThreads, getThread, markRead, markUnread, reply
-} from "../../../shared/api/mail";
+} from "@/shared/api/mail";
 
 import JavascriptTimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';

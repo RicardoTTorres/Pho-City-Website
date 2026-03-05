@@ -19,6 +19,12 @@ import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEd
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
 import { PUBLIC_ROUTES } from "@/shared/config/publicRoutes";
+import { type MailMessage, type MailThread, getThreads } from "@/shared/api/mail";
+import JavascriptTimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+JavascriptTimeAgo.addDefaultLocale(en);
+const getTimeAgo = new JavascriptTimeAgo('en-US');
 
 function getActivityIcon(section: string, action: string) {
   if (action === "deleted")
@@ -69,61 +75,69 @@ export default function DashboardPage() {
       .catch((err) => console.error("Failed to load activity:", err));
   }, []);
 
-  const latestMessages: Array<{
-    name: string;
-    snippet: string;
-    time: string;
-    email: string;
-    subject?: string;
-  }> = [
-    {
-      name: "Bill Nye",
-      snippet: "Loved the pho!",
-      time: "5 hours ago",
-      email: "bill@example.com",
-      subject: "Thanks for your feedback",
-    },
-    {
-      name: "John Doe",
-      snippet: "Do you have gluten-free options?",
-      time: "1 day ago",
-      email: "john@example.com",
-      subject: "About gluten-free options",
-    },
-    {
-      name: "Lychee T",
-      snippet: "Dog friendly??",
-      time: "2 days ago",
-      email: "lychee@example.com",
-      subject: "Re: Dog friendly",
-    },
-  ];
+  const [latestThreads, setLatestThreads] = useState<MailThread[]>();
 
-  const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
-  const [replyText, setReplyText] = useState<string>("");
+  useEffect(() => {
+    getThreads({maxResults: 3})
+      .then(({threads}) => setLatestThreads(threads))
+      .catch((err) => console.error("Failed to load messages:", err));
+  }, []);
 
-  function startReply(idx: number, name: string) {
-    setReplyingIndex(idx);
-    const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
-    setReplyText(`Hi ${firstName},\n\n`);
-  }
+  // const latestMessages: Array<{
+  //   name: string;
+  //   snippet: string;
+  //   time: string;
+  //   email: string;
+  //   subject?: string;
+  // }> = [
+  //   {
+  //     name: "Bill Nye",
+  //     snippet: "Loved the pho!",
+  //     time: "5 hours ago",
+  //     email: "bill@example.com",
+  //     subject: "Thanks for your feedback",
+  //   },
+  //   {
+  //     name: "John Doe",
+  //     snippet: "Do you have gluten-free options?",
+  //     time: "1 day ago",
+  //     email: "john@example.com",
+  //     subject: "About gluten-free options",
+  //   },
+  //   {
+  //     name: "Lychee T",
+  //     snippet: "Dog friendly??",
+  //     time: "2 days ago",
+  //     email: "lychee@example.com",
+  //     subject: "Re: Dog friendly",
+  //   },
+  // ];
 
-  function cancelReply() {
-    setReplyingIndex(null);
-    setReplyText("");
-  }
+  // const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
+  // const [replyText, setReplyText] = useState<string>("");
 
-  function sendReply(idx: number) {
-    const m = latestMessages[idx];
-    if (!m) return;
-    const subject = m.subject ?? `Re: Your message to Pho City`;
-    const body = replyText || "Hi,\n\n";
-    const href = `mailto:${m.email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
-    window.location.href = href;
-    cancelReply();
-  }
+  // function startReply(idx: number, name: string) {
+  //   setReplyingIndex(idx);
+  //   const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
+  //   setReplyText(`Hi ${firstName},\n\n`);
+  // }
+
+  // function cancelReply() {
+  //   setReplyingIndex(null);
+  //   setReplyText("");
+  // }
+
+  // function sendReply(idx: number) {
+  //   const m = latestMessages[idx];
+  //   if (!m) return;
+  //   const subject = m.subject ?? `Re: Your message to Pho City`;
+  //   const body = replyText || "Hi,\n\n";
+  //   const href = `mailto:${m.email}?subject=${encodeURIComponent(
+  //     subject,
+  //   )}&body=${encodeURIComponent(body)}`;
+  //   window.location.href = href;
+  //   cancelReply();
+  // }
 
   return (
     <div className="space-y-6">
@@ -205,7 +219,7 @@ export default function DashboardPage() {
           </h3>
 
           <div className="space-y-3">
-            {latestMessages.map((m, idx) => (
+            {!latestThreads ? <div>Loading...</div> : latestThreads.map((t, idx) => (
               <article
                 key={idx}
                 className="rounded-lg border border-gray-100 p-3"
@@ -213,15 +227,15 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="min-w-0">
                     <h4 className="font-semibold text-sm text-gray-800 truncate">
-                      {m.name}
+                      {t.messages[0]?.fromName || t.messages[0]?.fromEmail}
                     </h4>
-                    <span className="text-xs text-gray-500">{m.time}</span>
+                    <span className="text-xs text-gray-500">{getTimeAgo.format(t.messages[0]?.date ? new Date(t.messages[0]?.date) : new Date())}</span>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => startReply(idx, m.name)}
+                      onClick={() => {window.location.href = `/cms/messages?thread=${t.id}`;}}
                       className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
                     >
                       <ReplyIcon size={14} /> Reply
@@ -231,10 +245,10 @@ export default function DashboardPage() {
 
                 {/* Message Snippet */}
                 <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2">
-                  {`“${m.snippet}”`}
+                  {`“${t.messages[0]?.snippet}”`}
                 </div>
 
-                {/* Reply Box */}
+                {/* Reply Box
                 {replyingIndex === idx && (
                   <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
                     <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -267,7 +281,7 @@ export default function DashboardPage() {
                       </button>
                     </div>
                   </div>
-                )}
+                )} */}
               </article>
             ))}
           </div>
