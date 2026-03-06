@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getFooter, putFooter } from "../../../src/controllers/footerController.js"
+import { logActivity } from "../../../src/controllers/activityController.js";
 
 // Mock DB
 vi.mock("../../../src/db/connect_db.js", () => ({
   pool: {
     query: vi.fn(),
   },
+}));
+
+vi.mock("../../../src/controllers/activityController.js", () => ({
+  logActivity: vi.fn(),
 }));
 
 import { pool } from "../../../src/db/connect_db.js";
@@ -124,7 +129,7 @@ describe("putFooter", () => {
     });
   });
 
-  it("updates footer and returns ok true with updated footer data", async () => {
+  it("saves the updated footer to the database as a JSON string", async () => {
     const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
 
     pool.query.mockResolvedValueOnce([{}]);
@@ -138,6 +143,26 @@ describe("putFooter", () => {
     expect(pool.query).toHaveBeenCalledWith(
       "INSERT INTO site_settings (id, footer_json) VALUES (1, ?) ON DUPLICATE KEY UPDATE footer_json = VALUES(footer_json)",
       [JSON.stringify(footerObj)],
+    );
+  });
+
+  it("logs the footer update activity after a successful update", async () => {
+    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
+
+    pool.query.mockResolvedValueOnce([{}]);
+
+    const { req, res } = mockReqRes({
+      body: { footer: footerObj },
+      user: { email: "admin@test.com" },
+    });
+
+    await putFooter(req, res);
+
+    expect(logActivity).toHaveBeenCalledWith(
+      "updated",
+      "footer",
+      "Updated footer configuration",
+      "admin@test.com"
     );
   });
 });
