@@ -130,7 +130,7 @@ describe("putFooter", () => {
   });
 
   it("saves the updated footer to the database as a JSON string", async () => {
-    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
+    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" }};
 
     pool.query.mockResolvedValueOnce([{}]);
 
@@ -147,13 +147,13 @@ describe("putFooter", () => {
   });
 
   it("logs the footer update activity after a successful update", async () => {
-    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
+    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" }};
 
     pool.query.mockResolvedValueOnce([{}]);
 
     const { req, res } = mockReqRes({
       body: { footer: footerObj },
-      user: { email: "admin@test.com" },
+      user: { email: "admin@test.com" }
     });
 
     await putFooter(req, res);
@@ -164,5 +164,20 @@ describe("putFooter", () => {
       "Updated footer configuration",
       "admin@test.com"
     );
+  });
+
+  it("returns 500 when database fails update query", async () => {
+    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
+
+    pool.query.mockRejectedValueOnce(new Error("DB failure"));
+
+    const { req, res } = mockReqRes({
+      body: { footer: footerObj },
+    });
+
+    await putFooter(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Failed to update footer" });
   });
 });
