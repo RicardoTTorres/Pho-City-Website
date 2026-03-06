@@ -85,9 +85,19 @@ describe("getFooter", () => {
       pool.query.mockResolvedValueOnce([[{ footer_json: "{ invalid json }" }]]);
 
       const { req, res} = mockReqRes();
-        await getFooter(req, res);
+      await getFooter(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch footer" });
-    });
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch footer" });
+    }); 
+});
+
+describe("putFooter", () => {
+  it("returns 400 when footer is missing from the body of the request", async () => {
+    const { req, res } = mockReqRes({ body: {} });
+    await putFooter(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Missing footer in request body" });
+  });
 });
