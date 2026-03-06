@@ -80,4 +80,14 @@ describe("getFooter", () => {
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch footer" });
     });
+
+    it("returns 500 when footer_json contains an invalid JSON string", async () =>  {
+      pool.query.mockResolvedValueOnce([[{ footer_json: "{ invalid json }" }]]);
+
+      const { req, res} = mockReqRes();
+        await getFooter(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to fetch footer" });
+    });
 });
