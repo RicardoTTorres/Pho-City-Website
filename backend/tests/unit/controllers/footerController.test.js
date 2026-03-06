@@ -100,4 +100,27 @@ describe("putFooter", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "Missing footer in request body" });
   });
+
+  it("updates footer and returns ok true with updated footer data", async () => {
+    const footerObj = {
+      brand: { logo: "/logo.png", name: "Pho City" },
+      contact: {
+        phone: "(916) 754-2143",
+        address: "6175 Stockton Blvd #200",
+        cityZip: "Sacramento, CA 95824"
+    }};
+
+    pool.query.mockResolvedValueOnce([{}]);
+
+    const { req, res } = mockReqRes({
+      body: { footer: footerObj }
+    });
+
+    await putFooter(req, res);
+
+    expect(res.json).toHaveBeenCalledWith({
+      ok: true,
+      footer: footerObj
+    });
+  });
 });
