@@ -123,4 +123,21 @@ describe("putFooter", () => {
       footer: footerObj
     });
   });
+
+  it("updates footer and returns ok true with updated footer data", async () => {
+    const footerObj = { brand: { logo: "/logo.png", name: "Pho City" } };
+
+    pool.query.mockResolvedValueOnce([{}]);
+
+    const { req, res } = mockReqRes({
+      body: { footer: footerObj },
+    });
+
+    await putFooter(req, res);
+
+    expect(pool.query).toHaveBeenCalledWith(
+      "INSERT INTO site_settings (id, footer_json) VALUES (1, ?) ON DUPLICATE KEY UPDATE footer_json = VALUES(footer_json)",
+      [JSON.stringify(footerObj)],
+    );
+  });
 });
