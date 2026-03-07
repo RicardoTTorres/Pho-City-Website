@@ -112,4 +112,33 @@ describe("handleContactForm", () => {
     });
   });
 
+  it("returns 429 when rate limit is exceeded", async () => {
+  getSettings.mockResolvedValue({
+    contact: {
+      storeSubmissions: false,
+      emailNotificationsEnabled: false
+    }
+  });
+
+  const body = {
+    name: "John",
+    email: "john@test.com",
+    message: "Hello"
+  };
+
+  let res;
+
+  for (let i = 0; i < 6; i++) {
+    const mock = mockReqRes({ body });
+    res = mock.res;
+    await handleContactForm(mock.req, mock.res);
+  }
+
+  expect(res.status).toHaveBeenCalledWith(429);
+  expect(res.json).toHaveBeenCalledWith({
+    success: false,
+    error: "Too many requests. Please wait a few minutes."
+  });
+});
+
 });
