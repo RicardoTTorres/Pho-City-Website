@@ -1,37 +1,56 @@
 // src/features/public/pages/About.tsx
 import { useContent } from "@/app/providers/ContentContext";
+import AboutBeginningSection from "@/features/public/sections/AboutBeginningSection";
+import AboutFoodSection from "@/features/public/sections/AboutFoodSection";
+import AboutCommitmentSection from "@/features/public/sections/AboutCommitmentSection";
 
 export default function About() {
   const { content } = useContent();
+  const about = content.about;
 
   return (
-    <div className="bg-[#FFF8F1] w-full min-h-screen">
-      <section className="max-w-7xl mx-auto px-8 md:px-16 py-20">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-14">
-          <div className="md:max-w-[48%]">
-            <h1 className="text-4xl md:text-5xl font-bold text-[#A62626] mb-6">
-              {content.about.title}
-            </h1>
-            <div className="w-20 h-[3px] bg-[#C5A572] mb-8 rounded-full" />
-            <div className="bg-white shadow-lg rounded-2xl p-8 md:p-10 border border-[#E8E8E8]">
-              <p className="whitespace-pre-line text-[#2B2B2B] text-lg leading-relaxed">
-                {content.about.content}
+    <div className="w-full min-h-screen bg-brand-cream/30">
+      <section className="bg-brand-cream border-b border-brand-gold/20">
+        <div className="max-w-7xl mx-auto px-8 md:px-16 py-16 md:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+            <div className={!about.heroImage ? "md:col-span-2 max-w-2xl" : ""}>
+              <h1 className="text-4xl md:text-5xl font-bold text-brand-red leading-tight mb-4">
+                {about.heroTitle}
+              </h1>
+              <div className="w-16 h-[3px] bg-brand-gold mb-6 rounded-full" />
+              <p className="whitespace-pre-line text-brand-charcoal/80 text-lg leading-relaxed">
+                {about.heroIntro}
               </p>
             </div>
-          </div>
-          <div className="flex justify-center md:justify-end w-full md:w-auto">
-            <img
-              src={content.about.imageUrl}
-              alt="About Pho City"
-              className="
-                w-[420px] md:w-[520px]
-                rounded-2xl shadow-2xl
-                border-[2.5px] border-[#A62626]/20
-              "
-            />
+
+            {about.heroImage && (
+              <div className="order-first md:order-last">
+                <img
+                  src={about.heroImage}
+                  alt="About Pho City"
+                  className="w-full rounded-2xl shadow-md object-cover"
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>
+
+      <AboutBeginningSection
+        title={about.beginningTitle}
+        body={about.beginningBody}
+      />
+
+      <AboutFoodSection
+        title={about.foodTitle}
+        body={about.foodBody}
+        image={about.foodImage}
+      />
+
+      <AboutCommitmentSection
+        title={about.commitmentTitle}
+        body={about.commitmentBody}
+      />
     </div>
   );
 }

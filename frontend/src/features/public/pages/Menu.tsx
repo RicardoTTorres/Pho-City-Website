@@ -1,6 +1,7 @@
 // src/features/public/pages/Menu.tsx
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { Download } from "lucide-react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSidebar } from "@/features/public/components/MenuSidebar";
 import { MenuItem as MenuItemCard } from "@/shared/components/ui/MenuItem";
@@ -179,6 +180,18 @@ export default function Menu() {
 
         {/* Main Content */}
         <main className="flex-1">
+          {/* PDF download — quiet secondary option for customers who prefer print */}
+          <div className="flex justify-end mb-6">
+            <a
+              href="/api/menu/pdf"
+              download="pho-city-menu.pdf"
+              className="inline-flex items-center gap-1.5 text-sm text-brand-charcoal/50 hover:text-brand-red transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Download PDF Menu
+            </a>
+          </div>
+
           {allCategories.map((category) => (
             <section
               key={category.id || category.name}
@@ -192,7 +205,6 @@ export default function Menu() {
                 <div className="h-1 w-20 bg-gradient-to-r from-brand-gold to-brand-red rounded-full mx-auto"></div>
               </div>
 
-              {/* Customization accordion — sits between title and items */}
               {(() => {
                 const cust = customizations[String(category.id)];
                 return cust?.enabled && cust.sections.length > 0 ? (

@@ -89,7 +89,6 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
       if (!res.ok) {
-        // Do not keep stale/static placeholder admin menu when auth is missing.
         if (res.status === 401 || res.status === 403) {
           updateContent({ menuAdmin: null });
           return;
@@ -128,7 +127,17 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     async function fetchContact() {
       try {
         const res = await fetch(`${apiUrl}/api/contact`);
+        if (!res.ok) throw new Error(`Contact fetch failed: ${res.status}`);
         const data = await res.json();
+
+        const to12Hour = (t: string) => {
+          const [hStr, mStr] = String(t).split(":");
+          let h = parseInt(hStr ?? "0", 10);
+          const m = mStr ?? "00";
+          const ampm = h >= 12 ? "PM" : "AM";
+          h = h % 12 || 12;
+          return `${h}:${m} ${ampm}`;
+        };
 
         const hours = {} as Record<string, string>;
         if (Array.isArray(data.businessHours)) {
@@ -136,8 +145,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
             if (h.closed) {
               hours[h.day] = "Closed";
             } else {
-              const open = h.open ? String(h.open).slice(0, 5) : "";
-              const close = h.close ? String(h.close).slice(0, 5) : "";
+              const open = h.open ? to12Hour(h.open) : "";
+              const close = h.close ? to12Hour(h.close) : "";
               hours[h.day] = open && close ? `${open} - ${close}` : "";
             }
           }
@@ -147,6 +156,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           contact: {
             address: data.fullAddress ?? data.address ?? "",
             phone: data.phone ?? "",
+            email: data.email ?? "",
             hours,
           },
         });

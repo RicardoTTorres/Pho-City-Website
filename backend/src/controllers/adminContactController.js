@@ -27,6 +27,7 @@ export async function getContactInfo(req, res) {
     `);
 
     const c = contactRows[0];
+    if (!c) return res.status(404).json({ error: 'No contact info found' });
 
     res.status(200).json({
       phone: c.contact_phone,

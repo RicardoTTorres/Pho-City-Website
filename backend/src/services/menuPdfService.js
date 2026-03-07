@@ -1,6 +1,7 @@
 // src/services/menuPdfService.js
 import { fileURLToPath } from "url";
 import path from "path";
+import { readFileSync } from "fs";
 import React from "react";
 import {
   Document,
@@ -17,7 +18,15 @@ import { pool } from "../db/connect_db.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_PUBLIC = path.resolve(__dirname, "../../../frontend/public");
 const FONTS_DIR = path.join(FRONTEND_PUBLIC, "fonts");
-const LOGO_PATH = path.join(FRONTEND_PUBLIC, "logo.png");
+
+const LOGO_SRC = (() => {
+  try {
+    const buf = readFileSync(path.join(FRONTEND_PUBLIC, "logo.png"));
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+})();
 
 Font.register({
   family: "NotoSans",
@@ -325,7 +334,7 @@ function buildDocument({ categories, restaurantName, address, cityZip, phone, ho
     { title: `${restaurantName} Menu`, author: restaurantName },
     el(Page, { size: "LETTER", style: styles.page },
       el(View, { style: styles.headerRow },
-        el(Image, { src: LOGO_PATH, style: styles.logo }),
+        LOGO_SRC && el(Image, { src: LOGO_SRC, style: styles.logo }),
         el(View, { style: styles.headerText },
           el(Text, { style: styles.brandName }, restaurantName),
           el(Text, { style: styles.subtitle }, "Vietnamese Cuisine"),

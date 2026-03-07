@@ -24,7 +24,7 @@ export async function updateHero(payload: {
   title: string;
   subtitle: string;
   ctaText: string;
-  secondaryCtaText: string;
+  secondaryCtaText?: string;
   imageUrl?: string | null;
 }): Promise<HeroAPI> {
   const res = await fetch(`${API_URL}/api/hero`, {
