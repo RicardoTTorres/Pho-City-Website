@@ -9,7 +9,7 @@ export async function getAbout(req, res) {
     );
 
     if (!row) {
-      return res.json({
+      return res.status(200).json({
         about: {
           heroTitle: "",
           heroIntro: "",
@@ -28,7 +28,7 @@ export async function getAbout(req, res) {
       });
     }
 
-    res.json({
+    res.status(200).json({
       about: {
         heroTitle:          row.hero_title           ?? "",
         heroIntro:          row.hero_intro           ?? "",
@@ -114,7 +114,7 @@ export async function updateAbout(req, res) {
     );
 
     logActivity("updated", "about", "Updated about section", req.user?.email);
-    res.json({ message: "About section updated successfully!" });
+    res.status(200).json({ message: "About section updated successfully!" });
   } catch (error) {
     console.error("Error updating About section:", error);
     res.status(500).json({ message: "Internal Server Error" });
