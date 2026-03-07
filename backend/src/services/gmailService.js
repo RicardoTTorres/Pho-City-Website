@@ -1,6 +1,9 @@
 import { pool } from "../db/connect_db.js";
 import { google } from "googleapis";
 import { getSettings } from "./settingsService.js";
+import { simpleParser } from "mailparser";
+import { htmlToText } from "html-to-text";
+import EmailReplyParser from "email-reply-parser";
 
 export default class Gmail {
     static async create({email = undefined, auth = true} = {}) {
@@ -201,16 +204,16 @@ export default class Gmail {
                 });
 
                 // Parse raw message
-                body = "UNFINISHED";
+                body = await parseBody(response.data.raw);
 
                 // Save parsed body to cache
                 await pool.query(
                     `
                     UPDATE gmail_messages
-                    WHERE email=? AND message_id=?
                     SET body=?
+                    WHERE email=? AND message_id=?
                     `,
-                    [this.email, row.message_id, body]
+                    [body, this.email, row.message_id]
                 );
             }
 
@@ -224,14 +227,26 @@ export default class Gmail {
                 subject: row.subject,
                 fromName: row.from_name,
                 fromEmail: row.from_email,
-                fromSelf: (row.from_email === this.email)
+                fromSelf: (row.from_email === this.email),
+                isPreview: body == undefined
             };
         }));
+
+        let threadSnippet = messages.at(-1).body || messages.at(-1).snippet;
+        if (messages.at(-1).fromSelf) threadSnippet = `You: ${threadSnippet}`;
+
+        let threadPeople = [...new Set(
+            messages.map(m => m.fromSelf ? "You" : m.fromName || m.fromEmail))
+        ];
 
         return {
             id,
             messages,
-            isUnread: messages.map(m => m.isUnread).reduce((x, y) => x || y)
+            isUnread: messages.map(m => m.isUnread).reduce((x, y) => x || y),
+            date: messages.at(-1).date,
+            snippet: threadSnippet,
+            people: threadPeople,
+            isPreview: messages.some(m => m.isPreview)
         }
     }
 
@@ -274,7 +289,7 @@ export default class Gmail {
             }
         });
     }
-    
+
     async markUnread(threadId) {
         await this.gmail.users.threads.modify({
             id: threadId,
@@ -324,6 +339,9 @@ function parseMessage(message, clientEmail) {
                 }
             }
         }
+        if (subject.startsWith("Message from ")) {
+            subject = "";
+        }
     }
     date = new Date(date).toISOString();
 
@@ -338,4 +356,22 @@ function parseMessage(message, clientEmail) {
         snippet,
         isUnread: message.labelIds.includes('UNREAD')
     }
+}
+
+async function parseBody(raw) {
+    raw = raw.replace(/-/g, "+").replace(/_/g, "/"); // convert base64 url to base 64
+    const parsed = await simpleParser(Buffer.from(raw, "base64"));
+    
+    let text = "";
+    if (parsed.text) {
+        text = parsed.text;
+    } else if (parsed.html) {
+        text = htmlToText(parsed.html, {wordwrap: false});
+    }
+
+    text = new EmailReplyParser().parseReply(text);
+    if (text.startsWith("Message from "))
+        text = text.replace(/Message from .*? \(.*?\) via Pho City Website Contact Form:/, "");
+
+    return text.trim();
 }

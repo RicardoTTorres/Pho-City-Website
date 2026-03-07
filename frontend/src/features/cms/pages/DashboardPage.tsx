@@ -219,7 +219,7 @@ export default function DashboardPage() {
           </h3>
 
           <div className="space-y-3">
-            {!latestThreads ? <div>Loading...</div> : latestThreads.map((t, idx) => (
+            {!latestThreads ? <div>Loading...</div> : latestThreads.map((thread, idx) => (
               <article
                 key={idx}
                 className="rounded-lg border border-gray-100 p-3"
@@ -227,15 +227,15 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="min-w-0">
                     <h4 className="font-semibold text-sm text-gray-800 truncate">
-                      {t.messages[0]?.fromName || t.messages[0]?.fromEmail}
+                      {thread.people.join(", ")}
                     </h4>
-                    <span className="text-xs text-gray-500">{getTimeAgo.format(t.messages[0]?.date ? new Date(t.messages[0]?.date) : new Date())}</span>
+                    <span className="text-xs text-gray-500">{getTimeAgo.format(new Date(thread.date))}</span>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => {window.location.href = `/cms/messages?thread=${t.id}`;}}
+                      onClick={() => {window.location.href = `/cms/messages?thread=${thread.id}`;}}
                       className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
                     >
                       <ReplyIcon size={14} /> Reply
@@ -244,44 +244,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Message Snippet */}
-                <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2">
-                  {`“${t.messages[0]?.snippet}”`}
+                <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2 truncate">
+                  {thread.snippet}
                 </div>
 
-                {/* Reply Box
-                {replyingIndex === idx && (
-                  <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Reply
-                    </label>
-
-                    <textarea
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      rows={4}
-                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
-                      placeholder={`Write a reply to ${m.name}...`}
-                    />
-
-                    <div className="mt-2 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => sendReply(idx)}
-                        className="inline-flex items-center gap-1 bg-brand-red text-white text-xs px-3 py-1.5 rounded-md hover:bg-brand-redHover transition"
-                      >
-                        <Send size={14} /> Send
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={cancelReply}
-                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )} */}
               </article>
             ))}
           </div>

@@ -24,6 +24,7 @@ export default function MessagesPage() {
   const [threadsData, setThreadsData] = useState<MailThread[]>();
   const [openThread, setOpenThread] = useState<MailThread>();
   const [nextPageToken, setNextPageToken] = useState<string>();
+  const [openThreadLoading, setOpenThreadLoading] = useState<boolean>(false);
 
   async function refresh() {
     try {
@@ -75,7 +76,7 @@ export default function MessagesPage() {
   }
 
   async function switchThread(thread: MailThread | undefined) {
-    if (thread === openThread) {
+    if (thread?.id === openThread?.id) {
       thread = undefined;
     }
     setOpenThread(thread);
@@ -87,6 +88,13 @@ export default function MessagesPage() {
     } else {
       newSearchParams.set("thread", thread.id);
       setSearchParams(newSearchParams);
+    }
+    if (thread.isPreview) {
+      setOpenThreadLoading(true);
+      let threadFull = await getThread(thread.id);
+      Object.assign(thread, threadFull);
+      setOpenThread(thread);
+      setOpenThreadLoading(false);
     }
     if (thread.isUnread) {
       try {
@@ -142,7 +150,7 @@ export default function MessagesPage() {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 min-h-full">
           {openThread?.messages ? <div className="space-y-3">
             {openThread.messages.map((message) => (
-              <MessageView message={message} />
+              <MessageView message={message} loading={openThreadLoading} />
             ))}
             <button className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
               <ReplyIcon size={20} /> Reply
@@ -174,8 +182,6 @@ function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onCl
     }
   }
 
-  const message = thread.messages[0];
-  if (message === undefined) return null;
   return (
     <article
       key={thread.id}
@@ -191,22 +197,22 @@ function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onCl
             <div className={`rounded-xl w-1.5 h-1.5 ${isUnread ? "bg-brand-red" : "bg-gray-300"}`}></div>
           </button>
           <h4 className={`font-${isUnread ? "semibold" : "normal"} text-sm text-gray-800 truncate`}>
-            {message.fromName || message.fromEmail}
+            {thread.people.join(", ")}
           </h4>
           {thread.messages.length > 1 && <span className="text-sm text-gray-500">{thread.messages.length}</span>}
         </div>
-        <span className="text-xs text-gray-500">{timeAgo.format(new Date(message.date))}</span>
+        <span className="text-xs text-gray-500">{timeAgo.format(new Date(thread.date))}</span>
       </div>
 
-      <div className="text-gray-600 text-sm flex flex-row gap-3 items-center">
+      <div className="text-gray-600 text-sm flex flex-row gap-3 items-center truncate">
         <div className={`rounded-xl w-1.5 h-1.5`}></div>
-        {message.snippet}
+          {thread.snippet}
       </div>
     </article>
   );
 }
 
-function MessageView({ message }: { message: MailMessage }) {
+function MessageView({ message, loading }: { message: MailMessage, loading: boolean }) {
   return (
     <article
       key={message.id}
@@ -224,7 +230,7 @@ function MessageView({ message }: { message: MailMessage }) {
       </div>
 
       <div className="text-gray-700 text-sm flex flex-row gap-3 items-center">
-        {message.snippet}
+        {loading ? "Loading..." : message.body || message.snippet}
       </div>
     </article>
   );

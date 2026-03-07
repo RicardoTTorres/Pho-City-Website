@@ -10,13 +10,18 @@ export type MailMessage = {
   subject: string,
   snippet: string,
   body: string | undefined,
-  isUnread: boolean
+  isUnread: boolean,
+  isPreview: boolean
 };
 
 export type MailThread = {
   id: string,
   messages: MailMessage[],
-  isUnread: boolean
+  isUnread: boolean,
+  date: string,
+  snippet: string,
+  people: string[],
+  isPreview: boolean
 };
 
 export async function getState(): Promise<{ authenticated: boolean, registered: boolean, email: string }> {
