@@ -19,7 +19,7 @@ import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEd
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
 import { PUBLIC_ROUTES } from "@/shared/config/publicRoutes";
-import { type MailMessage, type MailThread, getThreads } from "@/shared/api/mail";
+import { type MailMessage, type MailThread, getThreads, getState, getSavedThreads } from "@/shared/api/mail";
 import JavascriptTimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
@@ -78,9 +78,18 @@ export default function DashboardPage() {
   const [latestThreads, setLatestThreads] = useState<MailThread[]>();
 
   useEffect(() => {
-    getThreads({maxResults: 3})
-      .then(({threads}) => setLatestThreads(threads))
-      .catch((err) => console.error("Failed to load messages:", err));
+    async function getData() {
+      const {authenticated} = await getState();
+      if (authenticated) {
+        const {threads} = await getThreads({maxResults: 3});
+        setLatestThreads(threads);
+      } else {
+        let {threads} = await getSavedThreads();
+        threads = threads.slice(0, 3);
+        setLatestThreads(threads);
+      }
+    }
+    getData().catch((err) => console.error("Failed to load messages:", err));
   }, []);
 
   // const latestMessages: Array<{

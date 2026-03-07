@@ -59,14 +59,17 @@ export async function handleContactForm(req, res) {
     // Send email notification if enabled
     if (emailNotificationsEnabled) {
       try {
-        const gmail = await Gmail.create();
-        await gmail.sendMessage({
-          to: gmail.email,
-          fromName: `${name} via Contact Form`,
-          replyTo: email,
-          subject: `Message from ${name}`,
-          message: `Message from ${name} (${email}) via Pho City Website Contact Form:\n\n${message}`
-        });
+        const gmail = await Gmail.create({auth: false});
+        const {authenticated} = await gmail.checkAuth();
+        if (authenticated) {
+          await gmail.sendMessage({
+            to: gmail.email,
+            fromName: `${name} via Contact Form`,
+            replyTo: email,
+            subject: `Message from ${name}`,
+            message: `Message from ${name} (${email}) via Pho City Website Contact Form:\n\n${message}`
+          });
+        }
       } catch (err) {
         console.log("Error sending email notification:", err);
       }

@@ -1,6 +1,7 @@
 import { pool } from "../db/connect_db.js";
 import { google } from "googleapis";
 import Gmail from "../services/gmailService.js";
+import { getSubmissions } from "../services/settingsService.js";
 
 /**
  * Get whether the contact email is authenticated to access inbox
@@ -106,7 +107,7 @@ export async function finishAuth(req, res) {
  */
 export async function getThreads(req, res) {
     try {
-        const maxResults = Math.min(req.query?.maxResults || 20, 40);
+        const maxResults = Math.min(req.query?.maxResults || 10, 40);
         const pageToken = req.query?.pageToken;
         const gmail = await Gmail.create();
         const threads = await gmail.fetchThreads({maxResults, pageToken});
@@ -124,11 +125,12 @@ export async function getThreads(req, res) {
 export async function getThread(req, res) {
     try {
         const {id} = req.params;
+        const {forceRefresh} = req.query;
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
         }
         const gmail = await Gmail.create();
-        const thread = await gmail.fetchThread(id);
+        const thread = await gmail.fetchThread(id, {forceRefresh});
         res.json(thread);
 
     } catch (err) {
@@ -143,8 +145,20 @@ export async function getThread(req, res) {
 export async function markRead(req, res) {
     try {
         const {id} = req.params;
+        const {db} = req.query;
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
+        }
+        if (db) {
+            await pool.query(
+                `
+                UPDATE contact_submissions
+                SET is_read=1
+                WHERE id=?
+                `,
+                [id]
+            );
+            return res.status(200).json({ ok: true });
         }
         const gmail = await Gmail.create();
         await gmail.markRead(id);
@@ -162,8 +176,20 @@ export async function markRead(req, res) {
 export async function markUnread(req, res) {
     try {
         const {id} = req.params;
+        const {db} = req.query;
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
+        }
+        if (db) {
+            await pool.query(
+                `
+                UPDATE contact_submissions
+                SET is_read=0
+                WHERE id=?
+                `,
+                [id]
+            );
+            return res.status(200).json({ ok: true });
         }
         const gmail = await Gmail.create();
         await gmail.markUnread(id);
@@ -176,20 +202,71 @@ export async function markUnread(req, res) {
 }
 
 /**
- * Mark thread as unread
+ * Reply to thread
  */
 export async function reply(req, res) {
     try {
         const {id} = req.params;
+        const {body} = req.body;
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
         }
+        if (!body) {
+            return res.status(400).json({ error: "Missing required field body" });
+        }
         const gmail = await Gmail.create();
-        // TODO
+        await gmail.reply(id, body);
         res.status(200).json({ ok: true });
 
     } catch (err) {
         console.error("Error replying to thread:", err);
         res.status(500).json({ error: "Error replying to thread" });
+    }
+}
+
+/**
+ * Gmail is not authenticated. Get submissions from database instead
+ */
+export async function getSavedThreads(req, res) {
+    try {
+        const submissions = await getSubmissions();
+        const threads = submissions.map((s => {
+            const d = new Date(s.submitted_at);
+            const correctDate = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds());
+            return {
+                id: `${s.id}`,
+                messages: [
+                    {
+                        id: `${s.id}`,
+                        threadId: `${s.id}`,
+                        isUnread: !s.is_read,
+                        snippet: s.message,
+                        body: s.message,
+                        date: correctDate,
+                        subject: "",
+                        fromName: s.name,
+                        fromEmail: s.email,
+                        fromSelf: false,
+                        isPreview: false,
+                        isGmail: false
+                    }
+                ],
+                isUnread: !s.is_read,
+                date: correctDate,
+                snippet: s.message,
+                people: [s.name],
+                isPreview: false,
+                isGmail:false
+            };
+        }));
+
+        res.json({
+            threads,
+            nextPageToken: undefined
+        });
+
+    } catch (err) {
+        console.error("Error getting saved threads:", err);
+        res.status(500).json({ error: "Error getting saved threads" });
     }
 }

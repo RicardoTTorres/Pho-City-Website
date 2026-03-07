@@ -137,11 +137,11 @@ export default class Gmail {
         };
     }
 
-    async fetchThread(id, {historyId = undefined, preview = false} = {}) {
+    async fetchThread(id, {historyId = undefined, preview = false, forceRefresh = false} = {}) {
         // Check if thread is cached and cache is up to date
         const [cacheRows] = await pool.query("SELECT * FROM gmail_threads WHERE email=? AND thread_id=?", [this.email, id]);
         
-        if (cacheRows.length == 0 || (historyId && historyId != cacheRows[0].history_id)) {
+        if (cacheRows.length == 0 || (historyId && historyId != cacheRows[0].history_id) || forceRefresh) {
             // Thread is not cached or cache is not up to date
 
             // Fetch newest thread data
@@ -228,7 +228,8 @@ export default class Gmail {
                 fromName: row.from_name,
                 fromEmail: row.from_email,
                 fromSelf: (row.from_email === this.email),
-                isPreview: body == undefined
+                isPreview: body == undefined,
+                isGmail: true
             };
         }));
 
@@ -246,12 +247,13 @@ export default class Gmail {
             date: messages.at(-1).date,
             snippet: threadSnippet,
             people: threadPeople,
-            isPreview: messages.some(m => m.isPreview)
+            isPreview: messages.some(m => m.isPreview),
+            isGmail: true
         }
     }
 
     async sendMessage({
-        to, subject, message, fromName=undefined, replyTo=undefined
+        to, subject, message, fromName=undefined, replyTo=undefined, inReplyTo=undefined, references=undefined, threadId=undefined
     }) {
         const parts = [];
 
@@ -260,6 +262,8 @@ export default class Gmail {
         else parts.push(`From: ${this.email}`);
         if (replyTo) parts.push(`Reply-To: ${replyTo}`);
         parts.push(`Subject: ${subject}`);
+        if (inReplyTo) parts.push(`In-Reply-To: ${inReplyTo}`);
+        if (references) parts.push(`References: ${references}`);
         parts.push(`Content-Type: text/plain; charset=utf-8`);
         parts.push(``);
         parts.push(message);
@@ -275,8 +279,9 @@ export default class Gmail {
         await this.gmail.users.messages.send({
             userId: 'me',
             requestBody: {
-                raw: encodedMessage
-            },
+                raw: encodedMessage,
+                threadId
+            }
         });
     }
 
@@ -297,6 +302,33 @@ export default class Gmail {
             requestBody: {
                 addLabelIds: ['UNREAD']
             }
+        });
+    }
+
+    async reply(threadId, body) {
+        const thread = await this.fetchThread(threadId, {preview: true});
+        const lastMessage = thread.messages.at(-1);
+
+        const response = await this.gmail.users.messages.get({
+            userId: "me",
+            id: lastMessage.id,
+            format: "metadata",
+            metadataHeaders: ["Message-ID"]
+        });
+        const internalMessageId = response.data.payload.headers
+            .find(({name, value}) => name.toLowerCase() == 'Message-ID'.toLowerCase()).value;
+        console.log(internalMessageId);
+        if (!internalMessageId) throw new Error("Internal Message-ID not found");
+
+        const allEmails = thread.messages.filter(m => !m.fromSelf).map(m => m.fromEmail);
+
+        await this.sendMessage({
+            to: (allEmails.length > 0 ? allEmails : [this.email]).join(", "),
+            subject: `Re: ${lastMessage.subject}`,
+            message: body,
+            inReplyTo: internalMessageId,
+            references: internalMessageId,
+            threadId
         });
     }
 }
@@ -338,9 +370,6 @@ function parseMessage(message, clientEmail) {
                     snippet = splits.slice(1).join(" via Pho City Website Contact Form: ");
                 }
             }
-        }
-        if (subject.startsWith("Message from ")) {
-            subject = "";
         }
     }
     date = new Date(date).toISOString();

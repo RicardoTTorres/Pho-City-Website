@@ -11,7 +11,8 @@ export type MailMessage = {
   snippet: string,
   body: string | undefined,
   isUnread: boolean,
-  isPreview: boolean
+  isPreview: boolean,
+  isGmail: boolean
 };
 
 export type MailThread = {
@@ -21,7 +22,8 @@ export type MailThread = {
   date: string,
   snippet: string,
   people: string[],
-  isPreview: boolean
+  isPreview: boolean,
+  isGmail: boolean
 };
 
 export async function getState(): Promise<{ authenticated: boolean, registered: boolean, email: string }> {
@@ -52,9 +54,9 @@ export async function getThreads(options: {pageToken?: string | undefined, maxRe
     return data;
 }
 
-export async function getThread(id: string): Promise<MailThread> {
+export async function getThread(id: string, options: {forceRefresh?: boolean | undefined} = {}): Promise<MailThread> {
     const response = await fetch(
-        `${API_URL}/api/admin/mail/threads/${id}`,
+        `${API_URL}/api/admin/mail/threads/${id}${options.forceRefresh ? "?forceRefresh=true" : ""}`,
         {credentials: "include"}
     );
     if (!response.ok) {
@@ -64,9 +66,9 @@ export async function getThread(id: string): Promise<MailThread> {
     return data;
 }
 
-export async function markRead(threadId: string) {
+export async function markRead(threadId: string, options: {db?: boolean | undefined} = {}) {
     const response = await fetch(
-        `${API_URL}/api/admin/mail/threads/${threadId}/read`,
+        `${API_URL}/api/admin/mail/threads/${threadId}/read${options.db ? "?db=true" : ""}`,
         {
             method: "POST",
             credentials: "include"
@@ -77,9 +79,9 @@ export async function markRead(threadId: string) {
     }
 }
 
-export async function markUnread(threadId: string) {
+export async function markUnread(threadId: string, options: {db?: boolean | undefined} = {}) {
     const response = await fetch(
-        `${API_URL}/api/admin/mail/threads/${threadId}/unread`,
+        `${API_URL}/api/admin/mail/threads/${threadId}/unread${options.db ? "?db=true" : ""}`,
         {
             method: "POST",
             credentials: "include"
@@ -103,4 +105,16 @@ export async function reply(threadId: string, body: string) {
     if (!response.ok) {
         throw new Error(`Server error in mail reply: ${response.status} ${response.statusText}`);
     }
+}
+
+export async function getSavedThreads(): Promise<{threads: MailThread[], nextPageToken: undefined}> {
+    const response = await fetch(
+        `${API_URL}/api/admin/mail/savedthreads`,
+        {credentials: "include"}
+    );
+    if (!response.ok) {
+        throw new Error(`Server error in mail getSavedThreads: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data
 }
