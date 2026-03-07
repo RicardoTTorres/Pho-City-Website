@@ -19,6 +19,12 @@ import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEd
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
 import { PUBLIC_ROUTES } from "@/shared/config/publicRoutes";
+import { type MailMessage, type MailThread, getThreads, getState, getSavedThreads } from "@/shared/api/mail";
+import JavascriptTimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+JavascriptTimeAgo.addDefaultLocale(en);
+const getTimeAgo = new JavascriptTimeAgo('en-US');
 
 function getActivityIcon(section: string, action: string) {
   if (action === "deleted")
@@ -69,61 +75,78 @@ export default function DashboardPage() {
       .catch((err) => console.error("Failed to load activity:", err));
   }, []);
 
-  const latestMessages: Array<{
-    name: string;
-    snippet: string;
-    time: string;
-    email: string;
-    subject?: string;
-  }> = [
-    {
-      name: "Bill Nye",
-      snippet: "Loved the pho!",
-      time: "5 hours ago",
-      email: "bill@example.com",
-      subject: "Thanks for your feedback",
-    },
-    {
-      name: "John Doe",
-      snippet: "Do you have gluten-free options?",
-      time: "1 day ago",
-      email: "john@example.com",
-      subject: "About gluten-free options",
-    },
-    {
-      name: "Lychee T",
-      snippet: "Dog friendly??",
-      time: "2 days ago",
-      email: "lychee@example.com",
-      subject: "Re: Dog friendly",
-    },
-  ];
+  const [latestThreads, setLatestThreads] = useState<MailThread[]>();
 
-  const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
-  const [replyText, setReplyText] = useState<string>("");
+  useEffect(() => {
+    async function getData() {
+      const {authenticated} = await getState();
+      if (authenticated) {
+        const {threads} = await getThreads({maxResults: 3});
+        setLatestThreads(threads);
+      } else {
+        let {threads} = await getSavedThreads();
+        threads = threads.slice(0, 3);
+        setLatestThreads(threads);
+      }
+    }
+    getData().catch((err) => console.error("Failed to load messages:", err));
+  }, []);
 
-  function startReply(idx: number, name: string) {
-    setReplyingIndex(idx);
-    const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
-    setReplyText(`Hi ${firstName},\n\n`);
-  }
+  // const latestMessages: Array<{
+  //   name: string;
+  //   snippet: string;
+  //   time: string;
+  //   email: string;
+  //   subject?: string;
+  // }> = [
+  //   {
+  //     name: "Bill Nye",
+  //     snippet: "Loved the pho!",
+  //     time: "5 hours ago",
+  //     email: "bill@example.com",
+  //     subject: "Thanks for your feedback",
+  //   },
+  //   {
+  //     name: "John Doe",
+  //     snippet: "Do you have gluten-free options?",
+  //     time: "1 day ago",
+  //     email: "john@example.com",
+  //     subject: "About gluten-free options",
+  //   },
+  //   {
+  //     name: "Lychee T",
+  //     snippet: "Dog friendly??",
+  //     time: "2 days ago",
+  //     email: "lychee@example.com",
+  //     subject: "Re: Dog friendly",
+  //   },
+  // ];
 
-  function cancelReply() {
-    setReplyingIndex(null);
-    setReplyText("");
-  }
+  // const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
+  // const [replyText, setReplyText] = useState<string>("");
 
-  function sendReply(idx: number) {
-    const m = latestMessages[idx];
-    if (!m) return;
-    const subject = m.subject ?? `Re: Your message to Pho City`;
-    const body = replyText || "Hi,\n\n";
-    const href = `mailto:${m.email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
-    window.location.href = href;
-    cancelReply();
-  }
+  // function startReply(idx: number, name: string) {
+  //   setReplyingIndex(idx);
+  //   const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
+  //   setReplyText(`Hi ${firstName},\n\n`);
+  // }
+
+  // function cancelReply() {
+  //   setReplyingIndex(null);
+  //   setReplyText("");
+  // }
+
+  // function sendReply(idx: number) {
+  //   const m = latestMessages[idx];
+  //   if (!m) return;
+  //   const subject = m.subject ?? `Re: Your message to Pho City`;
+  //   const body = replyText || "Hi,\n\n";
+  //   const href = `mailto:${m.email}?subject=${encodeURIComponent(
+  //     subject,
+  //   )}&body=${encodeURIComponent(body)}`;
+  //   window.location.href = href;
+  //   cancelReply();
+  // }
 
   return (
     <div className="space-y-6">
@@ -205,7 +228,7 @@ export default function DashboardPage() {
           </h3>
 
           <div className="space-y-3">
-            {latestMessages.map((m, idx) => (
+            {!latestThreads ? <div>Loading...</div> : latestThreads.map((thread, idx) => (
               <article
                 key={idx}
                 className="rounded-lg border border-gray-100 p-3"
@@ -213,15 +236,15 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="min-w-0">
                     <h4 className="font-semibold text-sm text-gray-800 truncate">
-                      {m.name}
+                      {thread.people.join(", ")}
                     </h4>
-                    <span className="text-xs text-gray-500">{m.time}</span>
+                    <span className="text-xs text-gray-500">{getTimeAgo.format(new Date(thread.date))}</span>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => startReply(idx, m.name)}
+                      onClick={() => {window.location.href = `/cms/messages?thread=${thread.id}`;}}
                       className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
                     >
                       <ReplyIcon size={14} /> Reply
@@ -230,44 +253,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Message Snippet */}
-                <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2">
-                  {`“${m.snippet}”`}
+                <div className="bg-gray-50 text-gray-700 text-sm rounded-lg px-3 py-2 truncate">
+                  {thread.snippet}
                 </div>
 
-                {/* Reply Box */}
-                {replyingIndex === idx && (
-                  <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Reply
-                    </label>
-
-                    <textarea
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      rows={4}
-                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
-                      placeholder={`Write a reply to ${m.name}...`}
-                    />
-
-                    <div className="mt-2 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => sendReply(idx)}
-                        className="inline-flex items-center gap-1 bg-brand-red text-white text-xs px-3 py-1.5 rounded-md hover:bg-brand-redHover transition"
-                      >
-                        <Send size={14} /> Send
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={cancelReply}
-                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
               </article>
             ))}
           </div>

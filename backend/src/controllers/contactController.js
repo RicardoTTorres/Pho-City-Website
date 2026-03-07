@@ -1,5 +1,5 @@
 // src/controllers/contactController.js
-import nodemailer from "nodemailer";
+import Gmail from "../services/gmailService.js";
 import crypto from "crypto";
 import { getSettings, storeSubmission } from "../services/settingsService.js";
 
@@ -58,25 +58,20 @@ export async function handleContactForm(req, res) {
 
     // Send email notification if enabled
     if (emailNotificationsEnabled) {
-      const toAddress = notificationEmail || process.env.GMAIL_USER;
-      if (toAddress && process.env.GMAIL_USER && process.env.GMAIL_PASS) {
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS,
-          },
-        });
-
-        await transporter.sendMail({
-          from: process.env.GMAIL_USER,
-          to: toAddress,
-          subject: `New contact message from ${name}`,
-          text: `From: ${name} <${email}>\n\n${message}`,
-          html: `<p><strong>From:</strong> ${name} &lt;${email}&gt;</p><p>${message.replace(/\n/g, "<br>")}</p>`,
-        });
+      try {
+        const gmail = await Gmail.create({auth: false});
+        const {authenticated} = await gmail.checkAuth();
+        if (authenticated) {
+          await gmail.sendMessage({
+            to: gmail.email,
+            fromName: `${name} via Contact Form`,
+            replyTo: email,
+            subject: `Message from ${name}`,
+            message: `Message from ${name} (${email}) via Pho City Website Contact Form:\n\n${message}`
+          });
+        }
+      } catch (err) {
+        console.log("Error sending email notification:", err);
       }
     }
 
