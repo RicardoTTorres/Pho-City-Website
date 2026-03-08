@@ -230,7 +230,7 @@ export default function Menu() {
                         price={Number.isFinite(priceNumber) ? priceNumber : 0}
                         description={item.description || ""}
                         image={item.image}
-                        popular={item.popular}
+                        popular={item.popular ?? false}
                       />
                     );
                   })}

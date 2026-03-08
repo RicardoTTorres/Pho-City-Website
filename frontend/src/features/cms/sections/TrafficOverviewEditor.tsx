@@ -149,11 +149,11 @@ export function TrafficOverviewEditor() {
                 type="number"
                 scale="time"
                 domain={["auto", "auto"]}
-                tickFormatter={(v) => formatTick(Number(v), view)}
+                tickFormatter={(v: number) => formatTick(Number(v), view)}
               />
               <YAxis allowDecimals={false} />
               <Tooltip
-                labelFormatter={(v) => formatTooltipLabel(Number(v), view)}
+                labelFormatter={(v: number) => formatTooltipLabel(Number(v), view)}
               />
               <Line
                 type="monotone"
