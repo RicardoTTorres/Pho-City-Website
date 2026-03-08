@@ -1,6 +1,7 @@
 // src/features/public/sections/MenuPreview.tsx
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { getFeaturedItems, type FeaturedItem } from "@/shared/api/menu";
 import { Card } from "@/shared/components/ui/card";
 import { parseBilingualName } from "@/utils/menuHelper";
@@ -17,19 +18,6 @@ function preloadImages(items: FeaturedItem[]) {
 export default function MenuPreview() {
   const [featured, setFeatured] = useState<FeaturedItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [inView, setInView] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry?.isIntersecting) setInView(true); },
-      { threshold: 0.1 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     getFeaturedItems()
@@ -45,19 +33,19 @@ export default function MenuPreview() {
 
   return (
     <section id="menu" className="py-20 bg-brand-gold/5 ">
-      <div
-        ref={sectionRef}
-        className={`mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-500 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
-        style={{ transitionDelay: inView ? "100ms" : "0ms" }}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        viewport={{ once: true }}
+        className="mx-auto bg-brand-gold/5 max-w-7xl px-4 sm:px-6 lg:px-8"
       >
-        {/* Header row */}
+        {/*Header row*/}
         <div className="flex items-baseline justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-semibold text-brand-charcoal">
-            House Favorites
-          </h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900"></h2>
           <a
             href="/menu"
-            className="text-sm font-medium text-brand-charcoal/60 hover:text-brand-charcoal flex items-center gap-1 transition"
+            className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition"
           >
             Browse full menu
             <svg
@@ -77,33 +65,29 @@ export default function MenuPreview() {
           </a>
         </div>
 
+        {/*Grid of dishes*/}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {loading &&
-            Array.from({ length: 4 }).map((_, i) => {
-              const skeletonAspect = i % 2 === 0 ? "aspect-[4/3]" : "aspect-square";
-              return (
-                <li key={`skeleton-${i}`}>
-                  <div className="rounded-xl bg-white border border-gray-100 overflow-hidden animate-pulse">
-                    <div className={`w-full bg-gray-200 ${skeletonAspect}`} />
-                    <div className="p-6 space-y-3">
-                      <div className="h-5 bg-gray-200 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded w-full" />
-                      <div className="h-4 bg-gray-200 rounded w-2/3" />
-                    </div>
+            Array.from({ length: 4 }).map((_, i) => (
+              <li key={`skeleton-${i}`}>
+                <div className="rounded-xl bg-white border border-gray-100 overflow-hidden animate-pulse">
+                  <div className="w-full aspect-[4/3] bg-gray-200" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-full" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
                   </div>
-                </li>
-              );
-            })}
-
-          {featured.map((dish, index) => {
+                </div>
+              </li>
+            ))}
+          {featured.map((dish) => {
             const { english, vietnamese } = parseBilingualName(dish.name);
-            const imgAspect = index % 2 === 0 ? "aspect-[4/3]" : "aspect-square";
 
             return (
               <li key={dish.id}>
                 <Card className="h-full flex flex-col overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 ease-out border border-gray-100 font-sans">
                   {/*Image*/}
-                  <div className={`relative w-full bg-gray-100 overflow-hidden flex items-center justify-center ${imgAspect}`}>
+                  <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden flex items-center justify-center">
                     {dish.image ? (
                       <img
                         src={dish.image}
@@ -131,7 +115,7 @@ export default function MenuPreview() {
                   </div>
 
                   {/*Text*/}
-                  <div className="pt-4 pb-5 px-6 flex-1 flex flex-col justify-start">
+                  <div className="pt-4 pb-5 px-6 flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="text-l font-bold text-red-900 leading-snug break-words line-clamp-3">
                         {english}
@@ -154,7 +138,7 @@ export default function MenuPreview() {
             );
           })}
         </ul>
-      </div>
+      </motion.div>
     </section>
   );
 }

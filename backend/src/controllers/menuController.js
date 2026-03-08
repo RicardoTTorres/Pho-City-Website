@@ -13,13 +13,14 @@ export async function getMenu(req, res) {
 
     // Fetch visible menu items (ordered by position within category)
     const [items] = await pool.query(`
-      SELECT 
+      SELECT
         item_id AS id,
         item_name AS name,
         item_description AS description,
         item_price AS price,
         item_image_url AS image,
         item_is_visible AS visible,
+        is_popular AS popular,
         category_id
       FROM menu_items
       WHERE item_is_visible = 1
@@ -38,6 +39,7 @@ export async function getMenu(req, res) {
           description: i.description,
           price: `$${Number(i.price).toFixed(2)}`,
           image: i.image || null,
+          popular: Boolean(i.popular),
         })),
     }));
 
@@ -59,7 +61,7 @@ export async function getAdminMenu(req, res) {
 
     // Fetch ALL menu items (including hidden ones for admin) ordered by position
     const [items] = await pool.query(`
-      SELECT 
+      SELECT
         item_id AS id,
         item_name AS name,
         item_description AS description,
@@ -68,6 +70,7 @@ export async function getAdminMenu(req, res) {
         item_is_visible AS visible,
         is_featured AS featured,
         featured_position AS featuredPosition,
+        is_popular AS popular,
         category_id
       FROM menu_items
       ORDER BY category_id ASC, position ASC, item_id ASC;
@@ -88,6 +91,7 @@ export async function getAdminMenu(req, res) {
           visible: Boolean(i.visible),
           featured: Boolean(i.featured),
           featuredPosition: i.featuredPosition ?? null,
+          popular: Boolean(i.popular),
           categoryId: i.category_id,
         })),
     }));
@@ -223,6 +227,7 @@ export async function addItem(req, res) {
       visible: item_is_visible,
       featured: is_featured,
       featuredPosition: featured_position,
+      popular: is_popular,
       category: category_id,
     } = req.body;
 
@@ -255,6 +260,7 @@ export async function addItem(req, res) {
       item_is_visible,
       is_featured,
       featured_position: resolvedFeaturedPosition,
+      is_popular,
       category_id,
       position: nextPos,
     });
@@ -302,6 +308,7 @@ export async function editItem(req, res) {
       visible: item_is_visible,
       featured: is_featured,
       featuredPosition: featured_position,
+      popular: is_popular,
       category: category_id,
     } = req.body;
 
@@ -318,6 +325,7 @@ export async function editItem(req, res) {
       item_is_visible,
       is_featured,
       featured_position: resolvedFeaturedPosition,
+      is_popular,
       category_id,
     });
     const keys = Object.keys(entries);
@@ -576,7 +584,8 @@ export async function getFeaturedItems(req, res) {
         item_description AS description,
         item_price AS price,
         item_image_url AS image,
-        featured_position AS featuredPosition
+        featured_position AS featuredPosition,
+        is_popular AS popular
       FROM menu_items
       WHERE is_featured = 1 AND item_is_visible = 1
       ORDER BY featured_position ASC
@@ -590,6 +599,7 @@ export async function getFeaturedItems(req, res) {
       price: `$${Number(i.price).toFixed(2)}`,
       image: i.image || null,
       featuredPosition: i.featuredPosition,
+      popular: Boolean(i.popular),
     }));
 
     res.json({ items: formatted });

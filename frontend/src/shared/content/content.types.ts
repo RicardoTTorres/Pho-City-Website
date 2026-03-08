@@ -27,6 +27,7 @@ export interface MenuItem {
   visible?: boolean;
   featured?: boolean;
   featuredPosition?: number | null;
+  popular?: boolean;
 }
 
 export interface MenuCategory {
@@ -45,11 +46,13 @@ export interface AboutPageContent {
   heroImage?: string | null;
   beginningTitle: string;
   beginningBody: string;
+  beginningImage?: string | null;
   foodTitle: string;
   foodBody: string;
   foodImage?: string | null;
   commitmentTitle: string;
   commitmentBody: string;
+  commitmentImage?: string | null;
   closingText: string;
   previewHeading?: string;
   previewBody?: string;

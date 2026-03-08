@@ -12,6 +12,7 @@ export type NewItemPayload = {
   visible?: boolean;
   featured?: boolean;
   featuredPosition?: number | null;
+  popular?: boolean;
 };
 
 export type NewCategoryPayload = {
@@ -32,6 +33,7 @@ export type FeaturedItem = {
   price: string;
   image: string | null;
   featuredPosition: number | null;
+  popular: boolean;
 };
 
 export async function getFeaturedItems(): Promise<FeaturedItem[]> {
@@ -71,6 +73,7 @@ export async function createItem(payload: NewItemPayload): Promise<void> {
       visible: payload.visible ?? true,
       featured: payload.featured,
       featuredPosition: payload.featuredPosition,
+      popular: payload.popular,
       category: payload.categoryId,
     }),
   });
@@ -90,6 +93,7 @@ export async function updateItem(id: string, payload: NewItemPayload): Promise<v
       visible: payload.visible ?? true,
       featured: payload.featured,
       featuredPosition: payload.featuredPosition,
+      popular: payload.popular,
       category: payload.categoryId,
     }),
   });

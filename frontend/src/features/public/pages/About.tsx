@@ -39,6 +39,7 @@ export default function About() {
       <AboutBeginningSection
         title={about.beginningTitle}
         body={about.beginningBody}
+        image={about.beginningImage}
       />
 
       <AboutFoodSection
@@ -50,6 +51,7 @@ export default function About() {
       <AboutCommitmentSection
         title={about.commitmentTitle}
         body={about.commitmentBody}
+        image={about.commitmentImage}
       />
     </div>
   );

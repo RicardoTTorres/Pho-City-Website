@@ -63,11 +63,13 @@ const EMPTY_ABOUT: AboutContent = {
   heroImage: null,
   beginningTitle: "",
   beginningBody: "",
+  beginningImage: null,
   foodTitle: "",
   foodBody: "",
   foodImage: null,
   commitmentTitle: "",
   commitmentBody: "",
+  commitmentImage: null,
   closingText: "",
   previewHeading: "",
   previewBody: "",
@@ -189,7 +191,7 @@ export function AboutSectionEditor() {
                 section="about"
                 currentUrl={form.heroImage || null}
                 onUploaded={(url) => handleChange("heroImage", url)}
-                label="Hero Image (optional)"
+                label="Hero Image"
               />
             </CollapsiblePanel>
 
@@ -215,7 +217,14 @@ export function AboutSectionEditor() {
                   className={`${TEXTAREA_CLASS} h-28`}
                 />
               </div>
+              <ImageUpload
+                section="about"
+                currentUrl={form.beginningImage || null}
+                onUploaded={(url) => handleChange("beginningImage", url)}
+                label="Section Image"
+              />
             </CollapsiblePanel>
+
             <CollapsiblePanel title="Section 2">
               <div>
                 <FieldLabel>Section Title</FieldLabel>
@@ -234,6 +243,12 @@ export function AboutSectionEditor() {
                   className={`${TEXTAREA_CLASS} h-28`}
                 />
               </div>
+              <ImageUpload
+                section="about"
+                currentUrl={form.foodImage || null}
+                onUploaded={(url) => handleChange("foodImage", url)}
+                label="Section Image"
+              />
             </CollapsiblePanel>
 
             <CollapsiblePanel title="Section 3">
@@ -258,6 +273,12 @@ export function AboutSectionEditor() {
                   className={`${TEXTAREA_CLASS} h-28`}
                 />
               </div>
+              <ImageUpload
+                section="about"
+                currentUrl={form.commitmentImage || null}
+                onUploaded={(url) => handleChange("commitmentImage", url)}
+                label="Section Image"
+              />
             </CollapsiblePanel>
 
             <div className="pt-4 flex justify-center">

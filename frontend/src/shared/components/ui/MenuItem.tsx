@@ -7,9 +7,10 @@ export interface MenuItemProps {
   price: number;
   description: string;
   image?: string | null | undefined;
+  popular?: boolean;
 }
 
-export function MenuItem({ name, price, description, image }: MenuItemProps) {
+export function MenuItem({ name, price, description, image, popular }: MenuItemProps) {
   const { english, vietnamese } = parseBilingualName(name);
   const safePrice = Number.isFinite(price) ? price : 0;
 
@@ -25,11 +26,23 @@ export function MenuItem({ name, price, description, image }: MenuItemProps) {
       ].join(" ")}
     >
       {image && (
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-40 object-cover rounded-xl mb-3"
-        />
+        <div className="relative mb-3">
+          <img
+            src={image}
+            alt={name}
+            className="w-full h-40 object-cover rounded-xl"
+          />
+          {popular && (
+            <span className="absolute top-2 left-2 bg-amber-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm">
+              Popular
+            </span>
+          )}
+        </div>
+      )}
+      {!image && popular && (
+        <span className="inline-block mb-2 bg-amber-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm">
+          Popular
+        </span>
       )}
       <header className="flex items-start gap-4 mb-3">
         <div className="flex-1 min-w-0">

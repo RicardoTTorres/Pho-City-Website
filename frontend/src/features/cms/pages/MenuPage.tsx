@@ -30,6 +30,7 @@ export interface MenuItem extends RawMenuItem {
   visible: boolean;
   featured: boolean;
   featuredPosition: number | null;
+  popular: boolean;
 }
 
 export interface Category extends Omit<RawCategory, "items"> {
@@ -94,6 +95,7 @@ export default function MenuPage() {
           visible: Boolean(item.visible ?? true),
           featured: Boolean(item.featured ?? false),
           featuredPosition: item.featuredPosition ?? null,
+          popular: Boolean(item.popular ?? false),
         };
         if (item.image) {
           formatted.image = item.image;

@@ -12,6 +12,7 @@ import {
   EyeOff,
   GripVertical,
   Star,
+  TrendingUp,
 } from "lucide-react";
 import {
   DndContext,
@@ -60,6 +61,7 @@ function SortableMenuItem({
   onToggleVisible,
   onToggleFeatured,
   onChangeFeaturedPosition,
+  onTogglePopular,
 }: {
   item: MenuItem;
   disabled?: boolean;
@@ -68,6 +70,7 @@ function SortableMenuItem({
   onToggleVisible: () => void;
   onToggleFeatured: () => void;
   onChangeFeaturedPosition: (position: number) => void;
+  onTogglePopular: () => void;
 }) {
   const {
     attributes,
@@ -158,6 +161,21 @@ function SortableMenuItem({
                   </select>
                 )}
               </div>
+              {/* Popular toggle */}
+              <button
+                onClick={onTogglePopular}
+                className="flex items-center gap-1.5 px-2 py-1 rounded transition-colors"
+                aria-label={`Toggle popular for ${item.name}`}
+              >
+                <TrendingUp
+                  className={`w-4 h-4 ${item.popular ? "text-amber-500" : "text-gray-400"}`}
+                />
+                <span
+                  className={`text-xs ${item.popular ? "text-amber-600" : "text-gray-500"}`}
+                >
+                  {item.popular ? "Popular" : "Mark popular"}
+                </span>
+              </button>
               {/* Visibility toggle */}
               <button
                 onClick={onToggleVisible}
@@ -374,6 +392,7 @@ export function MenuSectionEditor({
         visible: !item.visible,
         featured: item.featured,
         featuredPosition: item.featuredPosition,
+        popular: item.popular,
       });
     } catch (error) {
       console.error("Error updating visibility:", error);
@@ -399,10 +418,30 @@ export function MenuSectionEditor({
         visible: item.visible,
         featured: willFeature,
         featuredPosition: willFeature ? item.featuredPosition : null,
+        popular: item.popular,
       });
     } catch (error) {
       console.error("Error updating featured:", error);
       alert("Failed to update featured status. Please try again.");
+    }
+  };
+
+  const handleTogglePopular = async (item: MenuItem) => {
+    try {
+      await onUpdateItem(item.id, {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        categoryId: item.categoryId,
+        image: item.image || "",
+        visible: item.visible,
+        featured: item.featured,
+        featuredPosition: item.featuredPosition,
+        popular: !item.popular,
+      });
+    } catch (error) {
+      console.error("Error updating popular:", error);
+      alert("Failed to update popular status. Please try again.");
     }
   };
 
@@ -420,6 +459,7 @@ export function MenuSectionEditor({
         visible: item.visible,
         featured: item.featured,
         featuredPosition: position,
+        popular: item.popular,
       });
     } catch (error) {
       console.error("Error updating featured position:", error);
@@ -435,6 +475,7 @@ export function MenuSectionEditor({
         visible: editingItem?.visible ?? true,
         featured: editingItem?.featured ?? false,
         featuredPosition: editingItem?.featuredPosition ?? null,
+        popular: editingItem?.popular ?? false,
       };
       if (editingItem) {
         await onUpdateItem(editingItem.id, payload);
@@ -703,6 +744,7 @@ export function MenuSectionEditor({
                       onChangeFeaturedPosition={(pos) =>
                         handleChangeFeaturedPosition(item, pos)
                       }
+                      onTogglePopular={() => handleTogglePopular(item)}
                     />
                   ))}
                 </div>
