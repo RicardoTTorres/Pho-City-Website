@@ -69,6 +69,7 @@ describe("getMenu", () => {
         price: 12.5,
         image: "pho.jpg",
         visible: 1,
+        popular: 0,
         category_id: 1,
       },
     ];
@@ -92,6 +93,7 @@ describe("getMenu", () => {
                 description: "Hot soup",
                 price: "$12.50",
                 image: "pho.jpg",
+                popular: false,
               },
             ],
           },
@@ -180,6 +182,7 @@ describe("getAdminMenu", () => {
         visible: 0,
         featured: 1,
         featuredPosition: 1,
+        popular: 0,
         category_id: 2,
       },
     ];
@@ -206,6 +209,7 @@ describe("getAdminMenu", () => {
                 visible: false,
                 featured: true,
                 featuredPosition: 1,
+                popular: false,
                 categoryId: 2,
               },
             ],
@@ -726,6 +730,7 @@ describe("getFeaturedItems", () => {
         price: 15.99,
         image: "special.jpg",
         featuredPosition: 1,
+        popular: 0,
       },
     ];
     pool.query.mockResolvedValueOnce([items]);
@@ -742,6 +747,7 @@ describe("getFeaturedItems", () => {
           price: "$15.99",
           image: "special.jpg",
           featuredPosition: 1,
+          popular: false,
         },
       ],
     });

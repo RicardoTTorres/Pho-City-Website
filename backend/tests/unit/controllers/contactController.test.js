@@ -16,11 +16,22 @@ vi.mock("../../../src/services/settingsService.js", () => ({
 
 import { getSettings, storeSubmission } from "../../../src/services/settingsService.js";
 
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(console, "log").mockImplementation(() => {});
+});
+
+let ipCounter = 0;
+function uniqueIp() {
+  return `10.0.0.${++ipCounter}`;
+}
+
 function mockReqRes({
   body = {},
   params = {},
   user = {},
-  ip = "127.0.0.1"
+  ip = uniqueIp(),
 } = {}) {
   const res = {
     json: vi.fn(),
@@ -126,10 +137,11 @@ describe("handleContactForm", () => {
     message: "Hello"
   };
 
+  const sharedIp = uniqueIp();
   let res;
 
   for (let i = 0; i < 6; i++) {
-    const mock = mockReqRes({ body });
+    const mock = mockReqRes({ body, ip: sharedIp });
     res = mock.res;
     await handleContactForm(mock.req, mock.res);
   }
