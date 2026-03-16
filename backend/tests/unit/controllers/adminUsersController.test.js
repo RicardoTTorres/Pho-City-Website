@@ -145,7 +145,7 @@ describe("createAdminUser", () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "email and password are required" });
         expect(pool.query).not.toHaveBeenCalled();
-    })
+    });
 
     it("returns 400 when email or password has an invalid type", async () => {
         const { req, res } = mockReqRes({
@@ -160,7 +160,7 @@ describe("createAdminUser", () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid payload" });
         expect(pool.query).not.toHaveBeenCalled();
-    })
+    });
 
     it("returns 400 when role type is not permitted admin role", async () => {
         const { req, res } = mockReqRes({
@@ -176,7 +176,7 @@ describe("createAdminUser", () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid role" });
         expect(pool.query).not.toHaveBeenCalled();
-    })
+    });
 
     it("creates admin user, normalize fields, and returns the inserted admin record", async () => {
         const createdAdmin = {
@@ -212,6 +212,24 @@ describe("createAdminUser", () => {
         );
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith({ adminUser: createdAdmin });
-    })
+    });
+
+    it("returns 409 when trying to create a duplicate admin email", async () => {
+        bcrypt.hash.mockResolvedValueOnce("hashed-dup");
+        pool.query.mockRejectedValueOnce({ code: "ER_DUP_ENTRY" });
+
+        const { req, res } = mockReqRes({
+            body: { 
+                email: "bob.smith@phocity.com",
+                password: "helloWorld1@",
+                role: "admin"
+            }
+        });
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(409);
+        expect(res.json).toHaveBeenCalledWith({ error: "Email already exists" });
+    });
 
 });
