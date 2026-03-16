@@ -317,7 +317,7 @@ describe("updateAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     });
 
-    it("updates email and role, then returns the refreshed admin user", async () => {
+    it("updates email and role, then returns the updated admin user", async () => {
         const updatedAdmin = {
             id: 4,
             email: "bob.smith@phocity.com",
@@ -348,5 +348,82 @@ describe("updateAdminUser", () => {
               [4]
         );
         expect(res.json).toHaveBeenCalledWith({ adminUser: updatedAdmin });
+    });
+
+    it("hashes password before saving password update", async () => {
+        const updatedAdmin = {
+            id: 4,
+            email: "bob.smith@phocity.com",
+            role: "admin",
+            created_at: "2026-01-09 07:30:00"
+        };
+
+        bcrypt.hash.mockResolvedValueOnce("hash-reset");
+        pool.query.mockResolvedValueOnce([{ affectedRows: 1 }]).mockResolvedValueOnce([[updatedAdmin]]);
+
+        const { req, res } = mockReqRes({
+            params: { id: "8" },
+            body: {
+                password: "helloWorld1@"
+            }
+        });
+        
+        await updateAdminUser( req, res);
+
+        expect(bcrypt.hash).toHaveBeenCalledWith("helloWorld1@", 10);
+        expect(pool.query).toHaveBeenNthCalledWith(
+              1,
+              expect.stringContaining("SET password_hash = ?"),
+              ["hash-reset", 8]
+        );
+        expect(res.json).toHaveBeenCalledWith({ adminUser: updatedAdmin });
+    });
+
+    it("returns 404 when update affects 0 rows", async () => {
+        pool.query.mockResolvedValueOnce([{ affectedRows: 0 }]);
+    
+        const { req, res } = mockReqRes({
+            params: { id: "22" },
+            body: {
+                role: "editor"
+            }
+        });
+    
+        await updateAdminUser(req, res);
+    
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ error: "Admin user not found" });
+    });
+
+    it("returns 409 when updated email already exists for another admin", async () => {
+        pool.query.mockRejectedValueOnce({ code: "ER_DUP_ENTRY" });
+    
+        const { req, res } = mockReqRes({
+            params: { id: "22" },
+            body: {
+                email: "bob.smith@phocity.com"
+            }
+        });
+    
+        await updateAdminUser(req, res);
+    
+        expect(res.status).toHaveBeenCalledWith(409);
+        expect(res.json).toHaveBeenCalledWith({ error: "Email already exists" });
+    });
+
+    it("returns 500 when admin update fails unexpectedly", async () => {
+        pool.query.mockRejectedValueOnce(new Error("DB failure"));
+    
+        const { req, res } = mockReqRes({
+            params: { id: "22" },
+            body: {
+                role: "admin"
+            }
+        });
+    
+        await updateAdminUser(req, res);
+    
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to update admin user" });
     });
 })
