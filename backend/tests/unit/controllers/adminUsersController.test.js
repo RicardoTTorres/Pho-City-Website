@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 describe("getAdminUsers", () => {
-    it("return admin users in order from the database", async () => {
+    it("returns admin users in order from the database", async () => {
         const adminRows = [
             {
                 id: 2,
@@ -60,7 +60,7 @@ describe("getAdminUsers", () => {
         expect(res.json).toHaveBeenCalledWith({ adminUsers: adminRows });
     });
 
-    it("return 500 when database fails to load admin users", async () => {
+    it("returns 500 when database fails to load admin users", async () => {
         pool.query.mockRejectedValueOnce(new Error("DB failure"));
 
         const { req, res } = mockReqRes();
@@ -72,7 +72,7 @@ describe("getAdminUsers", () => {
 });
 
 describe("getAdminUserById", () => {
-    it("return 400 when user id is invalid", async () => {
+    it("returns 400 when user id is invalid", async () => {
         const { req, res } = mockReqRes({
             params: { id: "zero" }
         });
@@ -84,7 +84,7 @@ describe("getAdminUserById", () => {
         expect(pool.query).not.toHaveBeenCalled();
     });
 
-    it("return 404 when admin user not found", async () => {
+    it("returns 404 when admin user not found", async () => {
         pool.query.mockResolvedValueOnce([[]]);
 
         const { req, res } = mockReqRes({
@@ -95,5 +95,28 @@ describe("getAdminUserById", () => {
 
         expect(res.status).toHaveBeenCalledWith(404);
         expect(res.json).toHaveBeenCalledWith({ error: "Admin user not found" });
+    });
+    
+    it("returns admin user when id exists in the database", async () => {
+        const adminUser = {
+            id: 5,
+            email: "bruce.wayne@phocity.com",
+            role: "admin",
+            created_at: "2026-02-14 14:40:00",
+        };
+    
+        pool.query.mockResolvedValueOnce([[adminUser]]);
+
+        const { req, res } = mockReqRes({
+            params: { id: "5" }
+        });
+
+        await getAdminUserById(req, res);
+
+        expect(pool.query).toHaveBeenCalledWith(
+            expect.stringContaining("WHERE id = ?"),
+            [5]
+        );
+        expect(res.json).toHaveBeenCalledWith({ adminUser });
     });
 });
