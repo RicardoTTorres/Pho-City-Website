@@ -147,4 +147,19 @@ describe("createAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     })
 
+    it("returns 400 when email or password has an invalid type", async () => {
+        const { req, res } = mockReqRes({
+            body: { 
+                email: ["not", "a", "string"],
+                password: "helloWorld"
+            }
+        });
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid payload" });
+        expect(pool.query).not.toHaveBeenCalled();
+    })
+
 });
