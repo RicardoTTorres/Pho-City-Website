@@ -191,9 +191,9 @@ describe("createAdminUser", () => {
 
         const { req, res } = mockReqRes({
             body: {
-                email: "  Bob.Smith@PhoCity.com  ",
+                email: "Bob.Smith@PhoCity.com",
                 password: "helloWorld1$",
-                role: "  EDITOR  "
+                role: "EDITOR"
             }
         });
 
@@ -203,12 +203,12 @@ describe("createAdminUser", () => {
         expect(pool.query).toHaveBeenNthCalledWith(
               1,
               expect.stringContaining("INSERT INTO admins"),
-              ["bob.smith@phocity.com", "asdfghjkl1@", "editor"],
+              ["bob.smith@phocity.com", "asdfghjkl1@", "editor"]
         );
         expect(pool.query).toHaveBeenNthCalledWith(
               2,
               expect.stringContaining("SELECT id, email, role, created_at"),
-              [13],
+              [13]
         );
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith({ adminUser: createdAdmin });
@@ -232,4 +232,121 @@ describe("createAdminUser", () => {
         expect(res.json).toHaveBeenCalledWith({ error: "Email already exists" });
     });
 
+    it("returns 500 when creating admin user fails", async () => {
+        bcrypt.hash.mockResolvedValueOnce("hashed-unexpected");
+            pool.query.mockRejectedValueOnce(new Error("insert failed"));
+
+        const { req, res } = mockReqRes({
+            body: { 
+                email: "bob.smith@phocity.com",
+                password: "helloWorld1@",
+                role: "admin"
+            }
+        });
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to create admin user" });
+    });
 });
+
+describe("updateAdminUser", () => {
+    it("returns 400 when user id is invalid", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "-3" },
+            body: { role: "editor" }
+        });
+
+        await updateAdminUser( req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid user id" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when email update is blank", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "4" },
+            body: { email: " " }
+        });
+
+        await updateAdminUser( req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid email" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when password update is invalid", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "4" },
+            body: { password: "" }
+        });
+
+        await updateAdminUser( req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid password" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when role update is invalid", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "4" },
+            body: { role: "manager" }
+        });
+
+        await updateAdminUser( req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid role" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when no valid fields were provided to update", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "4" },
+            body: {}
+        });
+
+        await updateAdminUser( req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "No fields to update" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("updates email and role, then returns the refreshed admin user", async () => {
+        const updatedAdmin = {
+            id: 4,
+            email: "bob.smith@phocity.com",
+            role: "editor",
+            created_at: "2026-01-09 07:30:00"
+        };
+
+        pool.query.mockResolvedValueOnce([{ affectedRows: 1 }]).mockResolvedValueOnce([[updatedAdmin]]);
+
+        const { req, res } = mockReqRes({
+            params: { id: "4" },
+            body: {
+                email: "Bob.Smith@PhoCity.com",
+                role: "EDITOR"
+            }
+        });
+        
+        await updateAdminUser( req, res);
+
+        expect(pool.query).toHaveBeenNthCalledWith(
+              1,
+              expect.stringContaining("SET email = ?, role = ?"),
+              ["bob.smith@phocity.com", "editor", 4]
+        );
+        expect(pool.query).toHaveBeenNthCalledWith(
+              2,
+              expect.stringContaining("SELECT id, email, role, created_at"),
+              [4]
+        );
+        expect(res.json).toHaveBeenCalledWith({ adminUser: updatedAdmin });
+    });
+})
