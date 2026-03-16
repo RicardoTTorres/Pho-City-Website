@@ -132,5 +132,19 @@ describe("getAdminUserById", () => {
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: "Failed to load admin user" });
     });
-    
+});
+
+describe("createAdminUser", () => {
+    it("returns 400 when email or password is missing", async () => {
+        const { req, res } = mockReqRes({
+            body: { email: "bob.smith@phocity.com" }
+        });
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "email and password are required" });
+        expect(pool.query).not.toHaveBeenCalled();
+    })
+
 });
