@@ -178,4 +178,40 @@ describe("createAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     })
 
+    it("creates admin user, normalize fields, and returns the inserted admin record", async () => {
+        const createdAdmin = {
+            id: 13,
+            email: "bob.smith@phocity.com",
+            role: "editor",
+            created_at: "2026-03-01 21:45:00"
+        };
+
+        bcrypt.hash.mockResolvedValueOnce("asdfghjkl1@");
+        pool.query.mockResolvedValueOnce([{ insertId: 13 }]).mockResolvedValueOnce([[createdAdmin]]);
+
+        const { req, res } = mockReqRes({
+            body: {
+                email: "  Bob.Smith@PhoCity.com  ",
+                password: "helloWorld1$",
+                role: "  EDITOR  "
+            }
+        });
+
+        await createAdminUser(req, res);
+
+        expect(bcrypt.hash).toHaveBeenCalledWith("helloWorld1$", 10);
+        expect(pool.query).toHaveBeenNthCalledWith(
+              1,
+              expect.stringContaining("INSERT INTO admins"),
+              ["bob.smith@phocity.com", "asdfghjkl1@", "editor"],
+        );
+        expect(pool.query).toHaveBeenNthCalledWith(
+              2,
+              expect.stringContaining("SELECT id, email, role, created_at"),
+              [13],
+        );
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.json).toHaveBeenCalledWith({ adminUser: createdAdmin });
+    })
+
 });
