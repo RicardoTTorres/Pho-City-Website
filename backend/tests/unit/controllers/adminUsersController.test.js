@@ -60,4 +60,14 @@ describe("getAdminUsers", () => {
         expect(res.json).toHaveBeenCalledWith({ adminUsers: adminRows });
     });
 
+    it("return 500 when database fails to load admin users", async () => {
+        pool.query.mockRejectedValueOnce(new Error("DB failure"));
+
+        const { req, res } = mockReqRes();
+        await getAdminUsers(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to load admin users" });
+    });
+
 });
