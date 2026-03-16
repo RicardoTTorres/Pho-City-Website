@@ -258,7 +258,7 @@ describe("updateAdminUser", () => {
             body: { role: "editor" }
         });
 
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid user id" });
@@ -271,7 +271,7 @@ describe("updateAdminUser", () => {
             body: { email: " " }
         });
 
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid email" });
@@ -284,7 +284,7 @@ describe("updateAdminUser", () => {
             body: { password: "" }
         });
 
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid password" });
@@ -297,7 +297,7 @@ describe("updateAdminUser", () => {
             body: { role: "manager" }
         });
 
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "Invalid role" });
@@ -310,7 +310,7 @@ describe("updateAdminUser", () => {
             body: {}
         });
 
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "No fields to update" });
@@ -335,7 +335,7 @@ describe("updateAdminUser", () => {
             }
         });
         
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(pool.query).toHaveBeenNthCalledWith(
               1,
@@ -368,7 +368,7 @@ describe("updateAdminUser", () => {
             }
         });
         
-        await updateAdminUser( req, res);
+        await updateAdminUser(req, res);
 
         expect(bcrypt.hash).toHaveBeenCalledWith("helloWorld1@", 10);
         expect(pool.query).toHaveBeenNthCalledWith(
@@ -426,4 +426,77 @@ describe("updateAdminUser", () => {
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: "Failed to update admin user" });
     });
-})
+});
+
+describe("deleteAdminUser", () => {
+    it("returns 400 when user id is invalid", async () => {
+        const{ req, res } = mockReqRes({
+            params: { id: "abc" }
+        });
+
+        await deleteAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid user id" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when admin tries to delete the current logged in user", async () => {
+        const{ req, res } = mockReqRes({
+            params: { id: "11" },
+            user: { id: 11, email: "bob.smith@phocity.com"}
+        });
+
+        await deleteAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Cannot delete current user" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 404 when deleted admin user does not exist", async () => {
+        pool.query.mockResolvedValueOnce([{ affectedRows: 0 }]);
+
+        const{ req, res } = mockReqRes({
+            params: { id: "17" },
+            user: { id: 3, email: "bob.smith@phocity.com"}
+        });
+
+        await deleteAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ error: "Admin user not found" });
+    });
+
+    it("deletes admin user and returns 204 with no content", async () => {
+        pool.query.mockResolvedValueOnce([{ affectedRows: 1 }]);
+
+        const{ req, res } = mockReqRes({
+            params: { id: "14" },
+            user: { id: 3, email: "bob.smith@phocity.com"}
+        });
+
+        await deleteAdminUser(req, res);
+
+        expect(pool.query).toHaveBeenCalledWith(
+              expect.stringContaining("DELETE FROM admins"),
+              [14]
+        );
+        expect(res.status).toHaveBeenCalledWith(204);
+        expect(res.send).toHaveBeenCalled();
+    });
+
+    it("returns 500 when delete admin user query fails", async () => {
+        pool.query.mockRejectedValueOnce(new Error("DB failure"));
+
+        const{ req, res } = mockReqRes({
+            params: { id: "14" },
+            user: { id: 3, email: "bob.smith@phocity.com"}
+        });
+
+        await deleteAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: "Failed to delete admin user" });
+    });
+});
