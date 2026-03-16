@@ -69,5 +69,31 @@ describe("getAdminUsers", () => {
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: "Failed to load admin users" });
     });
+});
 
+describe("getAdminUserById", () => {
+    it("return 400 when user id is invalid", async () => {
+        const { req, res } = mockReqRes({
+            params: { id: "zero" }
+        });
+
+        await getAdminUserById(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "Invalid user id" });
+        expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("return 404 when admin user not found", async () => {
+        pool.query.mockResolvedValueOnce([[]]);
+
+        const { req, res } = mockReqRes({
+            params: { id: "12" }
+        });
+
+        await getAdminUserById(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ error: "Admin user not found" });
+    });
 });
