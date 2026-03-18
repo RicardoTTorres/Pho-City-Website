@@ -71,6 +71,7 @@ describe("getContactInfo", () => {
       city: "Sacramento",
       state: "CA",
       zipcode: "95824",
+      onlineOrdering: "",
       fullAddress: "6175 Stockton Blvd, Sacramento, CA 95824",
       businessHours: [
         {
