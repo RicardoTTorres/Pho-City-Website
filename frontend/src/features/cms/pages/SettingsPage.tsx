@@ -316,6 +316,37 @@ export default function SettingsPage() {
             />
           </div>
         </Card>
+
+        {/* PDF Menu */}
+        <Card title="PDF Menu">
+          <div className="space-y-3">
+            <div>
+              <FieldLabel>Download Button Label</FieldLabel>
+              <TextInput
+                value={settings.pdf.menuLabel}
+                onChange={(v) => patch("pdf", { menuLabel: v })}
+                placeholder="Download Menu"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Text shown on the public menu PDF download button.
+              </p>
+            </div>
+            <div>
+              <FieldLabel>Cache Duration (minutes)</FieldLabel>
+              <TextInput
+                type="number"
+                value={String(settings.pdf.cacheTtlMinutes)}
+                onChange={(v) =>
+                  patch("pdf", { cacheTtlMinutes: Math.max(1, Number(v)) })
+                }
+                placeholder="60"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                How long the generated PDF is cached before regenerating.
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
 
     </div>

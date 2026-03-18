@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `about_section` (
   `about_image_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`about_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `about_page_content` (
   `id`                   INT NOT NULL AUTO_INCREMENT,
   `hero_title`           VARCHAR(150) DEFAULT NULL,
@@ -23,15 +24,13 @@ CREATE TABLE IF NOT EXISTS `about_page_content` (
   `preview_button_label` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_heading` ALTER TABLE `about_page_content`
-ADD COLUMN `preview_heading` VARCHAR(150) DEFAULT NULL;VARCHAR(150) DEFAULT NULL;
-ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_body`         TEXT;
-ALTER TABLE `about_page_content` ADD COLUMN IF NOT EXISTS `preview_button_label` VARCHAR(100) DEFAULT NULL;
+
 INSERT INTO `about_page_content` (`hero_title`, `hero_intro`, `hero_image_url`)
 SELECT `about_title`, `about_description`, `about_image_url`
 FROM   `about_section`
 WHERE  NOT EXISTS (SELECT 1 FROM `about_page_content`)
 LIMIT  1;
+
 CREATE TABLE IF NOT EXISTS `contact_info` (
   `contact_id` INT NOT NULL AUTO_INCREMENT,
   `contact_address` VARCHAR(255) DEFAULT NULL,
@@ -40,8 +39,22 @@ CREATE TABLE IF NOT EXISTS `contact_info` (
   `contact_zipcode` VARCHAR(10) DEFAULT NULL,
   `contact_phone` VARCHAR(50) DEFAULT NULL,
   `contact_email` VARCHAR(100) DEFAULT NULL,
+  `online_ordering_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`contact_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `contact_submissions` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `submitted_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+  `ip_hash` VARCHAR(64) NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_submitted_at` (`submitted_at` DESC)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `hero_section` (
   `hero_id` INT NOT NULL AUTO_INCREMENT,
   `hero_main_title` VARCHAR(150) DEFAULT NULL,
@@ -51,21 +64,14 @@ CREATE TABLE IF NOT EXISTS `hero_section` (
   `hero_image_url` VARCHAR(512) DEFAULT NULL,
   PRIMARY KEY (`hero_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `menu_categories` (
   `category_id` INT NOT NULL AUTO_INCREMENT,
   `category_name` VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (`category_id`),
   UNIQUE KEY `category_name` (`category_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-CREATE TABLE IF NOT EXISTS `admins` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `email` VARCHAR(255) NOT NULL,
-  `password_hash` VARCHAR(255) NOT NULL,
-  `role` VARCHAR(50) NOT NULL DEFAULT 'admin',
-  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `admins_email_unique` (`email`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `menu_items` (
   `item_id` INT NOT NULL AUTO_INCREMENT,
   `item_name` VARCHAR(100) NOT NULL,
@@ -80,6 +86,51 @@ CREATE TABLE IF NOT EXISTS `menu_items` (
   KEY `category_id` (`category_id`),
   CONSTRAINT `menu_items_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `menu_categories` (`category_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `category_customization_groups` (
+  `id`          INT AUTO_INCREMENT PRIMARY KEY,
+  `category_id` INT NOT NULL,
+  `enabled`     TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY `uq_custgroup_category` (`category_id`),
+  CONSTRAINT `fk_custgroup_cat`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `menu_categories` (`category_id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `customization_sections` (
+  `id`       INT AUTO_INCREMENT PRIMARY KEY,
+  `group_id` INT NOT NULL,
+  `title`    VARCHAR(100) NOT NULL,
+  `position` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  CONSTRAINT `fk_section_group`
+    FOREIGN KEY (`group_id`)
+    REFERENCES `category_customization_groups` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `customization_items` (
+  `id`         INT AUTO_INCREMENT PRIMARY KEY,
+  `section_id` INT NOT NULL,
+  `name`       VARCHAR(150) NOT NULL,
+  `price`      VARCHAR(20) DEFAULT NULL,
+  `position`   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  CONSTRAINT `fk_custitem_section`
+    FOREIGN KEY (`section_id`)
+    REFERENCES `customization_sections` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `admins` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(255) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(50) NOT NULL DEFAULT 'admin',
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `admins_email_unique` (`email`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `operating_hours` (
   `oh_id` INT NOT NULL AUTO_INCREMENT,
   `day_of_week` VARCHAR(15) DEFAULT NULL,
@@ -89,6 +140,7 @@ CREATE TABLE IF NOT EXISTS `operating_hours` (
   PRIMARY KEY (`oh_id`),
   UNIQUE KEY `day_of_week` (`day_of_week`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `ordering_links` (
   `platform_id` INT NOT NULL AUTO_INCREMENT,
   `platform_name` VARCHAR(50) DEFAULT NULL,
@@ -96,12 +148,67 @@ CREATE TABLE IF NOT EXISTS `ordering_links` (
   PRIMARY KEY (`platform_id`),
   UNIQUE KEY `platform_name` (`platform_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `site_settings` (
   `id` INT NOT NULL,
   `footer_json` JSON NOT NULL,
+  `navbar_json` JSON NULL,
+  `settings_json` JSON NULL,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+INSERT INTO `site_settings` (`id`, `footer_json`, `settings_json`)
+VALUES (
+  1,
+  JSON_OBJECT(
+    'contact',
+    JSON_OBJECT(
+      'phone',    '(916) 754-2143',
+      'address',  '6175 Stockton Blvd #200',
+      'cityZip',  'Sacramento, CA 95824'
+    ),
+    'navLinks',
+    JSON_ARRAY(
+      JSON_OBJECT('path', '/',        'label', 'Home'),
+      JSON_OBJECT('path', '/about',   'label', 'About'),
+      JSON_OBJECT('path', '/menu',    'label', 'Menu'),
+      JSON_OBJECT('path', '/contact', 'label', 'Contact'),
+      JSON_OBJECT(
+        'path',     'https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200',
+        'label',    'Order',
+        'external', TRUE
+      )
+    ),
+    'socialLinks',
+    JSON_ARRAY(
+      JSON_OBJECT('url', 'https://instagram.com/', 'icon', 'instagram', 'platform', 'instagram')
+    )
+  ),
+  JSON_OBJECT(
+    'site',
+    JSON_OBJECT(
+      'siteName',          'Pho City',
+      'tagline',           'Authentic Vietnamese Cuisine',
+      'seoDescription',    'Experience authentic Vietnamese flavors in Sacramento. Traditional pho, fresh rolls, and modern Vietnamese food.',
+      'googleAnalyticsId', ''
+    ),
+    'contact',
+    JSON_OBJECT(
+      'notificationEmail',        '',
+      'emailNotificationsEnabled', FALSE,
+      'storeSubmissions',          TRUE
+    ),
+    'pdf',
+    JSON_OBJECT(
+      'menuLabel',       'Download Menu',
+      'cacheTtlMinutes', 60
+    )
+  )
+) ON DUPLICATE KEY UPDATE
+  `footer_json`   = VALUES(`footer_json`),
+  `settings_json` = VALUES(`settings_json`);
+
 CREATE TABLE IF NOT EXISTS `activity_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `action` VARCHAR(20) NOT NULL,
@@ -112,63 +219,24 @@ CREATE TABLE IF NOT EXISTS `activity_log` (
   PRIMARY KEY (`id`),
   KEY `idx_activity_created` (`created_at` DESC)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `traffic_dates` (
   `date` DATE NOT NULL,
   `date_views` INT NOT NULL,
   PRIMARY KEY (`date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `traffic_pages` (
   `page` VARCHAR(255) NOT NULL,
   `page_views` INT NOT NULL,
   PRIMARY KEY (`page`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `traffic_visitors` (
   `visitor_id` CHAR(36) NOT NULL,
   PRIMARY KEY (`visitor_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-INSERT INTO `site_settings` (`id`, `footer_json`)
-VALUES (
-    1,
-    JSON_OBJECT(
-      'contact',
-      JSON_OBJECT(
-        'phone',
-        '(916) 754-2143',
-        'address',
-        '6175 Stockton Blvd #200',
-        'cityZip',
-        'Sacramento, CA 95824'
-      ),
-      'navLinks',
-      JSON_ARRAY(
-        JSON_OBJECT('path', '/', 'label', 'Home'),
-        JSON_OBJECT('path', '/about', 'label', 'About'),
-        JSON_OBJECT('path', '/menu', 'label', 'Menu'),
-        JSON_OBJECT('path', '/contact', 'label', 'Contact'),
-        JSON_OBJECT(
-          'path',
-          'https://order.toasttab.com/online/pho-city-6175-stockton-boulevard-200',
-          'label',
-          'Order',
-          'external',
-          TRUE
-        )
-      ),
-      'socialLinks',
-      JSON_ARRAY(
-        JSON_OBJECT(
-          'url',
-          'https://instagram.com/',
-          'icon',
-          'instagram',
-          'platform',
-          'instagram'
-        )
-      )
-    )
-  ) ON DUPLICATE KEY
-UPDATE `footer_json` =
-VALUES(`footer_json`);
+
 CREATE TABLE IF NOT EXISTS `gmail_accounts` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) UNIQUE NOT NULL,
@@ -179,12 +247,14 @@ CREATE TABLE IF NOT EXISTS `gmail_accounts` (
   `expiry_date` BIGINT,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `gmail_threads` (
   `email` VARCHAR(255) NOT NULL,
   `thread_id` VARCHAR(255) NOT NULL,
   `history_id` INT,
   PRIMARY KEY (`email`, `thread_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS `gmail_messages` (
   `email` VARCHAR(255) NOT NULL,
   `message_id` VARCHAR(255) NOT NULL,
