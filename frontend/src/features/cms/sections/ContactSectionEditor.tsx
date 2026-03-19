@@ -93,7 +93,7 @@ export function ContactSectionEditor() {
           zipcode: data.zipcode ?? "",
           phone: data.phone ?? "",
           email: data.email ?? "",
-          onlineOrdering: "",
+          onlineOrdering: data.onlineOrdering ?? "",
           businessHours: Array.isArray(data.businessHours)
             ? data.businessHours
             : emptyBusinessHours(),
@@ -129,6 +129,7 @@ export function ContactSectionEditor() {
         city: contact.city,
         state: contact.state,
         zipcode: contact.zipcode,
+        onlineOrdering: contact.onlineOrdering,
         businessHours: contact.businessHours,
       }),
       credentials: "include",

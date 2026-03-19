@@ -18,7 +18,6 @@ export function CMSLayout() {
     setSearch("");
   }, [location.pathname]);
 
-  // ---- DARK MODE STATE ----
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -60,7 +59,7 @@ export function CMSLayout() {
     return () => {
       active = false;
     };
-  }, [API_URL, location.pathname, navigate]);
+  }, [API_URL, navigate]);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";

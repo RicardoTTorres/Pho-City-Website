@@ -14,7 +14,7 @@ import {
   Send,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEditor";
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
@@ -64,6 +64,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [recentActivity, setRecentActivity] = useState<ActivityEntry[]>([]);
 
   const { content } = useContent();
@@ -91,62 +92,6 @@ export default function DashboardPage() {
     }
     getData().catch((err) => console.error("Failed to load messages:", err));
   }, []);
-
-  // const latestMessages: Array<{
-  //   name: string;
-  //   snippet: string;
-  //   time: string;
-  //   email: string;
-  //   subject?: string;
-  // }> = [
-  //   {
-  //     name: "Bill Nye",
-  //     snippet: "Loved the pho!",
-  //     time: "5 hours ago",
-  //     email: "bill@example.com",
-  //     subject: "Thanks for your feedback",
-  //   },
-  //   {
-  //     name: "John Doe",
-  //     snippet: "Do you have gluten-free options?",
-  //     time: "1 day ago",
-  //     email: "john@example.com",
-  //     subject: "About gluten-free options",
-  //   },
-  //   {
-  //     name: "Lychee T",
-  //     snippet: "Dog friendly??",
-  //     time: "2 days ago",
-  //     email: "lychee@example.com",
-  //     subject: "Re: Dog friendly",
-  //   },
-  // ];
-
-  // const [replyingIndex, setReplyingIndex] = useState<number | null>(null);
-  // const [replyText, setReplyText] = useState<string>("");
-
-  // function startReply(idx: number, name: string) {
-  //   setReplyingIndex(idx);
-  //   const firstName = (name?.split(" ")[0] ?? "").replace(/[^\w-]/g, "");
-  //   setReplyText(`Hi ${firstName},\n\n`);
-  // }
-
-  // function cancelReply() {
-  //   setReplyingIndex(null);
-  //   setReplyText("");
-  // }
-
-  // function sendReply(idx: number) {
-  //   const m = latestMessages[idx];
-  //   if (!m) return;
-  //   const subject = m.subject ?? `Re: Your message to Pho City`;
-  //   const body = replyText || "Hi,\n\n";
-  //   const href = `mailto:${m.email}?subject=${encodeURIComponent(
-  //     subject,
-  //   )}&body=${encodeURIComponent(body)}`;
-  //   window.location.href = href;
-  //   cancelReply();
-  // }
 
   return (
     <div className="space-y-6">
@@ -244,7 +189,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      onClick={() => {window.location.href = `/cms/messages?thread=${thread.id}`;}}
+                      onClick={() => navigate(`/cms/messages?thread=${thread.id}`)}
                       className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
                     >
                       <ReplyIcon size={14} /> Reply

@@ -11,7 +11,8 @@ export async function getContactInfo(req, res) {
         contact_address,
         contact_city,
         contact_state,
-        contact_zipcode
+        contact_zipcode,
+        online_ordering_url
       FROM contact_info
       LIMIT 1
     `);
@@ -36,6 +37,7 @@ export async function getContactInfo(req, res) {
       city: c.contact_city,
       state: c.contact_state,
       zipcode: c.contact_zipcode,
+      onlineOrdering: c.online_ordering_url ?? "",
       fullAddress: `${c.contact_address}, ${c.contact_city}, ${c.contact_state} ${c.contact_zipcode}`,
       businessHours: hoursRows.map(h => ({
         day: h.day_of_week,
@@ -58,6 +60,7 @@ export async function updateContactInfo(req, res) {
     city,
     state,
     zipcode,
+    onlineOrdering,
     businessHours
   } = req.body;
 
@@ -81,10 +84,11 @@ export async function updateContactInfo(req, res) {
         contact_address = ?,
         contact_city = ?,
         contact_state = ?,
-        contact_zipcode = ?
+        contact_zipcode = ?,
+        online_ordering_url = ?
       LIMIT 1
       `,
-      [phone, email, address, city, state, zipcode]
+      [phone, email, address, city, state, zipcode, onlineOrdering ?? null]
     );
 
     for (const h of businessHours) {
