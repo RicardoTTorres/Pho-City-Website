@@ -270,3 +270,16 @@ CREATE TABLE IF NOT EXISTS `gmail_messages` (
   `from_email` VARCHAR(255),
   PRIMARY KEY (`email`, `message_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `imap_accounts` (
+  `email` VARCHAR(255) NOT NULL,
+  `app_pass` VARCHAR(50),
+  PRIMARY KEY (`email`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `imap_messages` (
+  `email` VARCHAR(255) NOT NULL,
+  `message_id` VARCHAR(255) NOT NULL,
+  `is_preview` BOOLEAN NOT NULL,
+  `snippet` TEXT,
+  `body` TEXT,
+  PRIMARY KEY (`email`, `message_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
