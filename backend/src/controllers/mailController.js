@@ -1,6 +1,6 @@
 import { pool } from "../db/connect_db.js";
 import { google } from "googleapis";
-import Gmail from "../services/gmailService.js";
+import { getEmailClient, GmailClient, ImapClient } from "../services/gmailService.js";
 import { getSubmissions } from "../services/settingsService.js";
 
 /**
@@ -9,12 +9,11 @@ import { getSubmissions } from "../services/settingsService.js";
  */
 export async function getState(req, res) {
     try {
-        const gmail = await Gmail.create({auth: false});
-        const {authenticated, registered} = await gmail.checkAuth();
+        const {authenticated, registered, email} = await getEmailClient();
         res.json({
             authenticated,
             registered,
-            email: gmail.email
+            email
         });
 
     } catch (err) {
@@ -79,7 +78,7 @@ export async function finishAuth(req, res) {
         const profile = await gmail.users.getProfile({
             userId: "me",
         });
-        const wrapper = new Gmail(profile.data.emailAddress);
+        const wrapper = new GmailClient(profile.data.emailAddress);
         await wrapper.saveTokens(tokens);
 
         res.send(`
@@ -109,8 +108,9 @@ export async function getThreads(req, res) {
     try {
         const maxResults = Math.min(req.query?.maxResults || 10, 40);
         const pageToken = req.query?.pageToken;
-        const gmail = await Gmail.create();
-        const threads = await gmail.fetchThreads({maxResults, pageToken});
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        const threads = await client.fetchThreads({maxResults, pageToken});
         res.json(threads);
 
     } catch (err) {
@@ -129,8 +129,9 @@ export async function getThread(req, res) {
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
         }
-        const gmail = await Gmail.create();
-        const thread = await gmail.fetchThread(id, {forceRefresh});
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        const thread = await client.fetchThread(id, {forceRefresh});
         res.json(thread);
 
     } catch (err) {
@@ -160,8 +161,9 @@ export async function markRead(req, res) {
             );
             return res.status(200).json({ ok: true });
         }
-        const gmail = await Gmail.create();
-        await gmail.markRead(id);
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        await client.markRead(id);
         res.status(200).json({ ok: true });
 
     } catch (err) {
@@ -191,8 +193,9 @@ export async function markUnread(req, res) {
             );
             return res.status(200).json({ ok: true });
         }
-        const gmail = await Gmail.create();
-        await gmail.markUnread(id);
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        await client.markUnread(id);
         res.status(200).json({ ok: true });
 
     } catch (err) {
@@ -214,8 +217,9 @@ export async function reply(req, res) {
         if (!body) {
             return res.status(400).json({ error: "Missing required field body" });
         }
-        const gmail = await Gmail.create();
-        await gmail.reply(id, body);
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        await client.reply(id, body);
         res.status(200).json({ ok: true });
 
     } catch (err) {

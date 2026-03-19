@@ -1,5 +1,5 @@
 // src/controllers/contactController.js
-import Gmail from "../services/gmailService.js";
+import { getEmailClient } from "../services/gmailService.js";
 import crypto from "crypto";
 import { getSettings, storeSubmission } from "../services/settingsService.js";
 
@@ -59,11 +59,10 @@ export async function handleContactForm(req, res) {
     // Send email notification if enabled
     if (emailNotificationsEnabled) {
       try {
-        const gmail = await Gmail.create({auth: false});
-        const {authenticated} = await gmail.checkAuth();
+        const {client, authenticated, registered} = await getEmailClient({send: true, inbox: false});
         if (authenticated) {
-          await gmail.sendMessage({
-            to: gmail.email,
+          await client.sendMessage({
+            to: client.email,
             fromName: `${name} via Contact Form`,
             replyTo: email,
             subject: `Message from ${name}`,
