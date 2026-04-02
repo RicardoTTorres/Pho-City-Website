@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, X64, Linux]
-
+    
     steps:
       - name: Sync repo to origin/main (discard local changes)
         run: |
@@ -16,20 +16,20 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           git clean -fd
-
+    
       - name: Install backend dependencies
         run: |
           cd /home/ubuntu/Pho-City-Website/backend
-          npm ci || npm install
-
+          npm ci
+    
       - name: Restart backend
-        run: pm2 restart pho-city-api
-
+        run: pm2 reload pho-city-api
+    
       - name: Build frontend
         run: |
           cd /home/ubuntu/Pho-City-Website/frontend
-          npm ci || npm install
+          npm ci
           npm run build
-
+  
       - name: Reload nginx
         run: sudo systemctl reload nginx
