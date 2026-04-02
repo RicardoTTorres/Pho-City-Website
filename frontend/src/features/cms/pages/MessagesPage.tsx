@@ -208,7 +208,7 @@ export default function MessagesPage() {
 
           <div className="space-y-2.5">
             {visibleThreads?.map((thread) => (
-              <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} onDelete={thread.isGmail ? handleDelete : undefined} />
+              <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} {...(thread.isGmail ? { onDelete: handleDelete } : {})} />
             ))}
           </div>
 
