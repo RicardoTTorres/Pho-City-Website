@@ -237,8 +237,9 @@ export async function trashThread(req, res) {
         if (!id) {
             return res.status(400).json({ error: "Missing required field id" });
         }
-        const gmail = await Gmail.create();
-        await gmail.trash(id);
+        const {client, authenticated} = await getEmailClient();
+        if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
+        await client.trash(id);
         res.status(200).json({ ok: true });
     } catch (err) {
         console.error("Error trashing thread:", err);
