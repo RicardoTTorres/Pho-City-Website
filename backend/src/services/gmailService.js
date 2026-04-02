@@ -10,12 +10,6 @@ export default class Gmail {
         if (!email) {
             const settings = await getSettings();
             email = settings.contact.notificationEmail;
-            // const [rows] = await pool.query(`
-            //     SELECT contact_email
-            //     FROM contact_info
-            //     LIMIT 1
-            // `);
-            // email = rows[0].contact_email;
         }
 
         const gmail = new this(email);
@@ -305,6 +299,21 @@ export default class Gmail {
         });
     }
 
+    async trash(threadId) {
+        await this.gmail.users.threads.trash({
+            userId: "me",
+            id: threadId,
+        });
+        await pool.query(
+            `DELETE FROM gmail_messages WHERE email=? AND thread_id=?`,
+            [this.email, threadId]
+        );
+        await pool.query(
+            `DELETE FROM gmail_threads WHERE email=? AND thread_id=?`,
+            [this.email, threadId]
+        );
+    }
+
     async reply(threadId, body) {
         const thread = await this.fetchThread(threadId, {preview: true});
         const lastMessage = thread.messages.at(-1);
@@ -317,7 +326,6 @@ export default class Gmail {
         });
         const internalMessageId = response.data.payload.headers
             .find(({name, value}) => name.toLowerCase() == 'Message-ID'.toLowerCase()).value;
-        console.log(internalMessageId);
         if (!internalMessageId) throw new Error("Internal Message-ID not found");
 
         const allEmails = thread.messages.filter(m => !m.fromSelf).map(m => m.fromEmail);

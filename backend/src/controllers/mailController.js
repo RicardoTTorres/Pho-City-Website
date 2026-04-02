@@ -225,6 +225,24 @@ export async function reply(req, res) {
 }
 
 /**
+ * Move thread to trash
+ */
+export async function trashThread(req, res) {
+    try {
+        const {id} = req.params;
+        if (!id) {
+            return res.status(400).json({ error: "Missing required field id" });
+        }
+        const gmail = await Gmail.create();
+        await gmail.trash(id);
+        res.status(200).json({ ok: true });
+    } catch (err) {
+        console.error("Error trashing thread:", err);
+        res.status(500).json({ error: "Error trashing thread" });
+    }
+}
+
+/**
  * Gmail is not authenticated. Get submissions from database instead
  */
 export async function getSavedThreads(req, res) {

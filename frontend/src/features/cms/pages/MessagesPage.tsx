@@ -5,7 +5,7 @@ import { Reply as ReplyIcon, Send } from "lucide-react";
 
 import {
   type MailMessage, type MailThread,
-  getState, getThreads, getThread, markRead, markUnread, reply, getSavedThreads
+  getState, getThreads, getThread, markRead, markUnread, reply, getSavedThreads, deleteThread
 } from "@/shared/api/mail";
 
 import JavascriptTimeAgo from 'javascript-time-ago';
@@ -28,6 +28,7 @@ export default function MessagesPage() {
   const [replying, setReplying] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
   const [replyError, setReplyError] = useState<string>();
+  const [customersOnly, setCustomersOnly] = useState<boolean>(false);
 
   async function refresh() {
     try {
@@ -157,6 +158,20 @@ export default function MessagesPage() {
     }
   }
 
+  async function handleDelete(threadId: string) {
+    try {
+      await deleteThread(threadId);
+      setThreadsData(prev => prev?.filter(t => t.id !== threadId));
+      if (openThread?.id === threadId) setOpenThread(undefined);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const visibleThreads = customersOnly
+    ? threadsData?.filter(t => t.people.some(p => p !== "You"))
+    : threadsData;
+
   useEffect(() => {
     refresh();
   }, []);
@@ -177,9 +192,23 @@ export default function MessagesPage() {
         {/* Left Side: Threads List */}
         <div className="space-y-2.5 overflow-y-auto py-6 px-3">
 
+          {/* Filter toggle */}
+          <div className="flex items-center gap-2 pb-1">
+            <button
+              onClick={() => setCustomersOnly(prev => !prev)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                customersOnly
+                  ? "bg-brand-red text-white border-brand-red"
+                  : "text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              Customers only
+            </button>
+          </div>
+
           <div className="space-y-2.5">
-            {threadsData.map((thread) => (
-              <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} />
+            {visibleThreads?.map((thread) => (
+              <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} onDelete={thread.isGmail ? handleDelete : undefined} />
             ))}
           </div>
 
@@ -270,9 +299,9 @@ export default function MessagesPage() {
   }
 }
 
-function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onClick: () => Promise<void>, selected?: boolean }) {
+function ThreadPreview({ thread, onClick, selected, onDelete }: { thread: MailThread, onClick: () => Promise<void>, selected?: boolean, onDelete?: (id: string) => Promise<void> }) {
   const [isUnread, setIsUnread] = useState<boolean>(thread.isUnread);
-  
+
   async function toggleRead() {
     try {
       if (thread.isUnread) {
@@ -301,7 +330,7 @@ function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onCl
     >
       <div className="flex items-center justify-between gap-3 mb-2">
         <div className="min-w-0 flex flex-row gap-3 items-center">
-          
+
           {/* Read Indicator*/}
           <button
             className={`rounded-xl w-4.5 h-4.5 hover:bg-gray-200 transition -m-1.5 p-1.5`}
@@ -323,8 +352,23 @@ function ThreadPreview({ thread, onClick, selected }: { thread: MailThread, onCl
 
         </div>
 
-        {/* Time Ago*/}
-        <span className="text-xs text-gray-500 text-nowrap">{timeAgo.format(new Date(thread.date))}</span>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Time Ago*/}
+          <span className="text-xs text-gray-500 text-nowrap">{timeAgo.format(new Date(thread.date))}</span>
+
+          {/* Delete */}
+          {onDelete &&
+            <button
+              className="text-gray-400 hover:text-red-500 transition p-1 rounded"
+              title="Delete"
+              onClick={(e) => { e.stopPropagation(); onDelete(thread.id); }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          }
+        </div>
 
       </div>
 

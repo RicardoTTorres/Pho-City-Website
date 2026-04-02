@@ -3,15 +3,9 @@ import { pool } from "../db/connect_db.js";
 
 export async function getTraffic(req, res) {
   try {
-    const [pages] = await pool.query(`
-            SELECT
-                page AS path,
-                page_views AS views
-            FROM traffic_pages
-            ORDER BY views DESC; 
+    const [[{ total }]] = await pool.query(`
+            SELECT COALESCE(SUM(page_views), 0) AS total FROM traffic_pages;
         `);
-
-    const total = pages.reduce((sum, item) => sum + item.views, 0);
 
     const [days] = await pool.query(`
             SELECT
@@ -30,7 +24,6 @@ export async function getTraffic(req, res) {
         uniqueVisitors: unique[0].count,
       },
       daily: days,
-      topPages: pages,
     });
   } catch (err) {
     console.error("Get Traffic Error:", err);

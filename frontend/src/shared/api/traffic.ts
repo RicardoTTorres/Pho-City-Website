@@ -9,10 +9,6 @@ export type TrafficData = {
     daily: {
         day: number,
         views: number
-    }[],
-    topPages: {
-        path: string,
-        views: number
     }[]
 }
 

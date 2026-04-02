@@ -107,6 +107,19 @@ export async function reply(threadId: string, body: string) {
     }
 }
 
+export async function deleteThread(threadId: string) {
+    const response = await fetch(
+        `${API_URL}/api/admin/mail/threads/${threadId}`,
+        {
+            method: "DELETE",
+            credentials: "include"
+        }
+    );
+    if (!response.ok) {
+        throw new Error(`Server error in mail deleteThread: ${response.status} ${response.statusText}`);
+    }
+}
+
 export async function getSavedThreads(): Promise<{threads: MailThread[], nextPageToken: undefined}> {
     const response = await fetch(
         `${API_URL}/api/admin/mail/savedthreads`,

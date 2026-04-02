@@ -82,7 +82,6 @@ export function TrafficOverviewEditor() {
   const emptyData: TrafficData = {
     total: { totalViews: 0, uniqueVisitors: 0 },
     daily: [],
-    topPages: [],
   };
   const [data, setData] = useState<TrafficData>(emptyData);
   const [view, setView] = useState<View>("month");

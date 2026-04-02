@@ -7,6 +7,7 @@ import Home from "@/features/public/pages/Home";
 import About from "@/features/public/pages/About";
 import Contact from "@/features/public/pages/Contact";
 import Menu from "@/features/public/pages/Menu";
+import { RequireAuth } from "@/features/auth/components/RequireAuth";
 
 // CMS + auth — only loaded when the user navigates to /cms/* or /adminlogin
 const AdminLogin = lazy(() => import("@/features/auth/pages/AdminLogin"));
@@ -50,24 +51,26 @@ export default function App() {
         }
       />
 
-      {/* CMS routes with CMSLayout (floating sidebar) */}
-      <Route
-        path="/cms"
-        element={
-          <Suspense fallback={<CMSFallback />}>
-            <CMSLayout />
-          </Suspense>
-        }
-      >
-        <Route index element={<Navigate to="/cms/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="menu" element={<MenuPage />} />
-        <Route path="content" element={<ContentPage />} />
-        <Route path="media" element={<MediaPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="registeradmin" element={<Navigate to="/cms/users" replace />} />
-        <Route path="messages" element={<MessagesPage />} />
-        <Route path="settings" element={<SettingsPage />} />
+      {/* CMS routes — protected by RequireAuth */}
+      <Route element={<RequireAuth />}>
+        <Route
+          path="/cms"
+          element={
+            <Suspense fallback={<CMSFallback />}>
+              <CMSLayout />
+            </Suspense>
+          }
+        >
+          <Route index element={<Navigate to="/cms/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="menu" element={<MenuPage />} />
+          <Route path="content" element={<ContentPage />} />
+          <Route path="media" element={<MediaPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="registeradmin" element={<Navigate to="/cms/users" replace />} />
+          <Route path="messages" element={<MessagesPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
       </Route>
 
       {/* Legacy route redirect */}
