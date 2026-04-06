@@ -178,6 +178,16 @@ describe("createAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     });
 
+    it("returns 400 when req.body is missing", async () => {
+        const { req, res } = mockReqRes();
+        req.body = undefined;
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "email and password are required" });
+    });
+
     it("creates admin user, normalize fields, and returns the inserted admin record", async () => {
         const createdAdmin = {
             id: 13,
