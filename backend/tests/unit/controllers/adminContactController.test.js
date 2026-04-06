@@ -112,6 +112,57 @@ describe("getContactInfo", () => {
   });
 });
 
+  it("returns closed business hrs with null opening/closing times", async () => {
+    pool.query.mockResolvedValueOnce([
+      [
+        {
+          contact_phone: "(916)-754-2413",
+          contact_email: "phocitysac@gmail.com",
+          contact_address: "6175 Stockton Blvd",
+          contact_city: "Sacramento",
+          contact_state: "CA",
+          contact_zipcode: "95824",
+          online_ordering_url: null,
+        },
+      ],
+    ])
+    
+    .mockResolvedValueOnce([
+      [
+        {
+          day_of_week: "Tuesday",
+          open_time: "09:00",
+          close_time: "20:00",
+          restaurant_is_closed: 1,
+        },
+      ],
+    ]);
+
+     const {req, res} = mockReqRes();
+     await getContactInfo(req, res);
+
+     expect (res.status).toHaveBeenCalledWith(200);
+     expect(res.json).toHaveBeenCalledWith({
+      phone: "(916)-754-2413",
+      email: "phocitysac@gmail.com",
+      address: "6175 Stockton Blvd",
+      city: "Sacramento",
+      state: "CA",
+      zipcode: "95824",
+      onlineOrdering: "",
+      fullAddress: "6175 Stockton Blvd, Sacramento, CA 95824",
+      businessHours: [
+        {
+          day: "Tuesday",
+          open: null,
+          close: null,
+          closed: true,
+        },
+
+      ],
+     });
+  });
+  
 describe("updateContactInfo", () => {
   it("returns 400 when payload is invalid", async () => {
     const { req, res } = mockReqRes({

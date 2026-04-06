@@ -46,8 +46,8 @@ describe("getHero", () => {
           hero_main_title: "Authentic Viet Cuisine",
           hero_subtitle: "come try our tasty food",
           hero_button_text: "View menu",
-          hero_secondary_button_text: "Download menu",
-          hero_image_url: "img.jpg",
+          hero_secondary_button_text: null,
+          hero_image_url: null,
         },
       ],
     ]);
@@ -61,8 +61,8 @@ describe("getHero", () => {
       title: "Authentic Viet Cuisine",
       subtitle: "come try our tasty food",
       ctaText: "View menu",
-      secondaryCtaText: "Download menu",
-      imageUrl: "img.jpg",
+      secondaryCtaText: null,
+      imageUrl: null,
     });
   });
 
@@ -105,6 +105,63 @@ describe("updateHero", () => {
     expect(res.json).toHaveBeenCalledWith({ message: "Invalid payload" });
     expect(pool.query).not.toHaveBeenCalled();
     expect(logActivity).not.toHaveBeenCalled();
+  });
+
+  it("returns null imageURL when updated image is null", async () => {
+    pool.query.mockResolvedValueOnce([{affectedRows: 1}]);
+    pool.query.mockResolvedValueOnce([
+      [
+        {hero_id: 1,
+          hero_main_title: "Updated Title",
+          hero_subtitle: "Updated Subtitle",
+          hero_button_text: "Updated CTA",
+          hero_secondary_button_text: "Updated Secondary CTA",
+          hero_image_url: null,
+        }, 
+      ],
+    ]);
+
+    const {req, res} = mockReqRes({
+      body: {
+        title: "Updated Title",
+        subtitle: "Updated Subtitle",
+        ctaText: "Updated CTA",
+        secondaryCtaText: "Updated Secondary CTA",
+        imageUrl: null,
+      },
+      user: { email: "admin@test.com" },
+    });
+
+    await updateHero(req, res);
+
+    expect(pool.query).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining("UPDATE hero_section"),
+      [
+        "Updated Title",
+        "Updated Subtitle",
+        "Updated CTA",
+        "Updated Secondary CTA",
+        null,
+      ]
+    );
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      id: 1,
+      title: "Updated Title",
+      subtitle: "Updated Subtitle",
+      ctaText: "Updated CTA",
+      secondaryCtaText: "Updated Secondary CTA",
+      imageUrl: null,
+    });
+
+    expect(logActivity).toHaveBeenCalledWith(
+      "updated",
+      "hero",
+      "Updated hero section",
+      "admin@test.com"
+    );
   });
 
   it("returns 200 updates hero, logs activity, and returns updated hero", async () => {
