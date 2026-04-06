@@ -327,6 +327,16 @@ describe("updateAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     });
 
+    it("returns 400 when req.body is missing", async () => {
+        const { req, res } = mockReqRes({ params: { id: "4" } });
+        req.body = undefined;
+
+        await updateAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "No fields to update" });
+    });
+
     it("updates email and role, then returns the updated admin user", async () => {
         const updatedAdmin = {
             id: 4,
