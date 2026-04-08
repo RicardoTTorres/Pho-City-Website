@@ -605,13 +605,17 @@ describe("getSavedThreads", () => {
   it("returns status 200 if successful", async () => {
     const {req, res} = mockReqRes();
 
+    const date = '2026-04-08T00:00:00.000Z';
+    const d = new Date(date);
+    const utc = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds());
+
     getSubmissions.mockResolvedValueOnce([
       {
         id: "abcd",
         name: "name",
         email: "email@example.com",
         message: "message",
-        submitted_at: '2026-04-08T00:00:00.000Z',
+        submitted_at: date,
         is_read: true,
       }
     ]);
@@ -629,7 +633,7 @@ describe("getSavedThreads", () => {
                 isUnread: false,
                 snippet: "message",
                 body: "message",
-                date: 1775581200000,
+                date: utc,
                 subject: "",
                 fromName: "name",
                 fromEmail: "email@example.com",
@@ -639,7 +643,7 @@ describe("getSavedThreads", () => {
             }
         ],
         isUnread: false,
-        date: 1775581200000,
+        date: utc,
         snippet: "message",
         people: ["name"],
         isPreview: false,
