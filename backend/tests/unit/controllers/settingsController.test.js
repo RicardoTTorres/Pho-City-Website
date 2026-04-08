@@ -119,6 +119,21 @@ describe("handleGetPublicSettings", () => {
     await handleGetPublicSettings(req, res);
     expect(res.json).toHaveBeenCalledWith({ pdfLabel: "Download Menu" });
   });
+
+  it("returns json with default menu label when menuLabel value was null in database response", async () => {
+    const testPdfValue = { menuLabel: null };
+    pool.query.mockResolvedValueOnce([
+        [
+          {
+            settings_json: { pdf: testPdfValue }
+          }
+        ]
+    ]);
+    const { req, res } = mockReqRes({});
+    await handleGetPublicSettings(req, res);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ pdfLabel: "Download Menu" } );
+  });
 });
 
 describe("handleGetInbox", () => {
