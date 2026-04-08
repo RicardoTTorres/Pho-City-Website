@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 
 describe("getAbout", () => {
-    it("returns database information for the about us section", async () =>{
+    it("returns database information for the about us section with 200 status", async () =>{
         pool.query.mockResolvedValueOnce([
             [
                 {
@@ -83,6 +83,89 @@ describe("getAbout", () => {
         });
     });
 
+    it("returns empty data if there is no row with 200 status", async () =>{
+        pool.query.mockResolvedValueOnce([
+            [
+                null
+            ],
+        ]);
+
+        const { req, res } = mockReqRes();
+        await getAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+                about: {
+                        heroTitle: "",
+                        heroIntro: "",
+                        heroImage: null,
+                        beginningTitle: "",
+                        beginningBody: "",
+                        beginningImage: null,
+                        foodTitle: "",
+                        foodBody: "",
+                        foodImage: null,
+                        commitmentTitle: "",
+                        commitmentBody: "",
+                        commitmentImage: null,
+                        closingText: "",
+                        previewHeading: "",
+                        previewBody: "",
+                        previewButtonLabel: "",
+                    }
+        });
+    });
+
+    it("returns empty values when they are null in the database with 200 status", async () =>{
+        pool.query.mockResolvedValueOnce([
+            [
+                {
+                        hero_title: null,
+                        hero_intro: null,
+                        hero_image_url: null,
+                        beginning_title: null,
+                        beginning_body: null,
+                        beginning_image_url: null,
+                        food_title: null,
+                        food_body: null,
+                        food_image_url: null,
+                        commitment_title: null,
+                        commitment_body: null,
+                        commitment_image_url: null,
+                        closing_text: null,
+                        preview_heading: null,
+                        preview_body: null,
+                        preview_button_label: null,
+                },
+            ],
+        ]);
+
+        const { req, res } = mockReqRes();
+        await getAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+                about: {
+                        heroTitle: "",
+                        heroIntro: "",
+                        heroImage: null,
+                        beginningTitle: "",
+                        beginningBody: "",
+                        beginningImage: null,
+                        foodTitle: "",
+                        foodBody: "",
+                        foodImage: null,
+                        commitmentTitle: "",
+                        commitmentBody: "",
+                        commitmentImage: null,
+                        closingText: "",
+                        previewHeading: "",
+                        previewBody: "",
+                        previewButtonLabel: "",
+                    }
+        });
+    });
+
     it("returns 500 on db error", async () => {
         pool.query.mockRejectedValueOnce(new Error("DB fail"));
 
@@ -119,6 +202,40 @@ describe("updateAbout", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ message: "Hero title is required." });
+    });
+
+    it("returns 200 as long as heroTitle isn't null and updates and logs activity", async () => {
+        pool.query.mockResolvedValueOnce([{ affectedRows: 1}]);
+
+        const {req, res} = mockReqRes({
+            body: {
+                heroTitle: "New Hero Title",
+                heroIntro: null,
+                heroImage: null,
+                beginningTitle: null,
+                beginningBody: null,
+                foodTitle: null,
+                foodBody: null,
+                commitmentTitle: null,
+                commitmentBody: null,
+                closingText: null,
+                previewHeading: null,
+                previewBody: null,
+                previewButtonLabel: null,
+            },
+        });
+
+        await updateAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ message: "About section updated successfully!" });
+
+        expect(logActivity).toHaveBeenCalledWith(
+            "updated", 
+            "about", 
+            "Updated about section", 
+            "admin@test.com",
+        );
     });
 
     it("returns 200 on successful update and logs activity", async () => {

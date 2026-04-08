@@ -275,6 +275,18 @@ describe("addCategory", () => {
     );
   });
 
+  it("returns 500 if the result is undefined", async () => {
+    pool.query
+      .mockResolvedValueOnce([[{ maxPos: 2 }]])
+      .mockResolvedValueOnce([{  }]);
+
+    const { req, res } = mockReqRes({ body: { name: "Test" } });
+    await addCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error adding category" });
+  });
+
   it("returns 400 when name is missing", async () => {
     const { req, res } = mockReqRes({ body: {} });
     await addCategory(req, res);
@@ -309,6 +321,16 @@ describe("editCategory", () => {
       "Renamed category to 'Updated Name'",
       "admin@test.com",
     );
+  });
+
+  it("returns 500 when id is undefined", async () => {
+    const { req, res } = mockReqRes({
+      params: { },
+      body: { name: "Updated Name" },
+    });
+    await editCategory(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error editing category" });
   });
 
   it("returns 400 when name is missing", async () => {
@@ -360,6 +382,13 @@ describe("deleteCategory", () => {
     );
   });
 
+  it("returns 500 when id is undefined", async () => {
+    const { req, res } = mockReqRes({ params: { } });
+    await deleteCategory(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error deleting category" });
+  });
+
   it("returns 404 when no matching row found", async () => {
     pool.query.mockResolvedValueOnce([{ affectedRows: 0 }]);
     const { req, res } = mockReqRes({ params: { id: "99" } });
@@ -386,7 +415,13 @@ describe("addItem", () => {
       .mockResolvedValueOnce([{ insertId: 42 }]);
 
     const { req, res } = mockReqRes({
-      body: { name: "Spring Roll", price: 5.0, category: 1 },
+      body: { 
+        name: "Spring Roll",
+        price: 5.0,
+        category: 1,
+        featured: true,
+        featuredPosition: 2,
+      },
     });
     await addItem(req, res);
 
@@ -455,6 +490,20 @@ describe("addItem", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Error adding item" });
   });
+
+   it("returns 500 when id is undefined", async () => {
+    pool.query
+      .mockResolvedValueOnce([[{ maxPos: 0 }]])
+      .mockResolvedValueOnce([{ }]);
+
+    const { req, res } = mockReqRes({
+      body: { name: "Spring Roll", price: 5.0, category: 1 },
+    });
+    await addItem(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error adding item" });
+  });
 });
 
 describe("editItem", () => {
@@ -517,6 +566,16 @@ describe("editItem", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Error editing item" });
   });
+
+  it("returns 500 if id is undefined", async () => {
+    const { req, res } = mockReqRes({
+      params: { },
+      body: { name: "Updated Pho" },
+    });
+    await editItem(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error editing item" });
+  });
 });
 
 describe("deleteItem", () => {
@@ -547,6 +606,13 @@ describe("deleteItem", () => {
   it("returns 500 on db error", async () => {
     pool.query.mockRejectedValueOnce(new Error("DB error"));
     const { req, res } = mockReqRes({ params: { id: "10" } });
+    await deleteItem(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error deleting item" });
+  });
+
+  it("returns 500 when id is undefined", async () => {
+    const { req, res } = mockReqRes({ params: { } });
     await deleteItem(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Error deleting item" });
