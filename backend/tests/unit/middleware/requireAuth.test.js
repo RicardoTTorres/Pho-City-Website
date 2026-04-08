@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import jwt from "jsonwebtoken";
 
 process.env.JWT_SECRET = "test-secret";
@@ -26,6 +26,11 @@ beforeEach(() => {
   tokenBlacklist.clear();
 });
 
+afterEach(() => {
+  vi.restoreAllMocks();
+  tokenBlacklist.clear();
+});
+
 describe("blacklist helpers", () => {
   it("adds a token to the blacklist", () => {
     blacklistToken("token-123");
@@ -38,6 +43,22 @@ describe("blacklist helpers", () => {
     blacklistToken("");
 
     expect(tokenBlacklist.size).toBe(0);
+  });
+});
+
+describe("module initialization", () => {
+  it("throws when JWT_SECRET is missing at import time", async () => {
+    vi.resetModules();
+    const originalSecret = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+
+    try {
+      await expect(
+        import("../../../src/middleware/requireAuth.js?missing-secret"),
+      ).rejects.toThrow("Missing required environment variable: JWT_SECRET");
+    } finally {
+      process.env.JWT_SECRET = originalSecret;
+    }
   });
 });
 
@@ -81,6 +102,7 @@ describe("requireAuth", () => {
       role: "admin",
     });
     expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith();
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
   });
