@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 
 describe("getAbout", () => {
-    it("returns database information for the about us section", async () =>{
+    it("returns database information for the about us section with 200 status", async () =>{
         pool.query.mockResolvedValueOnce([
             [
                 {
@@ -79,6 +79,39 @@ describe("getAbout", () => {
                         previewHeading: "Our Story",
                         previewBody: "For more than 10 years",
                         previewButtonLabel: "Learn More",
+                    }
+        });
+    });
+
+    it("returns empty data if there is no row with 200 status", async () =>{
+        pool.query.mockResolvedValueOnce([
+            [
+                null
+            ],
+        ]);
+
+        const { req, res } = mockReqRes();
+        await getAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+                about: {
+                        heroTitle: "",
+                        heroIntro: "",
+                        heroImage: null,
+                        beginningTitle: "",
+                        beginningBody: "",
+                        beginningImage: null,
+                        foodTitle: "",
+                        foodBody: "",
+                        foodImage: null,
+                        commitmentTitle: "",
+                        commitmentBody: "",
+                        commitmentImage: null,
+                        closingText: "",
+                        previewHeading: "",
+                        previewBody: "",
+                        previewButtonLabel: "",
                     }
         });
     });
