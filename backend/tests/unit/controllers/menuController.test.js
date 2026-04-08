@@ -275,6 +275,18 @@ describe("addCategory", () => {
     );
   });
 
+  it("returns 500 if the result is undefined", async () => {
+    pool.query
+      .mockResolvedValueOnce([[{ maxPos: 2 }]])
+      .mockResolvedValueOnce([{  }]);
+
+    const { req, res } = mockReqRes({ body: { name: "Test" } });
+    await addCategory(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error adding category" });
+  });
+
   it("returns 400 when name is missing", async () => {
     const { req, res } = mockReqRes({ body: {} });
     await addCategory(req, res);
