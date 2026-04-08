@@ -204,6 +204,40 @@ describe("updateAbout", () => {
         expect(res.json).toHaveBeenCalledWith({ message: "Hero title is required." });
     });
 
+    it("returns 200 as long as heroTitle isn't null and updates and logs activity", async () => {
+        pool.query.mockResolvedValueOnce([{ affectedRows: 1}]);
+
+        const {req, res} = mockReqRes({
+            body: {
+                heroTitle: "New Hero Title",
+                heroIntro: null,
+                heroImage: null,
+                beginningTitle: null,
+                beginningBody: null,
+                foodTitle: null,
+                foodBody: null,
+                commitmentTitle: null,
+                commitmentBody: null,
+                closingText: null,
+                previewHeading: null,
+                previewBody: null,
+                previewButtonLabel: null,
+            },
+        });
+
+        await updateAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ message: "About section updated successfully!" });
+
+        expect(logActivity).toHaveBeenCalledWith(
+            "updated", 
+            "about", 
+            "Updated about section", 
+            "admin@test.com",
+        );
+    });
+
     it("returns 200 on successful update and logs activity", async () => {
         pool.query.mockResolvedValueOnce([{ affectedRows: 1}]);
 
