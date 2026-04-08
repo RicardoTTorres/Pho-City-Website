@@ -10,7 +10,7 @@ import { getSubmissions } from "../services/settingsService.js";
 export async function getState(req, res) {
     try {
         const {authenticated, registered, email} = await getEmailClient();
-        res.json({
+        res.status(200).json({
             authenticated,
             registered,
             email
@@ -61,6 +61,9 @@ export async function createAuthUrl(req, res) {
 export async function finishAuth(req, res) {
     try {
         const { code } = req.query;
+        if (!code) {
+            return res.status(400).json({ error: "Missing required query parameter code" });
+        }
 
         const oauth2Client = new google.auth.OAuth2({
             clientId: process.env.CLIENT_ID,
@@ -78,6 +81,7 @@ export async function finishAuth(req, res) {
         const profile = await gmail.users.getProfile({
             userId: "me",
         });
+        if (profile.data?.emailAddress === undefined) throw new Error("could not get email address");
         const wrapper = new GmailClient(profile.data.emailAddress);
         await wrapper.saveTokens(tokens);
 
@@ -111,11 +115,11 @@ export async function getThreads(req, res) {
         const {client, authenticated} = await getEmailClient();
         if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
         const threads = await client.fetchThreads({maxResults, pageToken});
-        res.json(threads);
+        res.status(200).json(threads);
 
     } catch (err) {
         console.error("Error getting threads:", err);
-        res.status(500).json({ error: "Error getting threads "});
+        res.status(500).json({ error: "Error getting threads" });
     }
 }
 
@@ -132,7 +136,7 @@ export async function getThread(req, res) {
         const {client, authenticated} = await getEmailClient();
         if (!authenticated) return res.status(401).json({ error: "Not authenticated to access gmail" });
         const thread = await client.fetchThread(id, {forceRefresh});
-        res.json(thread);
+        res.status(200).json(thread);
 
     } catch (err) {
         console.error("Error getting thread:", err);
@@ -283,7 +287,7 @@ export async function getSavedThreads(req, res) {
             };
         }));
 
-        res.json({
+        res.status(200).json({
             threads,
             nextPageToken: undefined
         });
