@@ -116,6 +116,56 @@ describe("getAbout", () => {
         });
     });
 
+    it("returns empty values when they are null in the database with 200 status", async () =>{
+        pool.query.mockResolvedValueOnce([
+            [
+                {
+                        hero_title: null,
+                        hero_intro: null,
+                        hero_image_url: null,
+                        beginning_title: null,
+                        beginning_body: null,
+                        beginning_image_url: null,
+                        food_title: null,
+                        food_body: null,
+                        food_image_url: null,
+                        commitment_title: null,
+                        commitment_body: null,
+                        commitment_image_url: null,
+                        closing_text: null,
+                        preview_heading: null,
+                        preview_body: null,
+                        preview_button_label: null,
+                },
+            ],
+        ]);
+
+        const { req, res } = mockReqRes();
+        await getAbout(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+                about: {
+                        heroTitle: "",
+                        heroIntro: "",
+                        heroImage: null,
+                        beginningTitle: "",
+                        beginningBody: "",
+                        beginningImage: null,
+                        foodTitle: "",
+                        foodBody: "",
+                        foodImage: null,
+                        commitmentTitle: "",
+                        commitmentBody: "",
+                        commitmentImage: null,
+                        closingText: "",
+                        previewHeading: "",
+                        previewBody: "",
+                        previewButtonLabel: "",
+                    }
+        });
+    });
+
     it("returns 500 on db error", async () => {
         pool.query.mockRejectedValueOnce(new Error("DB fail"));
 
