@@ -178,6 +178,16 @@ describe("createAdminUser", () => {
         expect(pool.query).not.toHaveBeenCalled();
     });
 
+    it("returns 400 when req.body is missing", async () => {
+        const { req, res } = mockReqRes();
+        req.body = undefined;
+
+        await createAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "email and password are required" });
+    });
+
     it("creates admin user, normalize fields, and returns the inserted admin record", async () => {
         const createdAdmin = {
             id: 13,
@@ -315,6 +325,16 @@ describe("updateAdminUser", () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ error: "No fields to update" });
         expect(pool.query).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when req.body is missing", async () => {
+        const { req, res } = mockReqRes({ params: { id: "4" } });
+        req.body = undefined;
+
+        await updateAdminUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: "No fields to update" });
     });
 
     it("updates email and role, then returns the updated admin user", async () => {
