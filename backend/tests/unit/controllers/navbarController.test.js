@@ -43,6 +43,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe("getNavbar", () => {
@@ -100,7 +101,53 @@ describe("updateNavbar", () => {
   });
 
   it("normalizes navbar data, saves it, and logs activity", async () => {
-    saveNavbar.mockImplementationOnce(async (payload) => payload);
+    const savedNavbar = {
+      version: 1,
+      i18n: {
+        enabled: true,
+        defaultLocale: "en",
+        supportedLocales: ["en", "vi"],
+      },
+      brand: {
+        name: "Pho City Sacramento",
+        logo: "/brand.png",
+      },
+      links: [
+        {
+          id: "1",
+          label: { en: "Home", vi: "Trang Chu" },
+          href: "/",
+          type: "internal",
+          order: 1,
+          enabled: false,
+        },
+        {
+          id: "2",
+          label: { en: " Menu " },
+          href: "/menu",
+          type: "internal",
+          order: 2,
+          enabled: true,
+        },
+      ],
+      ctas: {
+        pickup: {
+          enabled: true,
+          label: { en: " Order Pickup " },
+          href: "https://pickup.test",
+        },
+        delivery: {
+          enabled: true,
+          label: { en: "Delivery" },
+          href: "https://delivery.test",
+        },
+      },
+      updatedAt: "2026-03-13T12:00:00.000Z",
+      updatedBy: 42,
+      persisted: true,
+    };
+
+    saveNavbar.mockResolvedValueOnce(savedNavbar);
 
     const { req, res } = mockReqRes({
       body: {
@@ -216,7 +263,7 @@ describe("updateNavbar", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      data: expect.any(Object),
+      data: savedNavbar,
     });
   });
 
@@ -241,6 +288,70 @@ describe("updateNavbar", () => {
       },
       updatedAt: "2026-03-13T12:00:00.000Z",
       updatedBy: 9,
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("falls back for unsupported label and link field values", async () => {
+    saveNavbar.mockImplementationOnce(async (payload) => payload);
+
+    const { req, res } = mockReqRes({
+      body: {
+        links: [
+          {
+            id: "ext",
+            label: 123,
+            href: " https://example.com/order ",
+            type: "external",
+            order: 3,
+          },
+          {
+            id: "nolabel",
+            label: 0,
+            href: "/specials",
+            order: 1,
+          },
+          {
+            label: "Missing id and href type",
+            href: 25,
+            order: 2,
+          },
+        ],
+      },
+      user: { id: 15, email: "editor@test.com" },
+    });
+
+    await updateNavbar(req, res);
+
+    expect(saveNavbar).toHaveBeenCalledWith({
+      version: 1,
+      i18n: { enabled: false, defaultLocale: "en", supportedLocales: ["en"] },
+      brand: { name: "Pho City", logo: "" },
+      links: [
+        {
+          id: "nolabel",
+          label: { en: "" },
+          href: "/specials",
+          type: "internal",
+          order: 1,
+          enabled: true,
+        },
+        {
+          id: "ext",
+          label: { en: "" },
+          href: "https://example.com/order",
+          type: "external",
+          order: 3,
+          enabled: true,
+        },
+      ],
+      ctas: {
+        pickup: { enabled: false, label: { en: "Pickup" }, href: "" },
+        delivery: { enabled: false, label: { en: "Delivery" }, href: "" },
+      },
+      updatedAt: "2026-03-13T12:00:00.000Z",
+      updatedBy: 15,
     });
 
     expect(res.status).toHaveBeenCalledWith(200);
