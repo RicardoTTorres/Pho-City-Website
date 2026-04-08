@@ -323,6 +323,16 @@ describe("editCategory", () => {
     );
   });
 
+  it("returns 500 when id is undefined", async () => {
+    const { req, res } = mockReqRes({
+      params: { },
+      body: { name: "Updated Name" },
+    });
+    await editCategory(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Error editing category" });
+  });
+
   it("returns 400 when name is missing", async () => {
     const { req, res } = mockReqRes({ params: { id: "3" }, body: {} });
     await editCategory(req, res);
