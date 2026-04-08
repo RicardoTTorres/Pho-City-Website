@@ -415,7 +415,13 @@ describe("addItem", () => {
       .mockResolvedValueOnce([{ insertId: 42 }]);
 
     const { req, res } = mockReqRes({
-      body: { name: "Spring Roll", price: 5.0, category: 1 },
+      body: { 
+        name: "Spring Roll",
+        price: 5.0,
+        category: 1,
+        featured: true,
+        featuredPosition: 2,
+      },
     });
     await addItem(req, res);
 
