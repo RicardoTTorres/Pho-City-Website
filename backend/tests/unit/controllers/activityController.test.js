@@ -79,4 +79,13 @@ describe("activityController", () => {
     });
   });
 
+  it("handles error in logActivity", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  pool.query.mockRejectedValue(new Error("fail"));
+
+  await logActivity("A", "B", "C");
+
+  expect(console.error).toHaveBeenCalled();
+  });
+
 });
