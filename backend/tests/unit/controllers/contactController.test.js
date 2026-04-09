@@ -9,13 +9,17 @@ vi.mock("nodemailer", () => ({
   },
 }));
 
+vi.mock("../../../src/services/gmailService.js", () => ({
+  getEmailClient: vi.fn(),
+}));
+
 vi.mock("../../../src/services/settingsService.js", () => ({
   getSettings: vi.fn(),
   storeSubmission: vi.fn(),
 }));
 
 import { getSettings, storeSubmission } from "../../../src/services/settingsService.js";
-
+import { getEmailClient } from "../../../src/services/gmailService.js";
 beforeEach(() => {
   vi.clearAllMocks();
   vi.spyOn(console, "error").mockImplementation(() => {});
@@ -151,6 +155,32 @@ describe("handleContactForm", () => {
     success: false,
     error: "Too many requests. Please wait a few minutes."
   });
+});
+
+it("covers emailNotificationsEnabled block", async () => {
+  getSettings.mockResolvedValue({
+    contact: {
+      storeSubmissions: false,
+      emailNotificationsEnabled: true
+    }
+  });
+
+  getEmailClient.mockResolvedValue({
+    client: { sendMessage: vi.fn() },
+    authenticated: true
+  });
+
+  const { req, res } = mockReqRes({
+    body: {
+      name: "John",
+      email: "john@test.com",
+      message: "Hello"
+    }
+  });
+
+  await handleContactForm(req, res);
+
+  expect(getEmailClient).toHaveBeenCalled();
 });
 
 });
