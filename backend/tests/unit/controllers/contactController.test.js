@@ -9,13 +9,17 @@ vi.mock("nodemailer", () => ({
   },
 }));
 
+vi.mock("../../../src/services/gmailService.js", () => ({
+  getEmailClient: vi.fn(),
+}));
+
 vi.mock("../../../src/services/settingsService.js", () => ({
   getSettings: vi.fn(),
   storeSubmission: vi.fn(),
 }));
 
 import { getSettings, storeSubmission } from "../../../src/services/settingsService.js";
-
+import { getEmailClient } from "../../../src/services/gmailService.js";
 beforeEach(() => {
   vi.clearAllMocks();
   vi.spyOn(console, "error").mockImplementation(() => {});
@@ -153,4 +157,47 @@ describe("handleContactForm", () => {
   });
 });
 
+it("covers emailNotificationsEnabled block", async () => {
+  getSettings.mockResolvedValue({
+    contact: {
+      storeSubmissions: false,
+      emailNotificationsEnabled: true
+    }
+  });
+
+  getEmailClient.mockResolvedValue({
+    client: { sendMessage: vi.fn() },
+    authenticated: false
+  });
+
+  const { req, res } = mockReqRes({
+    body: {
+      name: "John",
+      email: "john@test.com",
+      message: "Hello"
+    }
+  });
+
+  await handleContactForm(req, res);
+
+  expect(getEmailClient).toHaveBeenCalled();
+});
+
+it("covers email error catch", async () => {
+  getSettings.mockResolvedValue({
+    contact: { storeSubmissions: false, emailNotificationsEnabled: true }
+  });
+
+  getEmailClient.mockResolvedValue({
+    client: { sendMessage: vi.fn().mockRejectedValue(new Error()) },
+    authenticated: true
+  });
+
+  await handleContactForm(
+    { body: { name: "A", email: "a", message: "hi" } },
+    { status: vi.fn().mockReturnThis(), json: vi.fn() }
+  );
+
+  expect(console.log).toHaveBeenCalled();
+});
 });
