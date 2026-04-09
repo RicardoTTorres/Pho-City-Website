@@ -167,7 +167,7 @@ it("covers emailNotificationsEnabled block", async () => {
 
   getEmailClient.mockResolvedValue({
     client: { sendMessage: vi.fn() },
-    authenticated: true
+    authenticated: false
   });
 
   const { req, res } = mockReqRes({
@@ -183,4 +183,21 @@ it("covers emailNotificationsEnabled block", async () => {
   expect(getEmailClient).toHaveBeenCalled();
 });
 
+it("covers email error catch", async () => {
+  getSettings.mockResolvedValue({
+    contact: { storeSubmissions: false, emailNotificationsEnabled: true }
+  });
+
+  getEmailClient.mockResolvedValue({
+    client: { sendMessage: vi.fn().mockRejectedValue(new Error()) },
+    authenticated: true
+  });
+
+  await handleContactForm(
+    { body: { name: "A", email: "a", message: "hi" } },
+    { status: vi.fn().mockReturnThis(), json: vi.fn() }
+  );
+
+  expect(console.log).toHaveBeenCalled();
+});
 });
