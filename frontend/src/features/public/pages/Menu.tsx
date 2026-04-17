@@ -5,11 +5,22 @@ import { Download } from "lucide-react";
 import { useContent } from "@/app/providers/ContentContext";
 import { MenuSidebar } from "@/features/public/components/MenuSidebar";
 import { MenuItem as MenuItemCard } from "@/shared/components/ui/MenuItem";
-import { MenuCustomizationAccordion } from "@/shared/components/ui/MenuCustomizationAccordion";
+import { MenuItemModal } from "@/shared/components/ui/MenuItemModal";
 import {
   getAllCustomizations,
   type CustomizationMap,
+  type CategoryCustomization,
 } from "@/shared/api/menu";
+
+interface SelectedItem {
+  name: string;
+  price: number;
+  description: string;
+  image: string | null;
+  popular: boolean;
+  categoryName: string;
+  customization: CategoryCustomization | null;
+}
 
 export default function Menu() {
   const { content } = useContent();
@@ -19,10 +30,13 @@ export default function Menu() {
     [content.menuPublic],
   );
 
+  const isLoading = allCategories.length === 0;
+
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const [customizations, setCustomizations] = useState<CustomizationMap>({});
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
 
   useEffect(() => {
     getAllCustomizations().then(setCustomizations).catch(() => {});
@@ -192,6 +206,29 @@ export default function Menu() {
             </a>
           </div>
 
+          {isLoading && (
+            <div className="space-y-16">
+              {Array.from({ length: 2 }).map((_, si) => (
+                <div key={si} className="animate-pulse">
+                  <div className="text-center mb-8 space-y-2">
+                    <div className="h-8 w-48 bg-gray-200 rounded-lg mx-auto" />
+                    <div className="h-1 w-20 bg-gray-200 rounded-full mx-auto" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="rounded-2xl border border-amber-100 bg-amber-50/40 p-6 space-y-3">
+                        <div className="w-full h-40 rounded-xl bg-gray-200" />
+                        <div className="h-5 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-full" />
+                        <div className="h-4 bg-gray-200 rounded w-2/3" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {allCategories.map((category) => (
             <section
               key={category.id || category.name}
@@ -205,17 +242,7 @@ export default function Menu() {
                 <div className="h-1 w-20 bg-gradient-to-r from-brand-gold to-brand-red rounded-full mx-auto"></div>
               </div>
 
-              {(() => {
-                const cust = customizations[String(category.id)];
-                return cust?.enabled && cust.sections.length > 0 ? (
-                  <MenuCustomizationAccordion
-                    customization={cust}
-                    categoryName={category.name}
-                  />
-                ) : null;
-              })()}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                 {(category.items ?? [])
                   .filter((item) => item.visible !== false)
                   .map((item) => {
@@ -223,14 +250,28 @@ export default function Menu() {
                       (item.price || "0").toString().replace(/[^0-9.]/g, ""),
                     );
 
+                    const itemPrice = Number.isFinite(priceNumber) ? priceNumber : 0;
+                    const itemCust = customizations[String(category.id)] ?? null;
+
                     return (
                       <MenuItemCard
                         key={item.id || item.name}
                         name={item.name}
-                        price={Number.isFinite(priceNumber) ? priceNumber : 0}
+                        price={itemPrice}
                         description={item.description || ""}
                         image={item.image}
                         popular={item.popular ?? false}
+                        onClick={() =>
+                          setSelectedItem({
+                            name: item.name,
+                            price: itemPrice,
+                            description: item.description || "",
+                            image: item.image ?? null,
+                            popular: item.popular ?? false,
+                            categoryName: category.name,
+                            customization: itemCust,
+                          })
+                        }
                       />
                     );
                   })}
@@ -239,6 +280,20 @@ export default function Menu() {
           ))}
         </main>
       </div>
+
+      {/* Item detail modal */}
+      {selectedItem && (
+        <MenuItemModal
+          name={selectedItem.name}
+          price={selectedItem.price}
+          description={selectedItem.description}
+          image={selectedItem.image}
+          popular={selectedItem.popular}
+          categoryName={selectedItem.categoryName}
+          customization={selectedItem.customization}
+          onClose={() => setSelectedItem(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // src/features/cms/components/CMSHeader.tsx
 import { Search, Settings, LogOut, Sun, Moon, Menu } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type CMSHeaderProps = {
@@ -24,6 +24,7 @@ export function CMSHeader({
 }: CMSHeaderProps) {
   const API_URL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL || "";
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,7 +39,7 @@ export function CMSHeader({
       "/cms/dashboard": { t: "Dashboard", s: false },
       "/cms/menu": { t: "Menu", s: true },
       "/cms/media": { t: "Media Library", s: true },
-      "/cms/usermanual": { t: "User-manual", s: true },
+      "/cms/usermanual": { t: "Help", s: false },
     };
 
     const entry = map[path] ?? {
@@ -145,12 +146,14 @@ export function CMSHeader({
               {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
 
-            {/* Settings */}
+            {/* Settings shortcut */}
             <button
-              onClick={() => setMenuOpen((v) => !v)}
-              className="p-2 rounded-lg 
+              onClick={() => navigate("/cms/settings")}
+              className="p-2 rounded-lg
                          hover:bg-gray-100 dark:hover:bg-[#3A3A3A]
                          text-gray-600 dark:text-gray-100 transition"
+              aria-label="Site settings"
+              title="Settings"
             >
               <Settings size={18} />
             </button>

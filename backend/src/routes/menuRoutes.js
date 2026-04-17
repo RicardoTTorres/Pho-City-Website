@@ -19,6 +19,7 @@ import {
   deleteCustomization,
 } from "../controllers/customizationController.js";
 import { requireAuth } from "../middleware/requireAuth.js";
+import { requireAdmin } from "../middleware/requireAdmin.js";
 import { generateMenuPdf } from "../services/menuPdfService.js";
 
 const router = Router();
@@ -46,11 +47,11 @@ router.get("/admin", requireAuth, getAdminMenu);
 router.post("/categories", requireAuth, addCategory);
 router.put("/categories/reorder", requireAuth, reorderCategories);
 router.put("/categories/:id", requireAuth, editCategory);
-router.delete("/categories/:id", requireAuth, deleteCategory);
+router.delete("/categories/:id", requireAuth, requireAdmin, deleteCategory);
 
 router.post("/items", requireAuth, addItem);
 router.put("/items/:id", requireAuth, editItem);
-router.delete("/items/:id", requireAuth, deleteItem);
+router.delete("/items/:id", requireAuth, requireAdmin, deleteItem);
 
 router.put(
   "/categories/:categoryId/items/reorder",
@@ -61,6 +62,6 @@ router.put(
 // Customization accordion routes
 router.get("/customizations", getAllCustomizations);
 router.put("/categories/:id/customization", requireAuth, upsertCustomization);
-router.delete("/categories/:id/customization", requireAuth, deleteCustomization);
+router.delete("/categories/:id/customization", requireAuth, requireAdmin, deleteCustomization);
 
 export default router;

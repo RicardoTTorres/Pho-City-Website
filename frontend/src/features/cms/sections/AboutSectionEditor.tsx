@@ -64,12 +64,16 @@ const EMPTY_ABOUT: AboutContent = {
   beginningTitle: "",
   beginningBody: "",
   beginningImage: null,
+  beginningCaption: "",
   foodTitle: "",
   foodBody: "",
   foodImage: null,
+  foodCaption: "",
+  foodHighlights: "",
   commitmentTitle: "",
   commitmentBody: "",
   commitmentImage: null,
+  commitmentCaption: "",
   closingText: "",
   previewHeading: "",
   previewBody: "",
@@ -223,6 +227,16 @@ export function AboutSectionEditor() {
                 onUploaded={(url) => handleChange("beginningImage", url)}
                 label="Section Image"
               />
+              <div>
+                <FieldLabel>Image Caption</FieldLabel>
+                <input
+                  type="text"
+                  value={form.beginningCaption ?? ""}
+                  onChange={(e) => handleChange("beginningCaption", e.target.value)}
+                  placeholder="e.g. Where it all began — Sacramento, CA"
+                  className={INPUT_CLASS}
+                />
+              </div>
             </CollapsiblePanel>
 
             <CollapsiblePanel title="Section 2">
@@ -249,6 +263,27 @@ export function AboutSectionEditor() {
                 onUploaded={(url) => handleChange("foodImage", url)}
                 label="Section Image"
               />
+              <div>
+                <FieldLabel>Image Caption</FieldLabel>
+                <input
+                  type="text"
+                  value={form.foodCaption ?? ""}
+                  onChange={(e) => handleChange("foodCaption", e.target.value)}
+                  placeholder="e.g. Fresh ingredients prepared every morning"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <FieldLabel>Highlights (comma-separated)</FieldLabel>
+                <input
+                  type="text"
+                  value={form.foodHighlights ?? ""}
+                  onChange={(e) => handleChange("foodHighlights", e.target.value)}
+                  placeholder="e.g. Slow-simmered broth, Fresh herbs daily, Family recipes"
+                  className={INPUT_CLASS}
+                />
+                <p className="mt-1 text-xs text-brand-charcoal/50">Shown as small pill tags above the section body text.</p>
+              </div>
             </CollapsiblePanel>
 
             <CollapsiblePanel title="Section 3">
@@ -279,6 +314,16 @@ export function AboutSectionEditor() {
                 onUploaded={(url) => handleChange("commitmentImage", url)}
                 label="Section Image"
               />
+              <div>
+                <FieldLabel>Image Caption</FieldLabel>
+                <input
+                  type="text"
+                  value={form.commitmentCaption ?? ""}
+                  onChange={(e) => handleChange("commitmentCaption", e.target.value)}
+                  placeholder="e.g. Family and community at Pho City"
+                  className={INPUT_CLASS}
+                />
+              </div>
             </CollapsiblePanel>
 
             <div className="pt-4 flex justify-center">

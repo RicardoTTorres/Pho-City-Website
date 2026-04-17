@@ -23,7 +23,7 @@ function emptySection(): CustomizationSection {
   return { title: "", items: [emptyItem()] };
 }
 
-function emptyCustomization(): CategoryCustomization {
+export function emptyCustomization(): CategoryCustomization {
   return { enabled: true, sections: [emptySection()] };
 }
 
@@ -167,7 +167,7 @@ function SectionCard({
 }
 
 // ── Editor Modal ──────────────────────────────────────────────────────────────
-function EditorModal({
+export function EditorModal({
   category,
   initial,
   onSave,

@@ -22,9 +22,7 @@ export default function AboutPreviewSection() {
     const el = sectionRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) setInView(true);
-      },
+      ([entry]) => { if (entry?.isIntersecting) setInView(true); },
       { threshold: 0.15 },
     );
     observer.observe(el);
@@ -35,34 +33,57 @@ export default function AboutPreviewSection() {
     <section
       id="about-preview"
       aria-labelledby="about-preview-heading"
-      className="py-20 bg-brand-cream"
+      className="py-16 sm:py-20 bg-brand-cream overflow-hidden"
     >
       <div
         ref={sectionRef}
-        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-500 ${
+        className={`mx-auto max-w-5xl px-6 sm:px-8 lg:px-10 transition-all duration-700 ${
           inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
-        style={{ transitionDelay: inView ? "80ms" : "0ms" }}
+        style={{ transitionDelay: inView ? "60ms" : "0ms" }}
       >
-        <div className="mx-auto max-w-2xl text-center">
+        {/* Section header — full width, anchors both columns below */}
+        <div className="mb-8 sm:mb-10">
           <h2
             id="about-preview-heading"
-            className="text-3xl md:text-4xl font-semibold text-brand-charcoal"
+            className="text-4xl sm:text-5xl font-bold text-brand-charcoal leading-tight"
           >
             {heading}
           </h2>
+          <div className="mt-3 h-1 w-14 rounded-full bg-gradient-to-r from-brand-gold to-brand-red" />
+        </div>
 
-          <div className="mx-auto mt-4 h-0.5 w-12 rounded-full bg-gradient-to-r from-amber-500 to-brand-red" />
+        {/* Body + CTA — quote left, button right, visually tied under the heading */}
+        <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-16">
+          {/* Quote block */}
+          <div
+            className={`relative flex-1 min-w-0 transition-all duration-700 delay-100 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className="absolute -top-6 -left-2 text-[7rem] leading-none font-serif text-brand-gold/20 select-none pointer-events-none"
+            >
+              "
+            </span>
+            <blockquote className="relative pl-6 border-l-4 border-brand-gold">
+              <p className="text-lg sm:text-xl text-brand-charcoal/70 italic leading-relaxed font-serif">
+                {body}
+              </p>
+            </blockquote>
+          </div>
 
-          <p className="mt-6 text-base md:text-lg text-brand-charcoal/65 leading-relaxed">
-            {body}
-          </p>
-
-          <div className="mt-8">
+          {/* CTA — anchored to bottom of the quote block */}
+          <div
+            className={`shrink-0 transition-all duration-700 delay-200 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             <Button
               size="lg"
               asChild
-              className="bg-brand-red hover:bg-brand-red-hover text-white shadow-lg shadow-black/20"
+              className="bg-brand-red hover:bg-brand-red/90 text-white shadow-lg shadow-black/20"
             >
               <Link to="/about" aria-label="Learn more about our story">
                 {buttonLabel}

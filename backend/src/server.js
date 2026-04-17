@@ -24,11 +24,20 @@ import { ensureAdminTableAndSeed } from "./routes/auth.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security headers — clickjacking (X-Frame-Options), MIME sniffing (X-Content-Type-Options), etc.
-// CSP is omitted here because the React SPA handles its own inline scripts/styles.
+// Security headers
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        scriptSrc: ["'none'"],
+        styleSrc: ["'none'"],
+        imgSrc: ["'none'"],
+        connectSrc: ["'self'"],
+        frameAncestors: ["'none'"],
+        formAction: ["'none'"],
+      },
+    },
   }),
 );
 

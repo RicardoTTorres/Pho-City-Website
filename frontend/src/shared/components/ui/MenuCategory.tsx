@@ -21,7 +21,7 @@ export function MenuCategory({
         ${
           isActive
             ? "bg-gradient-to-r from-red-50 to-orange-50 text-red-700 border-l-4 border-red-600 shadow-sm"
-            : "text-slate-700 hover:bg--100/50 border-l-4 border-transparent"
+            : "text-slate-700 hover:bg-gray-100/50 border-l-4 border-transparent"
         }
       `}
     >

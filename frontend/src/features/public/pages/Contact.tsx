@@ -29,55 +29,59 @@ export default function Contact() {
         >
           {/*Contact Information Header*/}
           <div className="mb-6">
-            <h2 className="text-center md:text-3xl center font-bold text-brand-red mb-3">
+            <h2 className="text-center text-2xl md:text-3xl font-bold text-brand-red mb-2">
               Contact Information
             </h2>
+            <div className="mx-auto h-1 w-12 rounded-full bg-gradient-to-r from-brand-gold to-brand-red" />
           </div>
 
           {/*Contact Details*/}
           <div className="space-y-5 mb-8">
             <div className="flex items-start gap-4">
-              <MapPin className="w-6 h-6 text-brand-red flex-shrink-0 mt-1" />
+              <div className="flex-shrink-0 mt-0.5 bg-brand-red/10 rounded-lg p-2">
+                <MapPin className="w-5 h-5 text-brand-red" />
+              </div>
               <div>
-                <p className="font-semibold text-brand-red text-lg mb-1">
-                  Location
-                </p>
-                <p className="text-gray-700">{content.contact.address}</p>
+                <p className="font-semibold text-brand-red text-base mb-0.5">Location</p>
+                <p className="text-gray-700 text-sm leading-snug">{content.contact.address}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <Phone className="w-6 h-6 text-brand-red flex-shrink-0 mt-1" />
+              <div className="flex-shrink-0 mt-0.5 bg-brand-red/10 rounded-lg p-2">
+                <Phone className="w-5 h-5 text-brand-red" />
+              </div>
               <div>
-                <p className="font-semibold text-brand-red text-lg mb-1">
-                  Phone
-                </p>
-                <p className="text-gray-700">{content.contact.phone}</p>
+                <p className="font-semibold text-brand-red text-base mb-0.5">Phone</p>
+                <p className="text-gray-700 text-sm">{content.contact.phone}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <Mail className="w-6 h-6 text-brand-red flex-shrink-0 mt-1" />
+              <div className="flex-shrink-0 mt-0.5 bg-brand-red/10 rounded-lg p-2">
+                <Mail className="w-5 h-5 text-brand-red" />
+              </div>
               <div>
-                <p className="font-semibold text-brand-red text-lg mb-1">
-                  Email
-                </p>
-                <p className="text-gray-700">{content.contact.email}</p>
+                <p className="font-semibold text-brand-red text-base mb-0.5">Email</p>
+                <p className="text-gray-700 text-sm">{content.contact.email}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <Clock className="w-6 h-6 text-brand-red flex-shrink-0 mt-1" />
-              <div>
-                <p className="font-semibold text-brand-red text-lg mb-1">
-                  Hours
-                </p>
-                <div className="text-gray-700 space-y-1">
-                  {daysOfWeek.map((day) => (
-                    <p key={day} className="text-sm">
-                      <span className="font-medium">{day}:</span>{" "}
-                      {content.contact.hours[day]}
-                    </p>
+              <div className="flex-shrink-0 mt-0.5 bg-brand-red/10 rounded-lg p-2">
+                <Clock className="w-5 h-5 text-brand-red" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-brand-red text-base mb-2">Hours</p>
+                <div className="divide-y divide-gray-100 border border-gray-100 rounded-lg overflow-hidden">
+                  {daysOfWeek.map((day, i) => (
+                    <div
+                      key={day}
+                      className={`flex justify-between items-center px-3 py-1.5 text-sm ${i % 2 === 0 ? "bg-gray-50/60" : "bg-white"}`}
+                    >
+                      <span className="font-medium text-gray-700">{day}</span>
+                      <span className="text-gray-500 text-right">{content.contact.hours[day]}</span>
+                    </div>
                   ))}
                 </div>
               </div>

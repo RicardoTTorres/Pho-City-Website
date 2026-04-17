@@ -41,6 +41,7 @@ export const ContactForm = () => {
       <h2 className="text-center text-2xl md:text-3xl font-bold text-brand-red mb-2">
         Send us a Message
       </h2>
+      <div className="mx-auto mt-2 mb-4 h-1 w-12 rounded-full bg-gradient-to-r from-brand-gold to-brand-red" />
       <p className="text-center text-gray-700 mb-8">
         We'll get back to you as soon as possible.
       </p>

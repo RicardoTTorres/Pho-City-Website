@@ -114,7 +114,7 @@ export function Navbar(): ReactElement {
               <img
                 src={logoSrc}
                 alt="Pho City logo"
-                className="h-50 w-auto object-contain shrink-0"
+                className="h-10 md:h-12 lg:h-14 w-auto object-contain shrink-0"
               />
             ) : null}
           </div>
@@ -129,7 +129,7 @@ export function Navbar(): ReactElement {
                 <a
                   key={item.id}
                   href={item.href}
-                  className="hover:text-brand-red transition-colors"
+                  className="hover:text-brand-red transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40 focus-visible:rounded-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
@@ -140,7 +140,7 @@ export function Navbar(): ReactElement {
                 <Link
                   key={item.id}
                   to={item.href}
-                  className="hover:text-brand-red transition-colors"
+                  className="hover:text-brand-red transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40 focus-visible:rounded-sm"
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
@@ -193,7 +193,7 @@ export function Navbar(): ReactElement {
               <img
                 src={logoSrc}
                 alt="Pho City logo"
-                className="h-50 w-auto object-contain shrink-0"
+                className="h-10 w-auto object-contain shrink-0"
               />
             ) : null}
           </div>
@@ -240,7 +240,7 @@ export function Navbar(): ReactElement {
                 <a
                   key={item.id}
                   href={item.href}
-                  className="text-lg font-medium text-gray-800 hover:text-brand-red"
+                  className="text-lg font-medium text-gray-800 hover:text-brand-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40 focus-visible:rounded-sm"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
@@ -251,7 +251,7 @@ export function Navbar(): ReactElement {
                 <Link
                   key={item.id}
                   to={item.href}
-                  className="text-lg font-medium text-gray-800 hover:text-brand-red"
+                  className="text-lg font-medium text-gray-800 hover:text-brand-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40 focus-visible:rounded-sm"
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
@@ -262,7 +262,7 @@ export function Navbar(): ReactElement {
             {pickupEnabled && pickupHref ? (
               <Button
                 size="sm"
-                className="w-full bg-brand-red text-white hover:bg-brand-redHover"
+                className="w-full bg-brand-red text-white hover:bg-brand-red/90"
                 onClick={() => window.open(pickupHref, "_blank")}
               >
                 {pickupLabel}

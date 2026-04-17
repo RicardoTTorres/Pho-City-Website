@@ -29,6 +29,8 @@ export default function MessagesPage() {
   const [replyText, setReplyText] = useState<string>("");
   const [replyError, setReplyError] = useState<string>();
   const [customersOnly, setCustomersOnly] = useState<boolean>(false);
+  // Mobile: 'list' shows thread list, 'thread' shows open thread
+  const [mobileView, setMobileView] = useState<'list' | 'thread'>('list');
 
   async function refresh() {
     try {
@@ -104,8 +106,9 @@ export default function MessagesPage() {
       setReplying(false);
       setReplyText("");
       setOpenThread(thread);
+      if (thread !== undefined) setMobileView('thread');
 
-      const newSearchParams = new URLSearchParams(searchParams) 
+      const newSearchParams = new URLSearchParams(searchParams)
       if (thread === undefined) {
         if (newSearchParams.has("thread")) newSearchParams.delete("thread");
         setSearchParams(newSearchParams);
@@ -177,126 +180,160 @@ export default function MessagesPage() {
   }, []);
 
   if (isError) {
-    return <div>An error occurred, see console</div>
-
-  } else if (authenticated === undefined) {
-    return <div>Loading...</div>;
-
-  } else if (threadsData === undefined) {
-    return <div>Loading...</div>;
-
-  } else {
     return (
-      <div className="grid grid-cols-2 h-[calc(100vh-120px)] -my-6 -mx-3">
-        
-        {/* Left Side: Threads List */}
-        <div className="space-y-2.5 overflow-y-auto py-6 px-3">
+      <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+          <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-gray-800">Could not load messages</p>
+        <p className="text-xs text-gray-500">Check your connection and try refreshing the page.</p>
+        <button onClick={refresh} className="mt-1 text-xs px-3 py-1.5 rounded-md bg-brand-red text-white hover:bg-brand-red/90 transition">
+          Retry
+        </button>
+      </div>
+    );
+  }
 
-          {/* Filter toggle */}
-          <div className="flex items-center gap-2 pb-1">
-            <button
-              onClick={() => setCustomersOnly(prev => !prev)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                customersOnly
-                  ? "bg-brand-red text-white border-brand-red"
-                  : "text-gray-600 border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              Customers only
-            </button>
-          </div>
+  if (authenticated === undefined || threadsData === undefined) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-3 text-gray-400">
+          <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+          </svg>
+          <span className="text-sm">Loading messages...</span>
+        </div>
+      </div>
+    );
+  }
 
-          <div className="space-y-2.5">
-            {visibleThreads?.map((thread) => (
-              <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} {...(thread.isGmail ? { onDelete: handleDelete } : {})} />
-            ))}
-          </div>
+  return (
+    <div className="flex flex-col lg:grid lg:grid-cols-2 h-[calc(100vh-120px)] -my-6 -mx-3">
 
-          {nextPageToken &&
-            <div className="flex flex-row items-center justify-center py-1">
-                <button className="text-sm px-6 py-2 rounded-md bg-brand-red text-white shadow-md" onClick={loadMore}>
-                  Load More
-                </button>
-            </div>
-          }
-
+      {/* Left: thread list — hidden on mobile when a thread is open */}
+      <div className={`${mobileView === 'thread' ? 'hidden lg:flex' : 'flex'} flex-col overflow-y-auto py-6 px-3 gap-2.5`}>
+        <div className="flex items-center gap-2 pb-1 shrink-0">
+          <button
+            onClick={() => setCustomersOnly(prev => !prev)}
+            className={`text-xs px-3 py-1.5 rounded-full border transition ${
+              customersOnly
+                ? "bg-brand-red text-white border-brand-red"
+                : "text-gray-600 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            Customers only
+          </button>
         </div>
 
-        {/* Right Side: Selected Conversation */}
-        <div className="overflow-y-auto py-6 px-3">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 min-h-full">
+        <div className="space-y-2.5">
+          {visibleThreads?.map((thread) => (
+            <ThreadPreview key={thread.id} thread={thread} selected={thread.id === openThread?.id} onClick={() => switchThread(thread)} {...(thread.isGmail ? { onDelete: handleDelete } : {})} />
+          ))}
+          {visibleThreads?.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-8">No messages yet.</p>
+          )}
+        </div>
 
-            {!(openThread?.messages)
-            ? // Thread Not Selected
-            (
-              authenticated
-              ? <div className="text-center m-6 text-gray-400">No Conversation Selected</div>
-              : // Not Authenticated - Show Authentication in Right Panel
-              <div className="m-3">
-                <h1>Gmail Not Connected</h1>
-                <div className="my-4">
-                  The contact form is not connected to your gmail inbox.
-                  To view form submissions, direct emails, and full reply chains in one place,
-                  press the button below to grant access to the gmail account <strong>{email}</strong>
-                </div>
+        {nextPageToken && (
+          <div className="flex items-center justify-center py-1 shrink-0">
+            <button className="text-sm px-6 py-2 rounded-md bg-brand-red text-white shadow-md" onClick={loadMore}>
+              Load More
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Right: selected conversation — hidden on mobile when no thread is open */}
+      <div className={`${mobileView === 'list' ? 'hidden lg:block' : 'block'} overflow-y-auto py-6 px-3`}>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 min-h-full">
+
+          {/* Mobile back button */}
+          {openThread && (
+            <button
+              onClick={() => { setMobileView('list'); setOpenThread(undefined); }}
+              className="lg:hidden flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 mb-4 transition"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to messages
+            </button>
+          )}
+
+          {!(openThread?.messages) ? (
+            authenticated ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center gap-2">
+                <svg className="w-8 h-8 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                <p className="text-sm text-gray-400">Select a conversation to read it</p>
+              </div>
+            ) : (
+              <div className="space-y-4 p-2">
+                <h2 className="text-base font-semibold text-gray-800">Gmail Not Connected</h2>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Connect your Gmail account to view contact form submissions, direct emails,
+                  and full reply chains in one place.
+                  {email && <> You will be signing in as <strong>{email}</strong>.</>}
+                </p>
                 <Button onClick={startAuth}>Authenticate with Google</Button>
               </div>
             )
-            : // Thread Selected - Show Messages
+          ) : (
             <div className="space-y-3">
-
               <div className="space-y-3">
                 {openThread.messages.map((message) => (
                   <MessageView key={message.id} message={message} loading={openThreadLoading} />
                 ))}
               </div>
 
-              {!replying
-              ?
-              <button onClick={() => setReplying(true)} className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
-                <ReplyIcon size={20} /> Reply
-              </button>
-              :
-              <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Reply
-                </label>
-
-                <textarea
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  rows={4}
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
-                  placeholder={`Write a reply...`}
-                />
-
-                <div className="mt-2 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={sendReply}
-                    className="inline-flex items-center gap-1 bg-brand-red text-white text-xs px-3 py-1.5 rounded-md hover:bg-brand-redHover transition"
-                  >
-                    <Send size={14} /> Send
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {setReplying(false); setReplyText("");}}
-                    className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
-                  >
-                    Cancel
-                  </button>
+              {!replying ? (
+                <button onClick={() => setReplying(true)} className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+                  <ReplyIcon size={20} /> Reply
+                </button>
+              ) : (
+                <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Reply</label>
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    rows={4}
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red/40"
+                    placeholder="Write a reply..."
+                  />
+                  <div className="mt-2 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={sendReply}
+                      disabled={!replyText.trim()}
+                      className="inline-flex items-center gap-1 bg-brand-red text-white text-xs px-3 py-1.5 rounded-md hover:bg-brand-red/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send size={14} /> Send
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setReplying(false); setReplyText(""); }}
+                      className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {replyError && (
+                    <span className={`text-xs mt-1 block ${replyError === 'Sending...' ? 'text-gray-400' : 'text-red-500'}`}>
+                      {replyError}
+                    </span>
+                  )}
                 </div>
-                {replyError &&
-                  <span className="text-xs text-gray-500">{replyError}</span>
-                }
-              </div>}
-            </div>}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 function ThreadPreview({ thread, onClick, selected, onDelete }: { thread: MailThread, onClick: () => Promise<void>, selected?: boolean, onDelete?: (id: string) => Promise<void> }) {
@@ -333,7 +370,7 @@ function ThreadPreview({ thread, onClick, selected, onDelete }: { thread: MailTh
 
           {/* Read Indicator*/}
           <button
-            className={`rounded-xl w-4.5 h-4.5 hover:bg-gray-200 transition -m-1.5 p-1.5`}
+            className={`rounded-xl w-5 h-5 hover:bg-gray-200 transition -m-1.5 p-1.5`}
             onClick={(e) => {e.stopPropagation(); toggleRead();}}
             title={isUnread ? "Mark Read" : "Mark Unread"}
           >
