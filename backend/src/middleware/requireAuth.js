@@ -1,38 +1,54 @@
 // src/middleware/requireAuth.js
 import "dotenv/config";
-
 import jwt from "jsonwebtoken";
-
-export const tokenBlacklist = new Set();
+import { pool } from "../db/connect_db.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   throw new Error("Missing required environment variable: JWT_SECRET");
 }
 
-export function blacklistToken(token) {
-  if (token) {
-    tokenBlacklist.add(token);
+// Writes a token's jti to the DB blacklist so it cannot be reused after logout.
+// expiresAt is the token's exp claim (Unix seconds) — used to prune old rows.
+export async function blacklistToken(jti, expiresAt) {
+  if (!jti) return;
+  try {
+    await pool.query(
+      "INSERT IGNORE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
+      [jti, new Date(expiresAt * 1000)],
+    );
+  } catch (err) {
+    console.error("blacklistToken error:", err);
   }
 }
 
-export function isTokenBlacklisted(token) {
-  return tokenBlacklist.has(token);
+async function isTokenBlacklisted(jti) {
+  if (!jti) return false;
+  try {
+    const [rows] = await pool.query(
+      "SELECT 1 FROM token_blacklist WHERE jti = ? LIMIT 1",
+      [jti],
+    );
+    return rows.length > 0;
+  } catch (err) {
+    console.error("isTokenBlacklisted error:", err);
+    return false; // fail open — don't lock everyone out on a DB hiccup
+  }
 }
 
-export function requireAuth(req, res, next) {
+export async function requireAuth(req, res, next) {
   try {
     const token = req.cookies?.auth;
-
     if (!token) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    if (tokenBlacklist.has(token)) {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    if (decoded.jti && (await isTokenBlacklisted(decoded.jti))) {
       return res.status(401).json({ error: "Token has been invalidated" });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     return next();
   } catch (_err) {

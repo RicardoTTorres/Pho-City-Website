@@ -105,7 +105,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           to="/cms/menu"
-          className="flex items-center justify-center gap-2 bg-brand-red text-white p-3 rounded-lg hover:bg-brand-redHover transition"
+          className="flex items-center justify-center gap-2 bg-brand-red text-white p-3 rounded-lg hover:bg-brand-red/90 transition"
         >
           <PlusCircle size={18} /> Add Menu Item
         </Link>
@@ -173,7 +173,16 @@ export default function DashboardPage() {
           </h3>
 
           <div className="space-y-3">
-            {!latestThreads ? <div>Loading...</div> : latestThreads.map((thread, idx) => (
+            {!latestThreads ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="animate-pulse rounded-lg border border-gray-100 p-3 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-100 rounded w-full" />
+                  </div>
+                ))}
+              </div>
+            ) : latestThreads.map((thread, idx) => (
               <article
                 key={idx}
                 className="rounded-lg border border-gray-100 p-3"

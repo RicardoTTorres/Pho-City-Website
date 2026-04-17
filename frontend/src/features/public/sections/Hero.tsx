@@ -53,22 +53,29 @@ export function Hero(): ReactElement {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-red/25 via-brand-red/15 to-brand-gold/25" />
+      {/* Gradient overlay — stronger at bottom-left where text sits */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/40 to-black/10" />
 
-      <div className="absolute inset-0 bg-black/25" />
-
-      <div className="relative z-10 mx-auto max-w-3xl px-4 pt-24 pb-28">
-        <div className="rounded-3xl bg-gradient-to-br from-brand-red/5 to-brand-gold/5 backdrop-blur-xl ring-1 ring-white/30 p-8 shadow-2xl">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
+      <div className="relative z-10 mx-auto max-w-7xl w-full px-6 sm:px-10 pt-24 pb-28">
+        <div className="max-w-2xl">
+          <h1
+            id="hero-heading"
+            className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight drop-shadow-md"
+          >
             {hero.title}
           </h1>
-          <p className="mt-3 text-white/90 md:text-xl">{hero.subtitle}</p>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center relative z-20">
+          <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-brand-gold to-brand-red" />
+
+          <p className="mt-5 text-white/85 text-lg md:text-xl leading-relaxed max-w-xl drop-shadow">
+            {hero.subtitle}
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-4">
             <Button
               size="lg"
               asChild
-              className="bg-brand-red hover:bg-brand-red-hover text-white shadow-lg shadow-black/20"
+              className="bg-brand-red hover:bg-brand-red/90 text-white shadow-lg shadow-black/30"
             >
               <Link to="/menu" aria-label="Go to full menu">
                 {hero.ctaText}

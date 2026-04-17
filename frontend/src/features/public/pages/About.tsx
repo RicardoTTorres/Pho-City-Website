@@ -40,18 +40,26 @@ export default function About() {
         title={about.beginningTitle}
         body={about.beginningBody}
         image={about.beginningImage}
+        caption={about.beginningCaption || undefined}
       />
 
       <AboutFoodSection
         title={about.foodTitle}
         body={about.foodBody}
         image={about.foodImage}
+        caption={about.foodCaption || undefined}
+        highlights={
+          about.foodHighlights
+            ? about.foodHighlights.split(",").map((s) => ({ label: s.trim() })).filter((h) => h.label)
+            : undefined
+        }
       />
 
       <AboutCommitmentSection
         title={about.commitmentTitle}
         body={about.commitmentBody}
         image={about.commitmentImage}
+        caption={about.commitmentCaption || undefined}
       />
     </div>
   );

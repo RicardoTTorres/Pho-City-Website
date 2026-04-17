@@ -2,6 +2,7 @@
 import express from "express";
 import multer from "multer";
 import { requireAuth } from "../middleware/requireAuth.js";
+import { requireAdmin } from "../middleware/requireAdmin.js";
 import {
   handleUpload,
   handleList,
@@ -17,6 +18,6 @@ const upload = multer({
 
 router.get("/", requireAuth, handleList);
 router.post("/", requireAuth, upload.single("file"), handleUpload);
-router.delete("/", requireAuth, handleDelete);
+router.delete("/", requireAuth, requireAdmin, handleDelete);
 
 export default router;

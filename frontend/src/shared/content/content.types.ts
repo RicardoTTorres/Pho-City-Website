@@ -47,12 +47,16 @@ export interface AboutPageContent {
   beginningTitle: string;
   beginningBody: string;
   beginningImage?: string | null;
+  beginningCaption?: string;
   foodTitle: string;
   foodBody: string;
   foodImage?: string | null;
+  foodCaption?: string;
+  foodHighlights?: string; // comma-separated, e.g. "Slow-simmered broth,Fresh herbs daily"
   commitmentTitle: string;
   commitmentBody: string;
   commitmentImage?: string | null;
+  commitmentCaption?: string;
   closingText: string;
   previewHeading?: string;
   previewBody?: string;

@@ -589,7 +589,7 @@ export async function getFeaturedItems(req, res) {
       FROM menu_items
       WHERE is_featured = 1 AND item_is_visible = 1
       ORDER BY featured_position ASC
-      LIMIT 4;
+      LIMIT 6;
     `);
 
     const formatted = items.map((i) => ({

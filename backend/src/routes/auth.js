@@ -1,4 +1,5 @@
 // src/routes/auth.js
+import { randomUUID } from "node:crypto";
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -7,7 +8,6 @@ import rateLimit from "express-rate-limit";
 import { pool } from "../db/connect_db.js";
 import {
   blacklistToken,
-  isTokenBlacklisted,
   JWT_SECRET,
   requireAuth,
 } from "../middleware/requireAuth.js";
@@ -30,9 +30,6 @@ const forgotPasswordLimiter = rateLimit({
   message: { error: "Too many reset requests. Please try again in an hour." },
 });
 
-// In-memory OTP store for password resets (email -> { code, expiresAt })
-const resetOtps = new Map();
-
 const router = express.Router();
 
 const ADMIN_TABLE_SQL = `
@@ -45,6 +42,22 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 `;
 
+const TOKEN_BLACKLIST_SQL = `
+CREATE TABLE IF NOT EXISTS token_blacklist (
+  jti VARCHAR(36) PRIMARY KEY,
+  expires_at DATETIME NOT NULL,
+  INDEX idx_bl_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+`;
+
+const PASSWORD_RESETS_SQL = `
+CREATE TABLE IF NOT EXISTS password_resets (
+  email VARCHAR(255) PRIMARY KEY,
+  code VARCHAR(6) NOT NULL,
+  expires_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+`;
+
 const seedEmail = process.env.ADMIN_DEFAULT_EMAIL || "admin@phocity.com";
 const seedPassword = process.env.ADMIN_DEFAULT_PASSWORD || "changeme";
 
@@ -55,38 +68,56 @@ const authTtlJwt = `${authTtlDays}d`;
 const cookieOptions = {
   httpOnly: true,
   secure: isProd,
-  // In production, frontend/backend can be on different domains.
-  // SameSite=None is required for credentialed cross-site requests.
   sameSite: isProd ? "none" : "lax",
   path: "/",
   maxAge: authTtlMs,
 };
 
 function signAccess(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: authTtlJwt });
+  const jti = randomUUID();
+  return {
+    token: jwt.sign({ ...payload, jti }, JWT_SECRET, { expiresIn: authTtlJwt }),
+    jti,
+  };
 }
 
 export async function ensureAdminTableAndSeed() {
+  // Ensure all auth-related tables exist
   await pool.query(ADMIN_TABLE_SQL);
+  await pool.query(TOKEN_BLACKLIST_SQL);
+  await pool.query(PASSWORD_RESETS_SQL);
 
+  // Seed default admin if not present
   const [rows] = await pool.query(
     "SELECT id FROM admins WHERE email = ? LIMIT 1",
     [seedEmail],
   );
 
-  if (rows.length > 0) {
-    return;
+  if (rows.length === 0) {
+    const passwordHash = await bcrypt.hash(seedPassword, 10);
+    await pool.query(
+      "INSERT INTO admins (email, password_hash, role) VALUES (?, ?, 'admin')",
+      [seedEmail, passwordHash],
+    );
+    console.log(`Seeded default admin user: ${seedEmail}`);
   }
 
-  const passwordHash = await bcrypt.hash(seedPassword, 10);
-  await pool.query(
-    "INSERT INTO admins (email, password_hash, role) VALUES (?, ?, 'admin')",
-    [seedEmail, passwordHash],
+  // Warn loudly if the admin is still using the default password
+  const [adminRows] = await pool.query(
+    "SELECT password_hash FROM admins WHERE email = ? LIMIT 1",
+    [seedEmail],
   );
-  console.log(`Seeded default admin user: ${seedEmail}`);
+  if (adminRows.length > 0) {
+    const usingDefault = await bcrypt.compare("changeme", adminRows[0].password_hash);
+    if (usingDefault) {
+      console.warn("\n" + "=".repeat(60));
+      console.warn("  SECURITY WARNING");
+      console.warn("  The admin account is still using the default password.");
+      console.warn("  Change it immediately in the CMS under Users.");
+      console.warn("=".repeat(60) + "\n");
+    }
+  }
 }
-
-// await ensureAdminTableAndSeed();
 
 router.get("/login", (_req, res) => {
   res.send("Login endpoint is POST /api/admin/login with JSON body.");
@@ -113,7 +144,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = signAccess({
+    const { token } = signAccess({
       id: admin.id,
       email: admin.email,
       role: admin.role,
@@ -131,14 +162,21 @@ router.get("/me", requireAuth, (req, res) => {
   res.json({ ok: true, user: req.user });
 });
 
-router.get("/verify", (req, res) => {
+router.get("/verify", async (req, res) => {
   try {
     const token = req.cookies?.auth;
-    if (!token || isTokenBlacklisted(token)) {
-      return res.status(403).json({ ok: false });
+    if (!token) return res.status(403).json({ ok: false });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    if (decoded.jti) {
+      const [rows] = await pool.query(
+        "SELECT 1 FROM token_blacklist WHERE jti = ? LIMIT 1",
+        [decoded.jti],
+      );
+      if (rows.length > 0) return res.status(403).json({ ok: false });
     }
 
-    jwt.verify(token, JWT_SECRET);
     return res.status(200).json({ ok: true });
   } catch (_err) {
     return res.status(403).json({ ok: false });
@@ -163,10 +201,7 @@ router.post("/update-password", requireAuth, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const oldPasswordMatches = await bcrypt.compare(
-      oldPassword,
-      admin.password_hash,
-    );
+    const oldPasswordMatches = await bcrypt.compare(oldPassword, admin.password_hash);
     if (!oldPasswordMatches) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -200,7 +235,13 @@ router.post("/forgot-password", forgotPasswordLimiter, async (req, res) => {
     if (!rows.length) return res.json({ ok: true });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    resetOtps.set(normalizedEmail, { code, expiresAt: Date.now() + 15 * 60 * 1000 });
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await pool.query(
+      `INSERT INTO password_resets (email, code, expires_at) VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE code = VALUES(code), expires_at = VALUES(expires_at)`,
+      [normalizedEmail, code, expiresAt],
+    );
 
     // Log for dev environments without email configured
     console.log(`[Password Reset] OTP for ${normalizedEmail}: ${code}`);
@@ -234,13 +275,18 @@ router.post("/reset-password", async (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  const entry = resetOtps.get(normalizedEmail);
-
-  if (!entry || entry.code !== String(code) || Date.now() > entry.expiresAt) {
-    return res.status(400).json({ error: "Invalid or expired reset code" });
-  }
 
   try {
+    const [rows] = await pool.query(
+      "SELECT code, expires_at FROM password_resets WHERE email = ? LIMIT 1",
+      [normalizedEmail],
+    );
+    const entry = rows[0];
+
+    if (!entry || entry.code !== String(code) || new Date() > new Date(entry.expires_at)) {
+      return res.status(400).json({ error: "Invalid or expired reset code" });
+    }
+
     const passwordHash = await bcrypt.hash(newPassword, 10);
     const [result] = await pool.query(
       "UPDATE admins SET password_hash = ? WHERE email = ?",
@@ -251,7 +297,7 @@ router.post("/reset-password", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    resetOtps.delete(normalizedEmail);
+    await pool.query("DELETE FROM password_resets WHERE email = ?", [normalizedEmail]);
     return res.json({ ok: true });
   } catch (err) {
     console.error("reset-password error:", err);
@@ -259,9 +305,19 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-router.post("/logout", (req, res) => {
+router.post("/logout", async (req, res) => {
   const token = req.cookies?.auth;
-  blacklistToken(token);
+
+  if (token) {
+    try {
+      const decoded = jwt.decode(token);
+      if (decoded?.jti && decoded?.exp) {
+        await blacklistToken(decoded.jti, decoded.exp);
+      }
+    } catch {
+      // ignore decode errors on logout
+    }
+  }
 
   res.clearCookie("auth", {
     httpOnly: true,

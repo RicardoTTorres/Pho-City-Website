@@ -8,6 +8,7 @@ import {
   handleMarkRead,
 } from "../controllers/settingsController.js";
 import { requireAuth } from "../middleware/requireAuth.js";
+import { requireAdmin } from "../middleware/requireAdmin.js";
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get("/public", handleGetPublicSettings);
 
 // Admin-only
 router.get("/", requireAuth, handleGetSettings);
-router.put("/", requireAuth, handleSaveSettings);
+router.put("/", requireAuth, requireAdmin, handleSaveSettings);
 router.get("/inbox", requireAuth, handleGetInbox);
 router.patch("/inbox/:id/read", requireAuth, handleMarkRead);
 
