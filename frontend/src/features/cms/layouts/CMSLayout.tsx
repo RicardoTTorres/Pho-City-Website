@@ -59,6 +59,7 @@ export function CMSLayout() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [API_URL, navigate]);
 
   const toggleTheme = () => {

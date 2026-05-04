@@ -88,7 +88,7 @@ export default function MessagesPage() {
   }
 
   async function startAuth() {
-    const popup = window.open(`${API_URL}/api/admin/mail/oauth/init`, "googleAuth", "width=500,height=600");
+    window.open(`${API_URL}/api/admin/mail/oauth/init`, "googleAuth", "width=500,height=600");
     const listener = (event: MessageEvent) => {
       if (event.data === "gmail-connected") {
         window.removeEventListener("message", listener);
@@ -120,7 +120,7 @@ export default function MessagesPage() {
 
       if (thread.isPreview && thread.isGmail) {
         setOpenThreadLoading(true);
-        let threadFull = await getThread(thread.id);
+        const threadFull = await getThread(thread.id);
         updateThread(threadFull);
         setOpenThreadLoading(false);
       }
@@ -177,6 +177,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isError) {

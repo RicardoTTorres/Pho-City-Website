@@ -1,6 +1,9 @@
-# placeholder
+
 node_modules
 .env
-
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/
+frontend/playwright/.cache/
 frontend/src/global.d.ts
 git checkout main

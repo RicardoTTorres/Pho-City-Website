@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-
-
 test.describe("Menu page — desktop sidebar", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 

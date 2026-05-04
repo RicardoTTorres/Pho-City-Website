@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-
-
 const VIEWPORTS = [
   { label: "mobile", width: 390, height: 844 },
   { label: "tablet", width: 768, height: 1024 },

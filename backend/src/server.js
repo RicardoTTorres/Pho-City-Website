@@ -62,7 +62,7 @@ app.use(
       // allow curl/postman or same-origin requests (no Origin header)
       if (!origin) return cb(null, true);
 
-      if (allowedOrigins.length === 0) return cb(null, true); // fallback: don't block
+      if (allowedOrigins.length === 0) return cb(new Error("CORS: FRONTEND_ORIGIN is not configured"));
       if (allowedOrigins.includes(origin)) return cb(null, true);
 
       return cb(new Error(`CORS blocked for origin: ${origin}`));

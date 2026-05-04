@@ -38,13 +38,13 @@ export const getHero = async (req, res) => {
 
 export const updateHero = async (req, res) => {
   try {
-    const { title, subtitle, ctaText, secondaryCtaText, imageUrl } = req.body;
+    const { title, subtitle, ctaText, secondaryCtaText = null, imageUrl } = req.body;
 
     if (
       typeof title !== "string" ||
       typeof subtitle !== "string" ||
       typeof ctaText !== "string" ||
-      typeof secondaryCtaText !== "string"
+      (secondaryCtaText !== null && typeof secondaryCtaText !== "string")
     ) {
       return res.status(400).json({ message: "Invalid payload" });
     }

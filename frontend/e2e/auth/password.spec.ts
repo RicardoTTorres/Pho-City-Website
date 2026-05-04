@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-
 test.describe("Password logic on admin login", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/adminlogin");

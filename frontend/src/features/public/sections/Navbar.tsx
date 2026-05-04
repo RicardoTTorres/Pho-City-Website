@@ -13,8 +13,9 @@ function labelToString(label: NavbarLink["label"]) {
   return typeof label === "string" ? label : (label.en ?? "");
 }
 
-function ctaLabelToString(label: any) {
-  return typeof label === "string" ? label : (label?.en ?? "");
+function ctaLabelToString(label: unknown) {
+  if (typeof label === "string") return label;
+  return (label as { en?: string } | null)?.en ?? "";
 }
 
 export function Navbar(): ReactElement {
@@ -58,7 +59,7 @@ export function Navbar(): ReactElement {
     }
   };
 
-  const logoSrc = (navbar as any)?.brand?.logo || navConfig.brand.logo || null;
+  const logoSrc = navbar?.brand?.logo || navConfig.brand.logo || null;
 
   const cmsLinks = useMemo(() => {
     const raw = Array.isArray(navbar?.links) ? navbar!.links : [];
@@ -75,30 +76,30 @@ export function Navbar(): ReactElement {
   }, [navbar]);
 
   const fallbackLinks = useMemo(() => {
-    return (navConfig.nav ?? []).map((item: any) => ({
+    return navConfig.nav.map((item) => ({
       id: item.label,
       label: item.label,
       href: item.path,
-      type: item.external ? "external" : "internal",
+      type: "internal" as const,
     }));
   }, []);
 
   const linksToRender = cmsLinks.length > 0 ? cmsLinks : fallbackLinks;
 
   // CTAs
-  const pickupEnabled = (navbar as any)?.ctas?.pickup?.enabled ?? true;
+  const pickupEnabled = navbar?.ctas?.pickup?.enabled ?? true;
   const pickupHref =
-    (navbar as any)?.ctas?.pickup?.href || content.onlineOrder.pickupUrl || "";
+    navbar?.ctas?.pickup?.href || content.onlineOrder.pickupUrl || "";
   const pickupLabel =
-    ctaLabelToString((navbar as any)?.ctas?.pickup?.label) || "Order Online";
+    ctaLabelToString(navbar?.ctas?.pickup?.label) || "Order Online";
 
-  const deliveryEnabled = (navbar as any)?.ctas?.delivery?.enabled ?? true;
+  const deliveryEnabled = navbar?.ctas?.delivery?.enabled ?? true;
   const deliveryHref =
-    (navbar as any)?.ctas?.delivery?.href ||
+    navbar?.ctas?.delivery?.href ||
     content.onlineOrder.deliveryUrl ||
     "";
   const deliveryLabel =
-    ctaLabelToString((navbar as any)?.ctas?.delivery?.label) || "Delivery";
+    ctaLabelToString(navbar?.ctas?.delivery?.label) || "Delivery";
 
   return (
     <header className="sticky top-0 z-50 bg-brand-cream/80 backdrop-blur-md border-b-2 border-brand-red/50">

@@ -120,11 +120,6 @@ export default function MenuPage() {
     .filter((cat) => (cat.items?.length ?? 0) > 0);
 }, [derivedCategories, q]);
 
-  const formattedMenuData: MenuData = useMemo(
-    () => ({ categories: derivedCategories }),
-    [derivedCategories],
-  );
-
   // CRUD callbacks
   const handleCreateItem = async (data: NewItemPayload) => {
     await createItem(data);
@@ -137,7 +132,6 @@ export default function MenuPage() {
   };
 
   const handleDeleteItem = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
     await deleteItem(id);
     await refreshMenuAdmin();
   };
@@ -153,8 +147,6 @@ export default function MenuPage() {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
-      return;
     await deleteCategory(id);
     await refreshMenuAdmin();
   };

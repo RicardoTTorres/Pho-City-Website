@@ -22,7 +22,6 @@ export function MenuItemModal({
   description,
   image,
   popular,
-  categoryName,
   customization,
   onClose,
 }: MenuItemModalProps) {

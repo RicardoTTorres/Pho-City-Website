@@ -268,7 +268,7 @@ router.post("/forgot-password", forgotPasswordLimiter, async (req, res) => {
   }
 });
 
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", forgotPasswordLimiter, async (req, res) => {
   const { email, code, newPassword } = req.body || {};
   if (!email || !code || !newPassword) {
     return res.status(400).json({ error: "Missing fields" });

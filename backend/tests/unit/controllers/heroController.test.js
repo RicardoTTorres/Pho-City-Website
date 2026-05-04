@@ -94,7 +94,7 @@ describe("updateHero", () => {
         title: "Main",
         subtitle: "Sub",
         ctaText: "CTA",
-        secondaryCtaText: null,
+        secondaryCtaText: 123,
         imageUrl: "img.jpg",
       },
     });

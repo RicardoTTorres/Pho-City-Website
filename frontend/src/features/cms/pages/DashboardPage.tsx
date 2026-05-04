@@ -11,7 +11,6 @@ import {
   Phone,
   Trash2,
   Reply as ReplyIcon,
-  Send,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,7 +18,7 @@ import { TrafficOverviewEditor } from "@/features/cms/sections/TrafficOverviewEd
 import { fetchRecentActivity, type ActivityEntry } from "@/shared/api/activity";
 import { useContent } from "@/app/providers/ContentContext";
 import { PUBLIC_ROUTES } from "@/shared/config/publicRoutes";
-import { type MailMessage, type MailThread, getThreads, getState, getSavedThreads } from "@/shared/api/mail";
+import { type MailThread, getThreads, getState, getSavedThreads } from "@/shared/api/mail";
 import JavascriptTimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 

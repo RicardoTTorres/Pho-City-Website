@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { ImageUpload } from "@/shared/components/ui/ImageUpload";
 import { Portal } from "@/shared/components/ui/Portal";
+import { useToast, ToastContainer } from "@/shared/components/ui/Toast";
+import { ConfirmDialog } from "@/shared/components/ui/ConfirmDialog";
 import {
   Pencil,
   Trash2,
@@ -14,6 +16,7 @@ import {
   TrendingUp,
   MoreVertical,
   SlidersHorizontal,
+  X,
 } from "lucide-react";
 import { parseBilingualName } from "@/utils/menuHelper";
 import {
@@ -339,7 +342,7 @@ function getTemplateForCategory(name: string): CategoryCustomization {
   if (
     lower.includes("pho") ||
     lower.includes("phở") ||
-    lower.includes("ph\u1edf")
+    lower.includes("phở")
   ) {
     return JSON.parse(JSON.stringify(TEMPLATES.pho));
   }
@@ -364,7 +367,6 @@ function getTemplateForCategory(name: string): CategoryCustomization {
   ) {
     return JSON.parse(JSON.stringify(TEMPLATES.vermicelli));
   }
-  // Default: just special instructions
   const base = emptyCustomization();
   base.sections = [JSON.parse(JSON.stringify(SPECIAL_INSTRUCTIONS_SECTION))];
   return base;
@@ -398,25 +400,125 @@ interface MenuSectionEditorProps {
   onReorderItems: (categoryId: string, itemIds: string[]) => Promise<void>;
 }
 
+// ── Sortable Featured Row ─────────────────────────────────────────────────────
+function SortableFeaturedRow({
+  item,
+  index,
+  onEdit,
+  onRemove,
+}: {
+  item: MenuItem;
+  index: number;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const { english, vietnamese } = parseBilingualName(item.name);
+
+  const displayPrice = (() => {
+    const raw = String(item.price).replace(/[^0-9.]/g, "");
+    const num = parseFloat(raw);
+    return Number.isFinite(num) ? `$${num.toFixed(2)}` : String(item.price);
+  })();
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-100 last:border-b-0"
+    >
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none shrink-0"
+        aria-label="Drag to reorder featured item"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+
+      {/* Position badge */}
+      <span className="shrink-0 w-5 h-5 rounded-full bg-yellow-100 text-yellow-700 text-[10px] font-bold flex items-center justify-center leading-none">
+        {index + 1}
+      </span>
+
+      {/* Thumbnail */}
+      {item.image && (
+        <img
+          src={item.image}
+          alt=""
+          className="shrink-0 w-9 h-9 rounded object-cover border border-gray-100"
+        />
+      )}
+
+      {/* Text */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-900 truncate leading-snug">
+          {english}
+        </p>
+        {vietnamese && (
+          <p className="text-[11px] text-gray-400 italic truncate leading-snug">
+            {vietnamese}
+          </p>
+        )}
+        <p className="text-[11px] text-gray-500 truncate">
+          {item.category} · {displayPrice}
+        </p>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          onClick={onEdit}
+          className="px-2 py-1 text-[11px] font-semibold text-brand-gold hover:text-white hover:bg-brand-gold border border-brand-gold rounded transition-colors"
+        >
+          Edit
+        </button>
+        <button
+          onClick={onRemove}
+          className="p-1 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 rounded transition-colors"
+          aria-label="Remove from homepage"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Sortable Item ─────────────────────────────────────────────────────────────
 function SortableMenuItem({
   item,
   disabled = false,
+  featuredFull = false,
   onEdit,
   onDelete,
   onToggleVisible,
   onToggleFeatured,
-  onChangeFeaturedPosition,
   onTogglePopular,
   onCustomize,
 }: {
   item: MenuItem;
   disabled?: boolean;
+  featuredFull?: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onToggleVisible: () => void;
   onToggleFeatured: () => void;
-  onChangeFeaturedPosition: (position: number) => void;
   onTogglePopular: () => void;
   onCustomize: () => void;
 }) {
@@ -445,7 +547,6 @@ function SortableMenuItem({
 
   const { english, vietnamese } = parseBilingualName(item.name);
 
-  // Normalize price to always show as "$X.XX"
   const displayPrice = (() => {
     const raw = String(item.price).replace(/[^0-9.]/g, "");
     const num = parseFloat(raw);
@@ -457,6 +558,8 @@ function SortableMenuItem({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  const starDisabled = featuredFull && !item.featured;
 
   return (
     <div
@@ -489,7 +592,6 @@ function SortableMenuItem({
                 </p>
               )}
             </div>
-            {/* Price badge — clearly styled so it reads as price, not index */}
             <span className="shrink-0 text-[11px] sm:text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded tabular-nums leading-none mt-0.5">
               {displayPrice}
             </span>
@@ -524,94 +626,108 @@ function SortableMenuItem({
               )}
             </div>
 
-            {/* Action cluster: Edit + ⋮ only */}
-            <div className="flex items-center shrink-0">
+            {/* Action cluster: Star + Edit + ⋮ */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Star feature toggle — visible directly on the row */}
               <button
-                onClick={onEdit}
-                className="px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-brand-gold hover:text-white hover:bg-brand-gold border border-brand-gold rounded-l-md transition-colors inline-flex items-center gap-1"
+                onClick={onToggleFeatured}
+                disabled={starDisabled}
+                aria-label={item.featured ? "Remove from homepage" : "Feature on homepage"}
+                title={
+                  starDisabled
+                    ? "All 6 homepage slots are filled"
+                    : item.featured
+                    ? "Remove from homepage"
+                    : "Feature on homepage"
+                }
+                className={`p-1 rounded transition-colors ${
+                  item.featured
+                    ? "text-yellow-500 hover:text-yellow-600"
+                    : starDisabled
+                    ? "text-gray-200 cursor-not-allowed"
+                    : "text-gray-300 hover:text-yellow-400"
+                }`}
               >
-                <Pencil className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Edit
+                <Star
+                  className={`w-3.5 h-3.5 ${item.featured ? "fill-yellow-500" : ""}`}
+                />
               </button>
 
-              <div ref={kebabRef} className="relative">
+              {/* Edit + kebab */}
+              <div className="flex items-center">
                 <button
-                  onClick={() => setKebabOpen((v) => !v)}
-                  className="px-1.5 py-1 text-gray-400 hover:text-gray-700 border border-l-0 border-gray-200 hover:border-gray-300 rounded-r-md transition-colors"
-                  aria-label="More actions"
+                  onClick={onEdit}
+                  className="px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-brand-gold hover:text-white hover:bg-brand-gold border border-brand-gold rounded-l-md transition-colors inline-flex items-center gap-1"
                 >
-                  <MoreVertical className="w-3.5 h-3.5" />
+                  <Pencil className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  Edit
                 </button>
 
-                {kebabOpen && (
-                  <div className="absolute right-0 bottom-full mb-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 w-48 z-20">
-                    {/* Popular */}
-                    <button
-                      onClick={() => { onTogglePopular(); setKebabOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
-                    >
-                      <TrendingUp className={`w-3.5 h-3.5 ${item.popular ? "text-amber-500" : "text-gray-400"}`} />
-                      <span className={item.popular ? "text-amber-700 font-medium" : "text-gray-700"}>
-                        {item.popular ? "Unmark popular" : "Mark popular"}
-                      </span>
-                    </button>
-                    {/* Visibility */}
-                    <button
-                      onClick={() => { onToggleVisible(); setKebabOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
-                    >
-                      {item.visible
-                        ? <EyeOff className="w-3.5 h-3.5 text-gray-400" />
-                        : <Eye className="w-3.5 h-3.5 text-green-500" />}
-                      <span className="text-gray-700">{item.visible ? "Hide item" : "Show item"}</span>
-                    </button>
-                    {/* Feature */}
-                    <button
-                      onClick={() => { onToggleFeatured(); setKebabOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
-                    >
-                      <Star className={`w-3.5 h-3.5 ${item.featured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`} />
-                      <span className={item.featured ? "text-yellow-700 font-medium" : "text-gray-700"}>
-                        {item.featured ? "Unfeature" : "Feature on homepage"}
-                      </span>
-                    </button>
-                    {/* Featured position select */}
-                    {item.featured && (
-                      <div className="px-3 pb-1.5">
-                        <select
-                          value={item.featuredPosition ?? ""}
-                          onChange={(e) => onChangeFeaturedPosition(Number(e.target.value))}
-                          className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-brand-red"
-                        >
-                          <option value="" disabled>Position</option>
-                          {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <option key={n} value={n}>#{n}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                    {/* Customizations */}
-                    <div className="border-t border-gray-100 mt-1 pt-1">
+                <div ref={kebabRef} className="relative">
+                  <button
+                    onClick={() => setKebabOpen((v) => !v)}
+                    className="px-1.5 py-1 text-gray-400 hover:text-gray-700 border border-l-0 border-gray-200 hover:border-gray-300 rounded-r-md transition-colors"
+                    aria-label="More actions"
+                  >
+                    <MoreVertical className="w-3.5 h-3.5" />
+                  </button>
+
+                  {kebabOpen && (
+                    <div className="absolute right-0 bottom-full mb-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 w-48 z-20">
+                      {/* Popular */}
                       <button
-                        onClick={() => { onCustomize(); setKebabOpen(false); }}
+                        onClick={() => { onTogglePopular(); setKebabOpen(false); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
                       >
-                        <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-gray-700">Category customizations</span>
+                        <TrendingUp className={`w-3.5 h-3.5 ${item.popular ? "text-amber-500" : "text-gray-400"}`} />
+                        <span className={item.popular ? "text-amber-700 font-medium" : "text-gray-700"}>
+                          {item.popular ? "Unmark popular" : "Mark popular"}
+                        </span>
                       </button>
-                    </div>
-                    {/* Delete */}
-                    <div className="border-t border-gray-100 mt-1 pt-1">
+                      {/* Visibility */}
                       <button
-                        onClick={() => { onDelete(); setKebabOpen(false); }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left text-red-600 hover:bg-red-50 transition-colors"
+                        onClick={() => { onToggleVisible(); setKebabOpen(false); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Delete
+                        {item.visible
+                          ? <EyeOff className="w-3.5 h-3.5 text-gray-400" />
+                          : <Eye className="w-3.5 h-3.5 text-green-500" />}
+                        <span className="text-gray-700">{item.visible ? "Hide item" : "Show item"}</span>
                       </button>
+                      {/* Feature toggle */}
+                      <button
+                        onClick={() => { onToggleFeatured(); setKebabOpen(false); }}
+                        disabled={starDisabled}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors ${starDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
+                      >
+                        <Star className={`w-3.5 h-3.5 ${item.featured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`} />
+                        <span className={item.featured ? "text-yellow-700 font-medium" : "text-gray-700"}>
+                          {item.featured ? "Remove from homepage" : "Feature on homepage"}
+                        </span>
+                      </button>
+                      {/* Customizations */}
+                      <div className="border-t border-gray-100 mt-1 pt-1">
+                        <button
+                          onClick={() => { onCustomize(); setKebabOpen(false); }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-gray-50 transition-colors"
+                        >
+                          <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400" />
+                          <span className="text-gray-700">Category customizations</span>
+                        </button>
+                      </div>
+                      {/* Delete */}
+                      <div className="border-t border-gray-100 mt-1 pt-1">
+                        <button
+                          onClick={() => { onDelete(); setKebabOpen(false); }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -738,6 +854,16 @@ export function MenuSectionEditor({
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryFormData, setCategoryFormData] = useState({ name: "" });
 
+  // Toast notifications
+  const { toasts, showToast, dismissToast } = useToast();
+
+  // Confirm dialog state
+  const [pendingDelete, setPendingDelete] = useState<{
+    type: "item" | "category";
+    id: string;
+    label: string;
+  } | null>(null);
+
   // Customization state
   const [custMap, setCustMap] = useState<CustomizationMap>({});
   const [managingCategoryId, setManagingCategoryId] = useState<string | null>(null);
@@ -849,17 +975,28 @@ export function MenuSectionEditor({
       });
     } catch (error) {
       console.error("Error updating visibility:", error);
-      alert("Failed to update visibility. Please try again.");
+      showToast("Failed to update visibility. Please try again.", "error");
     }
   };
 
+  // Auto-assigns the next open featured slot (1–6) when featuring an item.
   const handleToggleFeatured = async (item: MenuItem) => {
     const willFeature = !item.featured;
     if (willFeature && featuredCount >= 6) {
-      alert("Maximum of 6 featured items allowed. Unfeature another item first.");
+      showToast("All 6 homepage slots are filled. Remove an item first.", "error");
       return;
     }
     try {
+      let targetPosition: number | null = null;
+      if (willFeature) {
+        const usedPositions = new Set(featuredItems.map((i) => i.featuredPosition));
+        for (let n = 1; n <= 6; n++) {
+          if (!usedPositions.has(n)) {
+            targetPosition = n;
+            break;
+          }
+        }
+      }
       await onUpdateItem(item.id, {
         name: item.name,
         description: item.description,
@@ -868,12 +1005,12 @@ export function MenuSectionEditor({
         image: item.image || "",
         visible: item.visible,
         featured: willFeature,
-        featuredPosition: willFeature ? item.featuredPosition : null,
+        featuredPosition: targetPosition,
         popular: item.popular,
       });
     } catch (error) {
       console.error("Error updating featured:", error);
-      alert("Failed to update featured status. Please try again.");
+      showToast("Failed to update featured status. Please try again.", "error");
     }
   };
 
@@ -892,26 +1029,42 @@ export function MenuSectionEditor({
       });
     } catch (error) {
       console.error("Error updating popular:", error);
-      alert("Failed to update popular status. Please try again.");
+      showToast("Failed to update popular status. Please try again.", "error");
     }
   };
 
-  const handleChangeFeaturedPosition = async (item: MenuItem, position: number) => {
+  // Reorders featured items by updating featuredPosition for each item that moved.
+  const handleFeaturedDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = featuredItems.findIndex((i) => i.id === active.id);
+    const newIndex = featuredItems.findIndex((i) => i.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(featuredItems, oldIndex, newIndex);
+
     try {
-      await onUpdateItem(item.id, {
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        categoryId: item.categoryId,
-        image: item.image || "",
-        visible: item.visible,
-        featured: item.featured,
-        featuredPosition: position,
-        popular: item.popular,
-      });
+      for (let idx = 0; idx < reordered.length; idx++) {
+        const item = reordered[idx];
+        const newPos = idx + 1;
+        if (item != null && item.featuredPosition !== newPos) {
+          await onUpdateItem(item.id, {
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            categoryId: item.categoryId,
+            image: item.image || "",
+            visible: item.visible,
+            featured: true,
+            featuredPosition: newPos,
+            popular: item.popular,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Error updating featured position:", error);
-      alert("Failed to update featured position. Please try again.");
+      console.error("Error reordering featured items:", error);
+      showToast("Failed to reorder featured items. Please try again.", "error");
     }
   };
 
@@ -933,17 +1086,14 @@ export function MenuSectionEditor({
       setItemModalOpen(false);
     } catch (error) {
       console.error("Error saving item:", error);
-      alert(`Failed to ${editingItem ? "update" : "add"} item. Please try again.`);
+      showToast(`Failed to ${editingItem ? "update" : "add"} item. Please try again.`, "error");
     }
   };
 
-  const handleDeleteItem = async (itemId: string) => {
-    try {
-      await onDeleteItem(itemId);
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      alert("Failed to delete item. Please try again.");
-    }
+  const handleDeleteItem = (itemId: string) => {
+    const item = menuItems.find((i) => i.id === itemId);
+    const label = item ? parseBilingualName(item.name).english : "this item";
+    setPendingDelete({ type: "item", id: itemId, label });
   };
 
   const handleAddCategory = () => {
@@ -970,16 +1120,31 @@ export function MenuSectionEditor({
       setCategoryModalOpen(false);
     } catch (error) {
       console.error("Error saving category:", error);
-      alert(`Failed to ${editingCategory ? "update" : "add"} category. Please try again.`);
+      showToast(`Failed to ${editingCategory ? "update" : "add"} category. Please try again.`, "error");
     }
   };
 
-  const handleDeleteCategory = async (categoryId: string) => {
+  const handleDeleteCategory = (categoryId: string) => {
+    const cat = categories.find((c) => c.id === categoryId);
+    const label = cat?.name ?? "this category";
+    setPendingDelete({ type: "category", id: categoryId, label });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    const { type, id, label } = pendingDelete;
+    setPendingDelete(null);
     try {
-      await onDeleteCategory(categoryId);
+      if (type === "item") {
+        await onDeleteItem(id);
+        showToast(`"${label}" was removed.`, "success");
+      } else {
+        await onDeleteCategory(id);
+        showToast(`"${label}" category was removed.`, "success");
+      }
     } catch (error) {
-      console.error("Error deleting category:", error);
-      alert("Failed to delete category. Please try again.");
+      console.error(`Error deleting ${type}:`, error);
+      showToast(`Failed to delete. Please try again.`, "error");
     }
   };
 
@@ -1000,7 +1165,7 @@ export function MenuSectionEditor({
       await onReorderItems(categoryId, itemIds);
     } catch (error) {
       console.error("Error reordering items:", error);
-      alert("Failed to reorder items. Please try again.");
+      showToast("Failed to reorder items. Please try again.", "error");
     }
   };
 
@@ -1018,9 +1183,11 @@ export function MenuSectionEditor({
       await onReorderCategories(categoryIds);
     } catch (error) {
       console.error("Error reordering categories:", error);
-      alert("Failed to reorder categories. Please try again.");
+      showToast("Failed to reorder categories. Please try again.", "error");
     }
   };
+
+  const slotsOpen = 6 - featuredCount;
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -1046,71 +1213,59 @@ export function MenuSectionEditor({
         <div className="space-y-3 md:space-y-4">
           {/* Featured Items Panel */}
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-0.5">
               <h3 className="flex items-center gap-2 font-semibold text-gray-800">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 Featured on Homepage
               </h3>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full tabular-nums">
                 {featuredCount} / 6 slots filled
               </span>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((slot) => {
-                const item = featuredItems.find((i) => i.featuredPosition === slot);
-                return item ? (
-                  <div
-                    key={slot}
-                    className="border border-yellow-200 bg-yellow-50 rounded-lg p-3 flex flex-col gap-2"
+            <p className="text-xs text-gray-400 mb-3">
+              Drag items to reorder. Click a star below to add an item.
+            </p>
+
+            {featuredCount === 0 ? (
+              <div className="text-center py-5 border border-dashed border-gray-200 rounded-lg">
+                <p className="text-sm text-gray-500">No featured items yet.</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Click a star on a menu item below to add it to the homepage.
+                </p>
+              </div>
+            ) : (
+              <>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleFeaturedDragEnd}
+                >
+                  <SortableContext
+                    items={featuredItems.map((i) => i.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    <span className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full self-start">
-                      #{slot}
-                    </span>
-                    {item.image && (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-20 object-cover rounded-md"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm truncate">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">{item.category}</p>
-                      <p className="text-xs font-medium text-gray-700 mt-0.5">
-                        {item.price}
-                      </p>
+                    <div className="border border-gray-100 rounded-lg overflow-hidden">
+                      {featuredItems.map((item, idx) => (
+                        <SortableFeaturedRow
+                          key={item.id}
+                          item={item}
+                          index={idx}
+                          onEdit={() => handleEditItem(item)}
+                          onRemove={() => handleToggleFeatured(item)}
+                        />
+                      ))}
                     </div>
-                    <div className="flex gap-1.5">
-                      <button
-                        onClick={() => handleEditItem(item)}
-                        className="flex-1 px-2 py-1.5 text-xs text-brand-gold hover:text-brand-red border border-brand-gold hover:border-brand-red rounded transition-colors flex items-center justify-center gap-1"
-                      >
-                        <Pencil className="w-3 h-3" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleToggleFeatured(item)}
-                        className="px-2.5 py-1.5 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 rounded transition-colors flex items-center justify-center"
-                        aria-label="Remove from featured"
-                        title="Remove from featured"
-                      >
-                        <Star className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    key={slot}
-                    className="border border-dashed border-gray-200 bg-gray-50 rounded-lg p-3 flex flex-col items-center justify-center gap-1 min-h-[120px]"
-                  >
-                    <span className="text-xs font-bold text-gray-300">#{slot}</span>
-                    <span className="text-xs text-gray-400">Empty slot</span>
-                  </div>
-                );
-              })}
-            </div>
+                  </SortableContext>
+                </DndContext>
+
+                {slotsOpen > 0 && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    {slotsOpen} homepage slot{slotsOpen !== 1 ? "s" : ""} open.
+                    Click a star on a menu item below to add it here.
+                  </p>
+                )}
+              </>
+            )}
           </div>
 
           {/* Filters and Add Button */}
@@ -1158,13 +1313,11 @@ export function MenuSectionEditor({
                       key={item.id}
                       item={item}
                       disabled={filteredCategory === "all"}
+                      featuredFull={featuredCount >= 6}
                       onEdit={() => handleEditItem(item)}
                       onDelete={() => handleDeleteItem(item.id)}
                       onToggleVisible={() => handleToggleVisible(item)}
                       onToggleFeatured={() => handleToggleFeatured(item)}
-                      onChangeFeaturedPosition={(pos) =>
-                        handleChangeFeaturedPosition(item, pos)
-                      }
                       onTogglePopular={() => handleTogglePopular(item)}
                       onCustomize={() => openCustomizeForItem(item)}
                     />
@@ -1386,6 +1539,27 @@ export function MenuSectionEditor({
           onClose={() => setManagingCategoryId(null)}
         />
       )}
+
+      {/* Confirm delete dialog */}
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={
+          pendingDelete?.type === "item"
+            ? "Delete menu item?"
+            : "Delete category?"
+        }
+        message={
+          pendingDelete?.type === "item"
+            ? `"${pendingDelete.label}" will be permanently removed from the menu.`
+            : `"${pendingDelete?.label}" and all its items will be permanently removed.`
+        }
+        confirmLabel="Delete"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+
+      {/* Toast notifications */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

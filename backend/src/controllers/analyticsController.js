@@ -35,7 +35,7 @@ export async function postTraffic(req, res) {
   try {
     const { uuid, path } = req.body;
     if (uuid === undefined || path === undefined) {
-      res.status(400).json({ error: "Missing required properties" });
+      return res.status(400).json({ error: "Missing required properties" });
     }
 
     const [result] = await pool.query(

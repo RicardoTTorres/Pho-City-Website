@@ -153,7 +153,8 @@ test.describe("CMS Menu page — Items tab", () => {
   test("'Add Item' button opens the item modal", async ({ page }) => {
     await page.getByRole("button", { name: /add item/i }).click();
 
-    await expect(page.getByRole("heading", { name: /add menu item/i })).toBeVisible({
+    const addItemHeading = page.getByRole("heading", { name: /add menu item/i });
+    await expect(addItemHeading).toBeVisible({
       timeout: 5_000,
     });
   });
@@ -163,7 +164,8 @@ test.describe("CMS Menu page — Items tab", () => {
   }) => {
     await page.getByRole("button", { name: /edit/i }).first().click();
 
-    await expect(page.locator('input[value="Pho Bo"]')).toBeVisible({ timeout: 5_000 });
+    const nameInput = page.locator('input[value="Pho Bo"]');
+    await expect(nameInput).toBeVisible({ timeout: 5_000 });
   });
 
   test("category filter dropdown contains all category names", async ({
@@ -235,7 +237,8 @@ test.describe("CMS Menu page — Categories tab", () => {
 
   test("'Add Category' button opens the category modal", async ({ page }) => {
     await page.getByRole("button", { name: /add category/i }).click();
-    await expect(page.getByRole("heading", { name: /add category/i })).toBeVisible({
+    const addCategoryHeading = page.getByRole("heading", { name: /add category/i });
+    await expect(addCategoryHeading).toBeVisible({
       timeout: 5_000,
     });
   });

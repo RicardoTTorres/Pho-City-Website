@@ -72,12 +72,11 @@ export function NavbarSectionEditor() {
           .sort((a, b) => a.order - b.order);
 
         setNavbar(normalized);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!alive) return;
-        setStatus(e?.message ?? "Failed to load navbar");
+        setStatus(e instanceof Error ? e.message : "Failed to load navbar");
       } finally {
-        if (!alive) return;
-        setLoading(false);
+        if (alive) setLoading(false);
       }
     })();
 
@@ -209,8 +208,8 @@ export function NavbarSectionEditor() {
       dirtyRef.current = false;
       setStatus("Navbar section saved!");
       setTimeout(() => setStatus(null), 3000);
-    } catch (e: any) {
-      setStatus(e?.message ?? "Failed to save navbar changes");
+    } catch (e: unknown) {
+      setStatus(e instanceof Error ? e.message : "Failed to save navbar changes");
     } finally {
       setSaving(false);
     }

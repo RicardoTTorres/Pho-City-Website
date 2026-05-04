@@ -15,7 +15,6 @@ import {
   EyeOff,
   Star,
   Flame,
-  Plus,
   Pencil,
   Trash2,
   Upload,
