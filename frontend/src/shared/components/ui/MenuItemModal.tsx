@@ -68,7 +68,7 @@ export function MenuItemModal({
         {/* Panel — bottom sheet on mobile, centered on md+ */}
         <div
           ref={panelRef}
-          className="relative w-full md:max-w-lg bg-white rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col max-h-[92dvh] animate-slide-up md:animate-none"
+          className="relative w-full md:max-w-lg bg-warm-cream rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col max-h-[92dvh] animate-slide-up md:animate-none"
         >
           {/* Drag handle (mobile) */}
           <div className="md:hidden flex justify-center pt-3 pb-0 flex-shrink-0">
@@ -132,21 +132,25 @@ export function MenuItemModal({
 
               {/* Description */}
               {description && (
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                <p
+                  className={`mt-3 text-sm text-slate-600 leading-relaxed ${
+                    hasCust ? "pb-4 border-b border-black/10" : ""
+                  }`}
+                >
                   {description}
                 </p>
               )}
 
               {/* Customizations */}
               {hasCust && (
-                <div className="mt-5 pt-4 border-t border-amber-100">
+                <div className="mt-5 pt-5">
                   <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-amber-500 mb-4">
                     Customize Your Order
                   </p>
 
-                  <div className="space-y-5">
+                  <div className="divide-y divide-black/10">
                     {customization!.sections.map((section, si) => (
-                      <div key={si}>
+                      <div key={si} className="py-5 first:pt-0 last:pb-0">
                         {/* Section header */}
                         <div className="flex items-center gap-2 mb-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-brand-red/60 flex-shrink-0" />
@@ -183,7 +187,7 @@ export function MenuItemModal({
               )}
 
               {/* Bottom note */}
-              <p className="mt-6 text-center text-xs text-slate-400">
+              <p className="mt-6 pt-4 border-t border-black/10 text-center text-xs text-slate-400">
                 Let your server know about any modifications when ordering.
               </p>
             </div>

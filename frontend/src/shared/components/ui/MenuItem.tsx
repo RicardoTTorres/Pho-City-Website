@@ -20,10 +20,10 @@ export function MenuItem({ name, price, description, image, popular, onClick }: 
       onClick={onClick}
       className={[
         "rounded-xl p-3 sm:p-5",
-        "bg-gradient-to-b from-amber-50/60 to-white",
-        "border border-amber-200/80",
+        "bg-gradient-to-b from-amber-50/30 to-white",
+        "border border-brand-charcoal/15",
         "transition-all duration-200",
-        "hover:border-amber-300 hover:shadow-md",
+        "hover:border-brand-charcoal/30 hover:shadow-md",
         onClick ? "cursor-pointer hover:shadow-lg active:scale-[0.985]" : "",
         "font-sans",
       ].join(" ")}

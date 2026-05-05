@@ -19,7 +19,7 @@ export default {
           redHover: "hsl(356 72% 33%)",
           gold: "hsl(42 86% 54%)",
           goldHover: "hsl(42 86% 45%)",
-          cream: "hsl(35 100% 97%)",
+          cream: "hsl(35 50% 94%)",
           charcoal: "hsl(12 12% 12%)",
           herb: "hsl(146 45% 36%)",
         },
