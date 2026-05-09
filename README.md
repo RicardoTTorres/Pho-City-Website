@@ -24,16 +24,17 @@ Another key problem this project addresses is creating an authorized administrat
 - [Deployment](#deployment)
 - [ER Diagram](#er-diagram)
 - [Figma Prototype](#figma-prototype)
+- [Website Screenshots](#website-screenshots)
 - [Jira Timeline](#jira-timeline)
-  - [Sprint 01](#sprint01)
-  - [Sprint 02](#sprint02)
-  - [Sprint 03](#sprint03)
-  - [Sprint 04](#sprint04)
-  - [Sprint 05](#sprint05)
-  - [Sprint 06](#sprint06)
-  - [Sprint 07](#sprint07)
-  - [Sprint 08](#sprint08)
-  - [Sprint 09](#sprint09)
+  - [Sprint 01](#sprint01---project-initialization)
+  - [Sprint 02](#sprint02---base-layout--structure)
+  - [Sprint 03](#sprint03---core-functionality-setup)
+  - [Sprint 04](#sprint04---ongoing-development)
+  - [Sprint 05](#sprint05---ongoing-development)
+  - [Sprint 06](#sprint06---ongoing-development)
+  - [Sprint 07](#sprint07---ongoing-development)
+  - [Sprint 08](#sprint08---testing)
+  - [Sprint 09](#sprint09---testing--deployment)
 - [Project Charter](#project-charter)
 - [Team Praxis Credits](#team-praxis-credits)
 
@@ -421,6 +422,7 @@ Pho-City-Website/
 - PC-165
 - PC-166
 - PC-168
+
 ## Sprint08 - Testing
 
 - PC-159
