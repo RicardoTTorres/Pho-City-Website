@@ -236,11 +236,7 @@ Pho-City-Website/
 
 # ER Diagram:
 
-<img src="assets/images/erd_1.png" width="700"/>
-<img src="assets/images/erd_2.png" width="700"/>
-<img src="assets/images/erd_3.png" width="700"/>
-<img src="assets/images/erd_4.png" width="700"/>
-<img src="assets/images/erd_5.png" width="700"/>
+<img src="assets/images/erd.png" width="700"/>
 
 <br></br>
 
