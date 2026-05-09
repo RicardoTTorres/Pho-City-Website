@@ -29,6 +29,11 @@ Another key problem this project addresses is creating an authorized administrat
   - [Sprint 02](#sprint02)
   - [Sprint 03](#sprint03)
   - [Sprint 04](#sprint04)
+  - [Sprint 05](#sprint05)
+  - [Sprint 06](#sprint06)
+  - [Sprint 07](#sprint07)
+  - [Sprint 08](#sprint08)
+  - [Sprint 09](#sprint09)
 - [Project Charter](#project-charter)
 - [Team Praxis Credits](#team-praxis-credits)
 
@@ -236,11 +241,7 @@ Pho-City-Website/
 
 # ER Diagram:
 
-<img src="assets/images/erd_1.png" width="700"/>
-<img src="assets/images/erd_2.png" width="700"/>
-<img src="assets/images/erd_3.png" width="700"/>
-<img src="assets/images/erd_4.png" width="700"/>
-<img src="assets/images/erd_5.png" width="700"/>
+<img src="assets/images/erd.png" width="700"/>
 
 <br></br>
 
@@ -274,9 +275,59 @@ Pho-City-Website/
 
 <br><br>
 
+# Website Screenshots:
+
+#### Home Page
+
+<img src="assets/images/home.png" width="700"/>
+
+#### Contact Page
+
+<img src="assets/images/contact.png" width="700"/>
+
+#### About Page
+
+<img src="assets/images/about.png" width="700"/>
+
+#### Menu Page
+
+<img src="assets/images/menu.png" width="700"/>
+
+### CMS
+
+#### Admin Dashboard
+
+<img src="assets/images/admin_dashboard.png" width="700"/>
+
+#### Admin Users
+
+<img src="assets/images/admin_users.png" width="700"/>
+
+#### Admin Menu
+
+<img src="assets/images/admin_menu.png" width="700"/>
+
+#### Admin Content
+
+<img src="assets/images/admin_content_hero.png" width="700"/>
+
+#### Admin Media
+
+<img src="assets/images/admin_media.png" width="700"/>
+
+#### Admin Messages
+
+<img src="assets/images/admin_messages.png" width="700"/>
+
+#### Admin Settings
+
+<img src="assets/images/admin_settings.png" width="700"/>
+
+<br><br>
+
 # Jira Timeline:
 
-#### Sprint01 - Project Initialization
+## Sprint01 - Project Initialization
 
 - Create ERD
 - Research API
@@ -288,9 +339,7 @@ Pho-City-Website/
 - Retrospective notes
 - Client review meeting
 
-<br><br>
-
-#### Sprint02 - Base Layout & Structure
+## Sprint02 - Base Layout & Structure
 
 - PC-7
 - PC-60
@@ -301,9 +350,7 @@ Pho-City-Website/
 - PC-17
 - PC-72
 
-<br><br>
-
-#### Sprint03 - Core Functionality Setup
+## Sprint03 - Core Functionality Setup
 
 - PC-55
 - PC-46
@@ -318,9 +365,7 @@ Pho-City-Website/
 - PC-70
 - PC-80
 
-<br><br>
-
-#### Sprint04 - Ongoing Development
+## Sprint04 - Ongoing Development
 
 - PC-101
 - PC-90
@@ -336,60 +381,67 @@ Pho-City-Website/
 - PC-103
 - PC-96
 
-<br><br>
-
-#### Sprint05 - Future Development
-
-- PC-66
-- PC-67
-- PC-68
-- PC-69
-- PC-71
-- PC-98
-- PC-99
-- PC-97
-- PC-100
-- PC-102
-
-<br><br>
-
-#### Sprint06 - Future Development
-
-- PC-24
-- PC-25
-- PC-30
-- PC-31
-- PC-33
-- PC-28
-- PC-20
-- PC-86
-- PC-83
-- PC-97
-- PC-88
-- PC-89
-
-<br><br>
-
-#### Sprint07 - Future Development
+## Sprint05 - Ongoing Development
 
 - PC-23
 - PC-24
-- PC-42
-- PC-43
-- PC-44
-- PC-45
-- PC-32
-- PC-20
+- PC-83
+- PC-86
+- PC-88
+- PC-93
+- PC-94
+- PC-104
+- PC-106
+- PC-107
 
-<br><br>
+## Sprint06 - Ongoing Development
 
-#### Sprint08 - Future Development/ Testing
+- PC-23
+- PC-86
+- PC-87
+- PC-88
+- PC-93
+- PC-105
+- PC-108
+- PC-127
+- PC-135
+- PC-136
+- PC-137
+- PC-146
 
-- Funcational Testing
-- Usability/ UX Testing
-- Performance Testing
-- Compatibilty Testing
-- Security Testing
+## Sprint07 - Ongoing Development
+
+- PC-23
+- PC-109
+- PC-156
+- PC-157
+- PC-158
+- PC-163
+- PC-164
+- PC-165
+- PC-166
+- PC-168
+## Sprint08 - Testing
+
+- PC-159
+- PC-160
+- PC-161
+- PC-162
+- PC-169
+- PC-170
+- PC-171
+- PC-172
+
+## Sprint09 - Testing & Deployment
+
+- PC-167
+- PC-173
+- PC-174
+- PC-175
+- PC-176
+- PC-177
+- PC-178
+- PC-180
 
 <br><br>
 
