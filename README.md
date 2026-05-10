@@ -234,9 +234,203 @@ Pho-City-Website/
 
 # Testing:
 
+The project uses **Vitest** for backend unit tests and **Playwright** for end to end frontend tests.
+
+### Run Backend Unit Tests
+```bash
+cd backend
+npm test
+```
+This will run the test files located at `backend/tests/`. For example:
+
+tests/unit/controllers/menuController.test.js
+
+
+To run a specific test file only:
+```bash
+cd backend/tests
+npx vitest run heroController
+```
+
 <br><br>
 
 # Deployment:
+
+Pho city is deployed to AWS EC2
+
+## Steps:
+
+<details>
+<summary><b> 1. Prepare AWS EC2 Server </b></summary>
+<br>
+
+    1.1. Launch Ubuntu EC2 instance in AWS
+
+    1.2. Configure EC2 security group to allow:
+
+        - SSH traffic for server access
+        - HTTP traffic for website
+        - HTTPS traffic for SSL
+
+    1.3. Connect to the EC2 instance using SSH
+
+    1.4. update server packages
+
+    1.5.  install required softwares such as
+        - Node.js, Git, Nginx, PM2
+</details>
+
+<details>
+<summary> <b> 2. Clone the application Repository </b> </summary>
+<br>
+
+    2.1. Navigate to the root directory of the project
+
+    2.2. Clone the pho city Github Repository
+
+    2.3. Enter the project directory
+
+    2.4. Confirm the frontend, backend, and configuration files are present
+
+</details>
+
+<details>
+<summary> <b> 3. Configure Backend Environment Variables </b> </summary>
+<br>
+
+    3.1. Create or Update backend production environment file
+        - Database host
+        - Database username
+        - Database password
+        - Database name
+        - Authentication/JWT secret
+        - Backend port
+        - Production frontend URL
+        - S3 service link
+</details>
+
+<details>
+<summary> <b> 4. Install Backend Dependencies </b> </summary>
+<br>
+
+    4.1. From the backend directory:
+        - Install backend dependencies using npm
+        - Confirm installation completes without error
+        - Verify required backend packages are available
+  </details>
+
+<details>
+<summary> <b> 5. Configure MySQL Database </b> </summary>
+<br>
+
+    5.1. Create or connect to the MySQL database
+
+    5.2. Create required application tables
+
+    5.3. Run database migration scripts
+
+    5.4. Seed required starting data
+        - Admin user account
+        - Menu Categories
+        - Homepage content
+        - Site settings
+        - footer/navigation content
+
+    5.5. Confirm backend can connect to the database
+
+</details>
+
+<details>
+<summary><b> 6. Start Backend API with PM2 </b></summary>
+<br>
+
+    6.1. Start backend Express server using PM2
+
+    6.2. Save the PM2 process so it restarted after server reboot
+
+    6.3. Confirm backend process is online
+
+    6.4. Review PM2 logs for startup errors
+
+</details>
+
+<details>
+<summary> <b> 7. Install Frontend Dependencies and Build Frontend </b></summary>
+<br>
+
+    7.1. Install frontend dependencies using npm
+
+    7.2. Run production build command
+
+    7.3. Confirm Vite creates the production build files successfully
+
+    7.4. Verify that the build output directory is available for Nginx
+</details>
+
+<details>
+<summary> <b> 8. Configure Nginx </b> </summary>
+<br>
+
+    8.1. Forward backend API requests to the Express API
+
+    8.2. Nginx Configuration Includes:
+        - Domain name / server IP
+        - Frontend build directory as web root
+        - Fallback route for React Client-side routing
+        - Reverse proxy rule for backend API requests
+        - Headers for proxied requests
+
+    8.3. After Nginx Configuration
+        - Test Nginx configuration
+        - Reload or restart Nginx
+        - Confirm website loads in browser
+</details>
+
+<details>
+<summary> <b> 9. Configure DNS with AWS Route 53 </b></summary>
+<br>
+
+    9.1. Create domain record in AWS Route 53
+
+    9.2. Point domain to EC2 instance
+
+    9.3. Confirm DNS records resolve correctly
+
+    9.4. Visit production domain in browser to verify access
+</details>
+
+<details>
+<summary> <b> 10. Deploy Updates with Github Actions </b> </summary>
+<br>
+
+    10.1. Uses Github Actions to support automated deployment
+
+    10.2. Deployment workflow triggered when:
+        - pulling latest code onto EC2 server
+        - installing updated dependencies
+        - Running tests
+        - Rebuilding frontend
+        - Restarting backend with PM2
+        - Reloading Nginx
+</details>
+
+<details>
+<summary><b> 11. Post-Deployment Verification </b></summary>
+<br>
+
+| Area       | Task                                         |
+| ---------- | -------------------------------------------- |
+| Website    | Confirm public website loads                 |
+| Navigation | Test all pages and links                     |
+| Menu       | Confirm menu categories and items are correct|
+| CMS        | Update sample content and verify live update |
+| Database   | Confirm backend can read/write data          |
+| Mobile     | Test website on mobile screen size           |
+| Nginx      | Check for server/routing errors              |
+| PM2        | Confirm backend process is online            |
+| Logs       | Review PM2 and Nginx logs for errors         |
+
+</details>
 
 <br><br>
 
