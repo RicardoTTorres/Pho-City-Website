@@ -110,6 +110,28 @@ DB_PASS=Your MySQL root password
 DB_NAME=Your MySQL database name
 DB_PORT=3306
 
+# For authorization
+JWT_SECRET=Strong secret here
+
+# Set up a temporary login for testing
+ADMIN_DEFAULT_EMAIL=Your default email
+ADMIN_DEFAULT_PASSWORD=Your default password
+
+# Default gmail account for messages feature
+GMAIL_USER=your_email@example.com
+GMAIL_PASS=your_email_app_password
+
+# Google API details for messages feature
+CLIENT_ID=your_google_oauth_client_id
+CLIENT_SECRET=your_google_oauth_client_secret
+REDIRECT_URI=http://localhost:5000/api/admin/mail/oauth/callback
+
+# AWS details for media feature
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=us-west-1
+S3_BUCKET=your_s3_bucket_name
+
 # The url of the frontend to filter requests
 FRONTEND_ORIGIN="http://localhost:5173"
 
@@ -227,8 +249,33 @@ Pho-City-Website/
 | `POST /api/analytics/traffic`                        | Record a traffic visit                   |
 | **Admin Users**                                      |                                          |
 | `GET /api/adminUsers`                                | Get list of admin users                  |
+| `GET /api/adminUsers/:id`                            | Get admin user by id                     |
+| `POST /api/adminUsers`                               | Register admin user                      |
+| `PUT /api/adminUsers/:id`                            | Update admin user                        |
+| `DELETE /api/adminUsers/:id`                         | Delete admin user                        |
 | **Activity**                                         |                                          |
 | `GET /api/admin/activity`                            | Get recent admin activity log            |
+| **Mail**                                             |                                          |
+| `GET /api/admin/mail/oauth/state`                    | Get authentication info                  |
+| `GET /api/admin/mail/oauth/init`                     | Create Google authentication URL         |
+| `GET /api/admin/mail/oauth/callback`                 | Process Google authentication token      |
+| `GET /api/admin/mail/threads`                        | Get list of threads                      |
+| `GET /api/admin/mail/threads/:id`                    | Get messages in a thread                 |
+| `POST /api/admin/mail/threads/:id/read`              | Mark thread as read                      |
+| `POST /api/admin/mail/threads/:id/unread`            | Mark thread as unread                    |
+| `POST /api/admin/mail/threads/:id/reply`             | Post reply to thread                     |
+| `DELETE /api/admin/mail/threads/:id`                 | Move thread to trash                     |
+| `GET /api/admin/mail/savedthreads`                   | Get threads saved in database            |
+| **Settings**                                         |                                          |
+| `GET /api/settings/public`                           | Get public settings without auth         |
+| `GET /api/settings`                                  | Get all settings (with auth)             |
+| `PUT /api/settings`                                  | Change settings                          |
+| `GET /api/settings/inbox`                            | Get saved contact form submissions       |
+| `PATCH /api/settings/inbox/:id/read`                 | Mark contact submission as read          |
+| **Upload**                                           |                                          |
+| `GET /api/upload`                                    | Get list of media                        |
+| `POST /api/upload`                                   | Upload media                             |
+| `DELETE /api/upload`                                 | Delete media                             |
 
 <br><br>
 
