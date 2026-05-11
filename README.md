@@ -109,9 +109,12 @@ DB_USER=root
 DB_PASS=Your MySQL root password
 DB_NAME=Your MySQL database name
 DB_PORT=3306
+DB_CONNECT_TIMEOUT_MS=10000
+DB_CONNECTION_LIMIT=10
 
 # For authorization
 JWT_SECRET=Strong secret here
+AUTH_TOKEN_TTL_DAYS=30
 
 # Set up a temporary login for testing
 ADMIN_DEFAULT_EMAIL=Your default email
@@ -132,8 +135,11 @@ AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 AWS_REGION=us-west-1
 S3_BUCKET=your_s3_bucket_name
 
-# The url of the frontend to filter requests
+# The url(s) of the frontend to filter requests
+# Single origin:
 FRONTEND_ORIGIN="http://localhost:5173"
+# Multiple origins (comma separated):
+# FRONTEND_ORIGIN="http://localhost:5173,https://phocitysac.com"
 
 # The port to run the Express server on
 PORT=5000
@@ -142,7 +148,10 @@ PORT=5000
 In the frontend folder, create a file titled `.env` with the following contents:
 
 ```bash
-# The url of the backend api
+# Used by Vite dev proxy in frontend/vite.config.ts
+LOCAL_BACKEND_URL="http://localhost:5000"
+
+# Used by frontend fetch calls in production builds
 VITE_API_URL="http://localhost:5000"
 ```
 
@@ -161,7 +170,7 @@ Pho-City-Website/
 │   │   │   └── requireAuth.js        # JWT auth guard for protected endpoints
 │   │   └── db/                       # Database utilities
 │   │       └── connect_db.js         # MySQL connection pool
-│   ├── db/                           # SQL artifacts (migrations, seeds)
+│   ├── db/                           # SQL schema and seed scripts
 │   ├── package.json
 │   └── package-lock.json
 │
@@ -191,7 +200,6 @@ Pho-City-Website/
 │   │   │   ├── components/ui/        # Shared UI components
 │   │   │   ├── config/               # Configuration constants
 │   │   │   ├── content/              # Content models & types
-│   │   │   ├── data/                 # Static/mock data
 │   │   │   ├── lib/                  # Utility functions
 │   │   │   └── menu/                 # Menu data utilities
 │   │   │
@@ -207,75 +215,86 @@ Pho-City-Website/
 
 # Backend API:
 
-| Route                                                | Description                              |
-| ---------------------------------------------------- | ---------------------------------------- |
-| **About**                                            |                                          |
-| `GET /api/about`                                     | Get about page contents                  |
-| `PUT /api/about`                                     | Edit about page contents                 |
-| **Auth**                                             |                                          |
-| `POST /api/admin/login`                              | Admin login                              |
-| `POST /api/admin/logout`                             | Admin logout                             |
-| `GET /api/admin/me`                                  | Get current authenticated user           |
-| `GET /api/admin/verify`                              | Verify auth token                        |
-| `POST /api/admin/update-password`                    | Update admin password                    |
-| **Contact**                                          |                                          |
-| `POST /api/contact`                                  | Send message from contact page           |
-| `GET /api/admin/contact`                             | Get contact page contents                |
-| `PUT /api/admin/contact`                             | Edit contact page contents               |
-| **Hero**                                             |                                          |
-| `GET /api/hero`                                      | Get hero section contents                |
-| `PUT /api/hero`                                      | Edit hero section contents               |
-| **Navbar**                                           |                                          |
-| `GET /api/navbar`                                    | Get navbar configuration                 |
-| `PUT /api/admin/navbar`                              | Edit navbar configuration                |
-| **Footer**                                           |                                          |
-| `GET /api/footer`                                    | Get footer configuration                 |
-| `PUT /api/footer`                                    | Edit footer configuration                |
-| **Dashboard**                                        |                                          |
-| `GET /api/admin/dashboard/stats`                     | Get stats for dashboard page             |
-| **Menu**                                             |                                          |
-| `GET /api/menu`                                      | Get all public menu data                 |
-| `GET /api/menu/admin`                                | Get all menu data including hidden items |
-| `POST /api/menu/categories`                          | Create new category                      |
-| `PUT /api/menu/categories/:id`                       | Edit category                            |
-| `DELETE /api/menu/categories/:id`                    | Delete category                          |
-| `PUT /api/menu/categories/reorder`                   | Reorder categories                       |
-| `POST /api/menu/items`                               | Create new menu item                     |
-| `PUT /api/menu/items/:id`                            | Edit menu item                           |
-| `DELETE /api/menu/items/:id`                         | Delete menu item                         |
-| `PUT /api/menu/categories/:categoryId/items/reorder` | Reorder items within a category          |
-| **Analytics**                                        |                                          |
-| `GET /api/admin/analytics/traffic`                   | Get traffic analytics data               |
-| `POST /api/analytics/traffic`                        | Record a traffic visit                   |
-| **Admin Users**                                      |                                          |
-| `GET /api/adminUsers`                                | Get list of admin users                  |
-| `GET /api/adminUsers/:id`                            | Get admin user by id                     |
-| `POST /api/adminUsers`                               | Register admin user                      |
-| `PUT /api/adminUsers/:id`                            | Update admin user                        |
-| `DELETE /api/adminUsers/:id`                         | Delete admin user                        |
-| **Activity**                                         |                                          |
-| `GET /api/admin/activity`                            | Get recent admin activity log            |
-| **Mail**                                             |                                          |
-| `GET /api/admin/mail/oauth/state`                    | Get authentication info                  |
-| `GET /api/admin/mail/oauth/init`                     | Create Google authentication URL         |
-| `GET /api/admin/mail/oauth/callback`                 | Process Google authentication token      |
-| `GET /api/admin/mail/threads`                        | Get list of threads                      |
-| `GET /api/admin/mail/threads/:id`                    | Get messages in a thread                 |
-| `POST /api/admin/mail/threads/:id/read`              | Mark thread as read                      |
-| `POST /api/admin/mail/threads/:id/unread`            | Mark thread as unread                    |
-| `POST /api/admin/mail/threads/:id/reply`             | Post reply to thread                     |
-| `DELETE /api/admin/mail/threads/:id`                 | Move thread to trash                     |
-| `GET /api/admin/mail/savedthreads`                   | Get threads saved in database            |
-| **Settings**                                         |                                          |
-| `GET /api/settings/public`                           | Get public settings without auth         |
-| `GET /api/settings`                                  | Get all settings (with auth)             |
-| `PUT /api/settings`                                  | Change settings                          |
-| `GET /api/settings/inbox`                            | Get saved contact form submissions       |
-| `PATCH /api/settings/inbox/:id/read`                 | Mark contact submission as read          |
-| **Upload**                                           |                                          |
-| `GET /api/upload`                                    | Get list of media                        |
-| `POST /api/upload`                                   | Upload media                             |
-| `DELETE /api/upload`                                 | Delete media                             |
+Auth route note: this table uses `/api/auth/*` as the canonical auth prefix. Equivalent `/api/admin/*` aliases are also mounted for the same auth handlers.
+
+| Route                                                | Access        | Description                              |
+| ---------------------------------------------------- | ------------- | ---------------------------------------- |
+| **About**                                            |               |                                          |
+| `GET /api/about`                                     | Public        | Get about page contents                  |
+| `PUT /api/about`                                     | Authenticated | Edit about page contents                 |
+| **Auth**                                             |               |                                          |
+| `GET /api/auth/login`                                | Public        | Login endpoint hint                      |
+| `POST /api/auth/login`                               | Public        | Admin login                              |
+| `POST /api/auth/logout`                              | Public        | Admin logout                             |
+| `GET /api/auth/me`                                   | Authenticated | Get current authenticated user           |
+| `GET /api/auth/verify`                               | Public        | Verify auth token from auth cookie       |
+| `POST /api/auth/update-password`                     | Authenticated | Update admin password                    |
+| `POST /api/auth/forgot-password`                     | Public        | Send password reset code                 |
+| `POST /api/auth/reset-password`                      | Public        | Reset password with code                 |
+| **Contact**                                          |               |                                          |
+| `GET /api/contact`                                   | Public        | Get contact page contents                |
+| `POST /api/contact`                                  | Public        | Send message from contact page           |
+| `GET /api/admin/contact`                             | Authenticated | Get admin editable contact contents      |
+| `PUT /api/admin/contact`                             | Authenticated | Edit contact page contents               |
+| **Hero**                                             |               |                                          |
+| `GET /api/hero`                                      | Public        | Get hero section contents                |
+| `PUT /api/hero`                                      | Authenticated | Edit hero section contents               |
+| **Navbar**                                           |               |                                          |
+| `GET /api/navbar`                                    | Public        | Get navbar configuration                 |
+| `PUT /api/admin/navbar`                              | Admin         | Edit navbar configuration                |
+| **Footer**                                           |               |                                          |
+| `GET /api/footer`                                    | Public        | Get footer configuration                 |
+| `PUT /api/footer`                                    | Authenticated | Edit footer configuration                |
+| **Dashboard**                                        |               |                                          |
+| `GET /api/admin/dashboard/stats`                     | Authenticated | Get stats for dashboard page             |
+| **Menu**                                             |               |                                          |
+| `GET /api/menu`                                      | Public        | Get all public menu data                 |
+| `GET /api/menu/featured`                             | Public        | Get featured menu items                  |
+| `GET /api/menu/pdf`                                  | Public        | Download menu PDF                        |
+| `GET /api/menu/customizations`                       | Public        | Get customization groups                 |
+| `GET /api/menu/admin`                                | Authenticated | Get all menu data including hidden items |
+| `POST /api/menu/categories`                          | Authenticated | Create new category                      |
+| `PUT /api/menu/categories/:id`                       | Authenticated | Edit category                            |
+| `DELETE /api/menu/categories/:id`                    | Admin         | Delete category                          |
+| `PUT /api/menu/categories/reorder`                   | Authenticated | Reorder categories                       |
+| `PUT /api/menu/categories/:id/customization`         | Authenticated | Upsert category customization            |
+| `DELETE /api/menu/categories/:id/customization`      | Admin         | Delete category customization            |
+| `POST /api/menu/items`                               | Authenticated | Create new menu item                     |
+| `PUT /api/menu/items/:id`                            | Authenticated | Edit menu item                           |
+| `DELETE /api/menu/items/:id`                         | Admin         | Delete menu item                         |
+| `PUT /api/menu/categories/:categoryId/items/reorder` | Authenticated | Reorder items within a category          |
+| **Analytics**                                        |               |                                          |
+| `GET /api/admin/analytics/traffic`                   | Authenticated | Get traffic analytics data               |
+| `POST /api/analytics/traffic`                        | Public        | Record a traffic visit                   |
+| **Admin Users**                                      |               |                                          |
+| `GET /api/adminUsers`                                | Admin         | Get list of admin users                  |
+| `GET /api/adminUsers/:id`                            | Admin         | Get admin user by id                     |
+| `POST /api/adminUsers`                               | Admin         | Register admin user                      |
+| `PUT /api/adminUsers/:id`                            | Admin         | Update admin user                        |
+| `DELETE /api/adminUsers/:id`                         | Admin         | Delete admin user                        |
+| **Activity**                                         |               |                                          |
+| `GET /api/admin/activity`                            | Authenticated | Get recent admin activity log            |
+| **Mail**                                             |               |                                          |
+| `GET /api/admin/mail/oauth/state`                    | Authenticated | Get authentication info                  |
+| `GET /api/admin/mail/oauth/init`                     | Authenticated | Create Google authentication URL         |
+| `GET /api/admin/mail/oauth/callback`                 | Authenticated | Process Google authentication token      |
+| `GET /api/admin/mail/threads`                        | Authenticated | Get list of threads                      |
+| `GET /api/admin/mail/threads/:id`                    | Authenticated | Get messages in a thread                 |
+| `POST /api/admin/mail/threads/:id/read`              | Authenticated | Mark thread as read                      |
+| `POST /api/admin/mail/threads/:id/unread`            | Authenticated | Mark thread as unread                    |
+| `POST /api/admin/mail/threads/:id/reply`             | Authenticated | Post reply to thread                     |
+| `DELETE /api/admin/mail/threads/:id`                 | Authenticated | Move thread to trash                     |
+| `GET /api/admin/mail/savedthreads`                   | Authenticated | Get threads saved in database            |
+| **Settings**                                         |               |                                          |
+| `GET /api/settings/public`                           | Public        | Get public settings without auth         |
+| `GET /api/settings`                                  | Authenticated | Get all settings (with auth)             |
+| `PUT /api/settings`                                  | Admin         | Change settings                          |
+| `GET /api/settings/inbox`                            | Authenticated | Get saved contact form submissions       |
+| `PATCH /api/settings/inbox/:id/read`                 | Authenticated | Mark contact submission as read          |
+| **Upload**                                           |               |                                          |
+| `GET /api/upload`                                    | Authenticated | Get list of media                        |
+| `POST /api/upload`                                   | Authenticated | Upload media                             |
+| `DELETE /api/upload`                                 | Admin         | Delete media                             |
 
 <br><br>
 
@@ -284,19 +303,41 @@ Pho-City-Website/
 The project uses **Vitest** for backend unit tests and **Playwright** for end to end frontend tests.
 
 ### Run Backend Unit Tests
+
 ```bash
 cd backend
 npm test
 ```
+
 This will run the test files located at `backend/tests/`. For example:
 
 tests/unit/controllers/menuController.test.js
 
-
 To run a specific test file only:
+
 ```bash
 cd backend/tests
 npx vitest run heroController
+```
+
+### Run Frontend End to End Tests
+
+```bash
+cd frontend
+npm run test:e2e
+```
+
+Other useful frontend test commands:
+
+```bash
+# Open Playwright UI mode
+npm run test:e2e:ui
+
+# Run tests with visible browser
+npm run test:e2e:headed
+
+# Open the latest Playwright report
+npm run test:e2e:report
 ```
 
 <br><br>
@@ -325,6 +366,7 @@ Pho city is deployed to AWS EC2
 
     1.5.  install required softwares such as
         - Node.js, Git, Nginx, PM2
+
 </details>
 
 <details>
@@ -354,6 +396,7 @@ Pho city is deployed to AWS EC2
         - Backend port
         - Production frontend URL
         - S3 service link
+
 </details>
 
 <details>
@@ -364,6 +407,7 @@ Pho city is deployed to AWS EC2
         - Install backend dependencies using npm
         - Confirm installation completes without error
         - Verify required backend packages are available
+
   </details>
 
 <details>
@@ -374,7 +418,10 @@ Pho city is deployed to AWS EC2
 
     5.2. Create required application tables
 
-    5.3. Run database migration scripts
+    5.3. Run SQL setup scripts from backend/db/
+        - schema.sql
+        - seed.sql (optional sample data)
+        - init.sql (legacy full dump if needed)
 
     5.4. Seed required starting data
         - Admin user account
@@ -412,6 +459,7 @@ Pho city is deployed to AWS EC2
     7.3. Confirm Vite creates the production build files successfully
 
     7.4. Verify that the build output directory is available for Nginx
+
 </details>
 
 <details>
@@ -431,6 +479,7 @@ Pho city is deployed to AWS EC2
         - Test Nginx configuration
         - Reload or restart Nginx
         - Confirm website loads in browser
+
 </details>
 
 <details>
@@ -444,6 +493,7 @@ Pho city is deployed to AWS EC2
     9.3. Confirm DNS records resolve correctly
 
     9.4. Visit production domain in browser to verify access
+
 </details>
 
 <details>
@@ -455,27 +505,31 @@ Pho city is deployed to AWS EC2
     10.2. Deployment workflow triggered when:
         - pulling latest code onto EC2 server
         - installing updated dependencies
-        - Running tests
         - Rebuilding frontend
         - Restarting backend with PM2
         - Reloading Nginx
+
+    10.3. Test coverage runs in CI on pull requests to main:
+        - Backend Vitest suite
+        - Frontend production build check
+
 </details>
 
 <details>
 <summary><b> 11. Post-Deployment Verification </b></summary>
 <br>
 
-| Area       | Task                                         |
-| ---------- | -------------------------------------------- |
-| Website    | Confirm public website loads                 |
-| Navigation | Test all pages and links                     |
-| Menu       | Confirm menu categories and items are correct|
-| CMS        | Update sample content and verify live update |
-| Database   | Confirm backend can read/write data          |
-| Mobile     | Test website on mobile screen size           |
-| Nginx      | Check for server/routing errors              |
-| PM2        | Confirm backend process is online            |
-| Logs       | Review PM2 and Nginx logs for errors         |
+| Area       | Task                                          |
+| ---------- | --------------------------------------------- |
+| Website    | Confirm public website loads                  |
+| Navigation | Test all pages and links                      |
+| Menu       | Confirm menu categories and items are correct |
+| CMS        | Update sample content and verify live update  |
+| Database   | Confirm backend can read/write data           |
+| Mobile     | Test website on mobile screen size            |
+| Nginx      | Check for server/routing errors               |
+| PM2        | Confirm backend process is online             |
+| Logs       | Review PM2 and Nginx logs for errors          |
 
 </details>
 
