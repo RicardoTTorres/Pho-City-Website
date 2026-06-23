@@ -9,6 +9,7 @@ import {
   deleteCategory,
   addItem,
   editItem,
+  bulkUpdateItemPrices,
   deleteItem,
   reorderCategories,
   reorderCategoryItems,
@@ -50,6 +51,7 @@ router.put("/categories/:id", requireAuth, editCategory);
 router.delete("/categories/:id", requireAuth, requireAdmin, deleteCategory);
 
 router.post("/items", requireAuth, addItem);
+router.put("/items/prices/bulk", requireAuth, requireAdmin, bulkUpdateItemPrices);
 router.put("/items/:id", requireAuth, editItem);
 router.delete("/items/:id", requireAuth, requireAdmin, deleteItem);
 

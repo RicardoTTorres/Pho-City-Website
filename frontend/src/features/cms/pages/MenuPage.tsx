@@ -6,12 +6,14 @@ import { MenuSectionEditor } from "@/features/cms/sections/MenuSectionEditor";
 import {
   createItem,
   updateItem,
+  bulkUpdateItemPrices,
   deleteItem,
   createCategory,
   updateCategory,
   deleteCategory,
   type NewItemPayload,
   type NewCategoryPayload,
+  type BulkPriceUpdatePayload,
 } from "@/shared/api/menu";
 import type {
   MenuData as RawMenuData,
@@ -131,6 +133,11 @@ export default function MenuPage() {
     await refreshMenuAdmin();
   };
 
+  const handleBulkUpdatePrices = async (updates: BulkPriceUpdatePayload[]) => {
+    await bulkUpdateItemPrices(updates);
+    await refreshMenuAdmin();
+  };
+
   const handleDeleteItem = async (id: string) => {
     await deleteItem(id);
     await refreshMenuAdmin();
@@ -192,6 +199,7 @@ export default function MenuPage() {
         loading={menuLoading}
         onCreateItem={handleCreateItem}
         onUpdateItem={handleUpdateItem}
+        onBulkUpdatePrices={handleBulkUpdatePrices}
         onDeleteItem={handleDeleteItem}
         onCreateCategory={handleCreateCategory}
         onUpdateCategory={handleUpdateCategory}

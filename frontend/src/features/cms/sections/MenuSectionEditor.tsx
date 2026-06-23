@@ -53,7 +53,11 @@ import type {
   Category,
   MenuData,
 } from "@/features/cms/pages/MenuPage";
-import type { NewItemPayload, NewCategoryPayload } from "@/shared/api/menu";
+import type {
+  NewItemPayload,
+  NewCategoryPayload,
+  BulkPriceUpdatePayload,
+} from "@/shared/api/menu";
 
 // ── Customization templates ───────────────────────────────────────────────────
 
@@ -392,12 +396,51 @@ interface MenuSectionEditorProps {
   loading: boolean;
   onCreateItem: (data: NewItemPayload) => Promise<void>;
   onUpdateItem: (id: string, data: NewItemPayload) => Promise<void>;
+  onBulkUpdatePrices: (updates: BulkPriceUpdatePayload[]) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onCreateCategory: (data: NewCategoryPayload) => Promise<void>;
   onUpdateCategory: (id: string, data: NewCategoryPayload) => Promise<void>;
   onDeleteCategory: (id: string) => Promise<void>;
   onReorderCategories: (categoryIds: string[]) => Promise<void>;
   onReorderItems: (categoryId: string, itemIds: string[]) => Promise<void>;
+}
+
+type BulkPriceRow = {
+  id: string;
+  name: string;
+  category: string;
+  currentPrice: string;
+  newPrice: string;
+};
+
+function normalizeEditablePrice(price: string | number) {
+  const raw = String(price).replace(/[^0-9.]/g, "");
+  const num = Number.parseFloat(raw);
+  return Number.isFinite(num) ? num.toFixed(2) : "";
+}
+
+function validateBulkPrice(price: string) {
+  const value = price.trim();
+  if (value === "") return { ok: false, error: "Price is required" };
+  if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+    return { ok: false, error: "Use a valid price with up to 2 decimals" };
+  }
+
+  const numericPrice = Number(value);
+  if (!Number.isFinite(numericPrice)) {
+    return { ok: false, error: "Use a valid price" };
+  }
+  if (numericPrice < 0) return { ok: false, error: "Price cannot be negative" };
+  if (numericPrice > 9999.99) {
+    return { ok: false, error: "Price must be 9999.99 or less" };
+  }
+
+  return { ok: true, normalized: numericPrice.toFixed(2), error: "" };
+}
+
+function formatPriceForDisplay(price: string | number) {
+  const normalized = normalizeEditablePrice(price);
+  return normalized ? `$${normalized}` : String(price);
 }
 
 // ── Sortable Featured Row ─────────────────────────────────────────────────────
@@ -832,6 +875,7 @@ export function MenuSectionEditor({
   loading,
   onCreateItem,
   onUpdateItem,
+  onBulkUpdatePrices,
   onDeleteItem,
   onCreateCategory,
   onUpdateCategory,
@@ -850,6 +894,10 @@ export function MenuSectionEditor({
     categoryId: "",
     image: "",
   });
+  const [bulkPriceModalOpen, setBulkPriceModalOpen] = useState(false);
+  const [bulkPriceStep, setBulkPriceStep] = useState<"edit" | "confirm">("edit");
+  const [bulkPriceRows, setBulkPriceRows] = useState<BulkPriceRow[]>([]);
+  const [bulkPriceSubmitting, setBulkPriceSubmitting] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryFormData, setCategoryFormData] = useState({ name: "" });
@@ -931,6 +979,19 @@ export function MenuSectionEditor({
 
   const visibleItemsCount = filteredItems.filter((item) => item.visible).length;
 
+  const bulkRowsWithValidation = bulkPriceRows.map((row) => {
+    const validation = validateBulkPrice(row.newPrice);
+    return { row, validation };
+  });
+  const bulkChangedRows = bulkRowsWithValidation.filter(({ row, validation }) => (
+    validation.ok && validation.normalized !== row.currentPrice
+  ));
+  const bulkInvalidRows = bulkRowsWithValidation.filter(({ row, validation }) => (
+    row.newPrice.trim() !== row.currentPrice && !validation.ok
+  ));
+  const canReviewBulkPrices =
+    bulkChangedRows.length > 0 && bulkInvalidRows.length === 0 && !bulkPriceSubmitting;
+
   const handleAddItem = () => {
     setEditingItem(null);
     setItemFormData({
@@ -941,6 +1002,54 @@ export function MenuSectionEditor({
       image: "",
     });
     setItemModalOpen(true);
+  };
+
+  const handleOpenBulkPriceEditor = () => {
+    setBulkPriceRows(
+      filteredItems.map((item) => {
+        const currentPrice = normalizeEditablePrice(item.price);
+        return {
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          currentPrice,
+          newPrice: currentPrice,
+        };
+      }),
+    );
+    setBulkPriceStep("edit");
+    setBulkPriceModalOpen(true);
+  };
+
+  const handleBulkPriceChange = (id: string, price: string) => {
+    setBulkPriceRows((rows) =>
+      rows.map((row) => (row.id === id ? { ...row, newPrice: price } : row)),
+    );
+    setBulkPriceStep("edit");
+  };
+
+  const handleSubmitBulkPrices = async () => {
+    const updates = bulkChangedRows
+      .map(({ row, validation }) => ({
+        id: row.id,
+        price: validation.normalized ?? "",
+      }))
+      .filter((update) => update.price !== "");
+
+    if (updates.length === 0 || bulkInvalidRows.length > 0) return;
+
+    setBulkPriceSubmitting(true);
+    try {
+      await onBulkUpdatePrices(updates);
+      setBulkPriceModalOpen(false);
+      setBulkPriceStep("edit");
+      showToast(`Updated ${updates.length} price${updates.length !== 1 ? "s" : ""}.`, "success");
+    } catch (error) {
+      console.error("Error bulk updating prices:", error);
+      showToast("Failed to update prices. Please try again.", "error");
+    } finally {
+      setBulkPriceSubmitting(false);
+    }
   };
 
   const handleEditItem = (item: MenuItem) => {
@@ -1287,13 +1396,24 @@ export function MenuSectionEditor({
                 {visibleItemsCount} visible
               </span>
             </div>
-            <Button
-              onClick={handleAddItem}
-              className="w-full sm:w-auto bg-brand-red hover:bg-brand-gold text-white text-sm md:text-base"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Button
+                type="button"
+                onClick={handleOpenBulkPriceEditor}
+                disabled={filteredItems.length === 0}
+                className="w-full sm:w-auto bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 text-sm md:text-base"
+              >
+                <SlidersHorizontal className="w-4 h-4 mr-2" />
+                Bulk Prices
+              </Button>
+              <Button
+                onClick={handleAddItem}
+                className="w-full sm:w-auto bg-brand-red hover:bg-brand-gold text-white text-sm md:text-base"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Item
+              </Button>
+            </div>
           </div>
 
           {/* Items List */}
@@ -1377,6 +1497,193 @@ export function MenuSectionEditor({
             )}
           </div>
         </div>
+      )}
+
+      {/* Bulk Price Modal */}
+      {bulkPriceModalOpen && (
+        <Portal>
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 max-w-3xl w-full max-h-[92vh] overflow-y-auto">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-brand-red">
+                    Bulk Price Update
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {bulkPriceStep === "edit"
+                      ? "Edit prices for the currently visible menu items."
+                      : "Review price changes before updating."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBulkPriceModalOpen(false)}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                  aria-label="Close bulk price editor"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {bulkPriceStep === "edit" ? (
+                <>
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="hidden sm:grid grid-cols-[1fr_120px_150px] gap-3 px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span>Item</span>
+                      <span>Current</span>
+                      <span>New Price</span>
+                    </div>
+                    <div className="divide-y divide-gray-100">
+                      {bulkRowsWithValidation.map(({ row, validation }) => {
+                        const { english, vietnamese } = parseBilingualName(row.name);
+                        const changed =
+                          validation.ok && validation.normalized !== row.currentPrice;
+                        const invalid =
+                          row.newPrice.trim() !== row.currentPrice && !validation.ok;
+
+                        return (
+                          <div
+                            key={row.id}
+                            className="grid gap-2 px-3 py-3 sm:grid-cols-[1fr_120px_150px] sm:items-center"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {english}
+                              </p>
+                              {vietnamese && (
+                                <p className="text-xs text-gray-400 italic truncate">
+                                  {vietnamese}
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-500 truncate">
+                                {row.category}
+                              </p>
+                            </div>
+                            <div className="text-sm font-semibold text-gray-700 tabular-nums">
+                              {formatPriceForDisplay(row.currentPrice)}
+                            </div>
+                            <div>
+                              <label htmlFor={`bulk-price-${row.id}`} className="sr-only">
+                                New price for {english}
+                              </label>
+                              <input
+                                id={`bulk-price-${row.id}`}
+                                type="number"
+                                min="0"
+                                max="9999.99"
+                                step="0.01"
+                                inputMode="decimal"
+                                value={row.newPrice}
+                                onChange={(e) =>
+                                  handleBulkPriceChange(row.id, e.target.value)
+                                }
+                                className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red ${
+                                  invalid
+                                    ? "border-red-300 bg-red-50"
+                                    : changed
+                                      ? "border-amber-300 bg-amber-50"
+                                      : "border-gray-300"
+                                }`}
+                              />
+                              {invalid && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {validation.error}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col-reverse sm:flex-row gap-3 justify-between sm:items-center pt-4">
+                    <p className="text-sm text-gray-500">
+                      {bulkChangedRows.length} changed
+                      {bulkInvalidRows.length > 0
+                        ? `, ${bulkInvalidRows.length} invalid`
+                        : ""}
+                    </p>
+                    <div className="flex flex-col-reverse sm:flex-row gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setBulkPriceModalOpen(false)}
+                        className="w-full sm:w-auto px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBulkPriceStep("confirm")}
+                        disabled={!canReviewBulkPrices}
+                        className="w-full sm:w-auto px-4 py-2.5 bg-brand-red hover:bg-brand-gold disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                      >
+                        Review Changes
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="grid grid-cols-[1fr_170px] gap-3 px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span>Item</span>
+                      <span>Price Change</span>
+                    </div>
+                    <div className="divide-y divide-gray-100">
+                      {bulkChangedRows.map(({ row, validation }) => {
+                        const { english, vietnamese } = parseBilingualName(row.name);
+                        return (
+                          <div
+                            key={row.id}
+                            className="grid grid-cols-[1fr_170px] gap-3 px-3 py-3 items-center"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {english}
+                              </p>
+                              {vietnamese && (
+                                <p className="text-xs text-gray-400 italic truncate">
+                                  {vietnamese}
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-500 truncate">
+                                {row.category}
+                              </p>
+                            </div>
+                            <div className="text-sm font-semibold text-gray-700 tabular-nums">
+                              {formatPriceForDisplay(row.currentPrice)} {"->"}{" "}
+                              {formatPriceForDisplay(validation.normalized ?? row.newPrice)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setBulkPriceStep("edit")}
+                      disabled={bulkPriceSubmitting}
+                      className="w-full sm:w-auto px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg transition-colors font-medium"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmitBulkPrices}
+                      disabled={bulkPriceSubmitting || bulkChangedRows.length === 0}
+                      className="w-full sm:w-auto px-4 py-2.5 bg-brand-red hover:bg-brand-gold disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                    >
+                      {bulkPriceSubmitting ? "Updating..." : "Update Prices"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </Portal>
       )}
 
       {/* Item Modal */}

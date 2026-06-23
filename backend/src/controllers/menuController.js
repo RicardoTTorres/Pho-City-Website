@@ -365,6 +365,123 @@ export async function editItem(req, res) {
   }
 }
 
+export async function bulkUpdateItemPrices(req, res) {
+  const conn = await pool.getConnection();
+  let transactionStarted = false;
+
+  try {
+    await conn.beginTransaction();
+    transactionStarted = true;
+
+    const { updates } = req.body;
+
+    if (!Array.isArray(updates) || updates.length === 0) {
+      await conn.rollback();
+      return res.status(400).json({ error: "updates must be a non-empty array" });
+    }
+
+    const seenIds = new Set();
+    const normalizedUpdates = [];
+
+    for (const update of updates) {
+      if (update === null || typeof update !== "object") {
+        await conn.rollback();
+        return res.status(400).json({ error: "Each update must include id and price" });
+      }
+
+      const { id, price } = update;
+      const idString = String(id ?? "").trim();
+
+      if (idString === "") {
+        await conn.rollback();
+        return res.status(400).json({ error: "Missing item id" });
+      }
+
+      if (!/^\d+$/.test(idString)) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Item id must be numeric" });
+      }
+
+      if (seenIds.has(idString)) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Duplicate item ids are not allowed" });
+      }
+
+      const priceString = String(price ?? "").trim();
+      if (!/^\d+(\.\d{1,2})?$/.test(priceString)) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Invalid price" });
+      }
+
+      const numericPrice = Number(priceString);
+      if (!Number.isFinite(numericPrice)) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Invalid price" });
+      }
+
+      if (numericPrice < 0) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Price cannot be negative" });
+      }
+
+      if (numericPrice > 9999.99) {
+        await conn.rollback();
+        return res.status(400).json({ error: "Price exceeds maximum allowed value" });
+      }
+
+      seenIds.add(idString);
+      normalizedUpdates.push({
+        id: Number(idString),
+        price: numericPrice.toFixed(2),
+      });
+    }
+
+    const itemIds = normalizedUpdates.map((update) => update.id);
+    const [existing] = await conn.query(
+      "SELECT item_id FROM menu_items WHERE item_id IN (?)",
+      [itemIds],
+    );
+
+    if (existing.length !== normalizedUpdates.length) {
+      await conn.rollback();
+      return res.status(400).json({ error: "One or more item ids do not exist" });
+    }
+
+    for (const update of normalizedUpdates) {
+      const [result] = await conn.query(
+        `
+        UPDATE menu_items
+        SET item_price = ?
+        WHERE item_id = ?;
+      `,
+        [update.price, update.id],
+      );
+
+      if (result.affectedRows < 1) {
+        await conn.rollback();
+        return res.status(400).json({ error: "One or more item ids do not exist" });
+      }
+    }
+
+    await conn.commit();
+    logActivity(
+      "updated",
+      "menu_item",
+      `Bulk updated prices for ${normalizedUpdates.length} menu items.`,
+      req.user?.email,
+    );
+    return res.status(200).json({ ok: true, updated: normalizedUpdates.length });
+  } catch (err) {
+    if (transactionStarted) {
+      await conn.rollback();
+    }
+    console.error("Error in menu/bulkUpdateItemPrices:", err);
+    return res.status(500).json({ error: "Error bulk updating item prices" });
+  } finally {
+    conn.release();
+  }
+}
+
 export async function deleteItem(req, res) {
   try {
     const id = req.params.id;

@@ -54,7 +54,13 @@ const MOCK_MENU = {
   },
 };
 
-async function setupMenuPage(page: Page) {
+async function setupMenuPage(
+  page: Page,
+  options: {
+    onBulkPriceUpdate?: (body: unknown) => void;
+    onSingleItemUpdate?: (body: unknown) => void;
+  } = {},
+) {
   await mockAdminSession(page);
 
   await page.route(/\/api\/menu\/admin(?:\?.*)?$/, (route) =>
@@ -66,6 +72,12 @@ async function setupMenuPage(page: Page) {
   );
 
   // Stub mutating endpoints so UI interactions complete without errors.
+  await page.route(/\/api\/menu\/items\/prices\/bulk(?:\?.*)?$/, async (route) => {
+    if (route.request().method() === "PUT") {
+      options.onBulkPriceUpdate?.(route.request().postDataJSON());
+    }
+    return route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+  });
   await page.route(/\/api\/menu\/items(?:\/[^/?#]+)?(?:\?.*)?$/, (route) => {
     const method = route.request().method();
     if (method === "POST") {
@@ -74,6 +86,9 @@ async function setupMenuPage(page: Page) {
         contentType: "application/json",
         body: JSON.stringify({ item: { id: "999", name: "New Item" } }),
       });
+    }
+    if (method === "PUT") {
+      options.onSingleItemUpdate?.(route.request().postDataJSON());
     }
     return route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
   });
@@ -193,6 +208,66 @@ test.describe("CMS Menu page — Items tab", () => {
     await expect(page.getByRole("heading", { name: "Pho Bo" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Bun Bo Hue" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Spring Rolls" })).not.toBeVisible();
+  });
+});
+
+
+test.describe("CMS Menu page — bulk price editing", () => {
+  test("single-item edit still submits through the existing item route", async ({
+    page,
+  }) => {
+    let singleItemBody: unknown = null;
+    await setupMenuPage(page, {
+      onSingleItemUpdate: (body) => {
+        singleItemBody = body;
+      },
+    });
+
+    await page.getByRole("button", { name: /edit/i }).first().click();
+    await page.locator('input[type="number"]').fill("14.25");
+    await page.getByRole("button", { name: /update item/i }).click();
+
+    expect(singleItemBody).toMatchObject({ price: 14.25 });
+  });
+
+  test("bulk price editor sends only changed prices after review", async ({
+    page,
+  }) => {
+    let bulkBody: unknown = null;
+    await setupMenuPage(page, {
+      onBulkPriceUpdate: (body) => {
+        bulkBody = body;
+      },
+    });
+
+    await page.getByRole("button", { name: /bulk prices/i }).click();
+    await expect(
+      page.getByRole("heading", { name: /bulk price update/i }),
+    ).toBeVisible();
+
+    await page.getByLabel("New price for Pho Bo").fill("14.99");
+    await page.getByLabel("New price for Spring Rolls").fill("7.50");
+    await page.getByRole("button", { name: /review changes/i }).click();
+
+    await expect(page.getByText("$12.99 -> $14.99")).toBeVisible();
+    await expect(page.getByText("$6.99 -> $7.50")).toBeVisible();
+    await page.getByRole("button", { name: /update prices/i }).click();
+
+    expect(bulkBody).toEqual({
+      updates: [
+        { id: "101", price: "14.99" },
+        { id: "201", price: "7.50" },
+      ],
+    });
+  });
+
+  test("bulk price review is disabled when no prices changed", async ({ page }) => {
+    await setupMenuPage(page);
+    await page.getByRole("button", { name: /bulk prices/i }).click();
+
+    await expect(
+      page.getByRole("button", { name: /review changes/i }),
+    ).toBeDisabled();
   });
 });
 

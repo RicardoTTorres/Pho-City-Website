@@ -19,6 +19,11 @@ export type NewCategoryPayload = {
   name: string;
 };
 
+export type BulkPriceUpdatePayload = {
+  id: string;
+  price: string;
+};
+
 const toNumberPrice = (price: string) => {
   const cleaned = price.toString().replace(/[^0-9.]/g, "");
   const n = Number.parseFloat(cleaned);
@@ -98,6 +103,18 @@ export async function updateItem(id: string, payload: NewItemPayload): Promise<v
     }),
   });
   if (!res.ok) throw new Error("Failed to update item");
+}
+
+export async function bulkUpdateItemPrices(
+  updates: BulkPriceUpdatePayload[],
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/menu/items/prices/bulk`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ updates }),
+  });
+  if (!res.ok) throw new Error("Failed to bulk update item prices");
 }
 
 export async function deleteItem(id: string): Promise<void> {

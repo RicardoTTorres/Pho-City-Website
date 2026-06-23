@@ -7,6 +7,7 @@ import {
   deleteCategory,
   addItem,
   editItem,
+  bulkUpdateItemPrices,
   deleteItem,
   reorderCategories,
   reorderCategoryItems,
@@ -575,6 +576,173 @@ describe("editItem", () => {
     await editItem(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "Error editing item" });
+  });
+});
+
+describe("bulkUpdateItemPrices", () => {
+  it("updates prices in one transaction and returns updated count", async () => {
+    const conn = mockConn();
+    conn.query
+      .mockResolvedValueOnce([[{ item_id: 10 }, { item_id: 20 }]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: {
+        updates: [
+          { id: "10", price: "12.99" },
+          { id: "20", price: "8" },
+        ],
+      },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.beginTransaction).toHaveBeenCalled();
+    expect(conn.query).toHaveBeenNthCalledWith(
+      1,
+      "SELECT item_id FROM menu_items WHERE item_id IN (?)",
+      [[10, 20]],
+    );
+    expect(conn.query).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("UPDATE menu_items"),
+      ["12.99", 10],
+    );
+    expect(conn.query).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining("UPDATE menu_items"),
+      ["8.00", 20],
+    );
+    expect(conn.commit).toHaveBeenCalled();
+    expect(conn.rollback).not.toHaveBeenCalled();
+    expect(conn.release).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ ok: true, updated: 2 });
+    expect(logActivity).toHaveBeenCalledWith(
+      "updated",
+      "menu_item",
+      "Bulk updated prices for 2 menu items.",
+      "admin@test.com",
+    );
+  });
+
+  it("returns 400 and rolls back for invalid price", async () => {
+    const conn = mockConn();
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: { updates: [{ id: "10", price: "12.999" }] },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.beginTransaction).toHaveBeenCalled();
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.query).not.toHaveBeenCalled();
+    expect(conn.release).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("returns 400 and rolls back for duplicate ids", async () => {
+    const conn = mockConn();
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: {
+        updates: [
+          { id: "10", price: "12.99" },
+          { id: "10", price: "13.99" },
+        ],
+      },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.query).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("returns 400 and rolls back for a missing item id", async () => {
+    const conn = mockConn();
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: { updates: [{ price: "12.99" }] },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.query).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Missing item id" });
+  });
+
+  it("returns an error and rolls back when an item id does not exist", async () => {
+    const conn = mockConn();
+    conn.query.mockResolvedValueOnce([[{ item_id: 10 }]]);
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: {
+        updates: [
+          { id: "10", price: "12.99" },
+          { id: "20", price: "13.99" },
+        ],
+      },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.query).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "One or more item ids do not exist",
+    });
+  });
+
+  it("rolls back and returns 500 on database error", async () => {
+    const conn = mockConn();
+    conn.query.mockRejectedValueOnce(new Error("DB error"));
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({
+      body: { updates: [{ id: "10", price: "12.99" }] },
+    });
+
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.release).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Error bulk updating item prices",
+    });
+  });
+
+  it("returns 400 and rolls back when updates is empty", async () => {
+    const conn = mockConn();
+    pool.getConnection.mockResolvedValueOnce(conn);
+
+    const { req, res } = mockReqRes({ body: { updates: [] } });
+    await bulkUpdateItemPrices(req, res);
+
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.commit).not.toHaveBeenCalled();
+    expect(conn.query).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "updates must be a non-empty array",
+    });
   });
 });
 
