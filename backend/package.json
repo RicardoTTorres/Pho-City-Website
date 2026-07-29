@@ -3,9 +3,12 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "migrate": "node src/db/migrateCli.js up",
+    "migrate:status": "node src/db/migrateCli.js status",
+    "test": "vitest run tests/unit",
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "test:watch": "vitest tests/unit",
+    "test:coverage": "vitest run tests/unit --coverage"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.999.0",
@@ -40,7 +43,7 @@
   "vitest": {
     "environment": "node",
     "include": [
-      "tests/**/*.test.js"
+      "tests/unit/**/*.test.js"
     ],
     "setupFiles": [
       "tests/setup.js"

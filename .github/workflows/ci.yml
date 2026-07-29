@@ -8,6 +8,18 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: integration-root-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pintegration-root-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     defaults:
       run:
@@ -28,6 +40,21 @@ jobs:
 
       - name: Run Vitest
         run: npm run test
+
+      - name: Run disposable MySQL integration tests
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
+          RUN_DB_INTEGRATION_TESTS: "true"
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PORT: 3306
+          TEST_DB_USER: root
+          TEST_DB_PASS: integration-root-password
+          TEST_DB_APPROVED_DATABASES: >-
+            pho_city_schema_test,
+            pho_city_migrations_empty_test,
+            pho_city_migrations_upgrade_test,
+            pho_city_legacy_upgrade_test
 
   frontend:
     runs-on: ubuntu-latest

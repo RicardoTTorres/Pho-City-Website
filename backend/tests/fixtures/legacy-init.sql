@@ -1,5 +1,9 @@
-CREATE DATABASE  IF NOT EXISTS `pho_city_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `pho_city_db`;
+-- DESTRUCTIVE HISTORICAL FIXTURE — INTEGRATION TESTS ONLY.
+--
+-- This file contains DROP TABLE statements and represents a legacy schema.
+-- Never use it for installation, staging, EC2, RDS, or any persistent database.
+-- The integration-test harness selects and approves a disposable database
+-- before this fixture may be applied.
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pho_city_db
@@ -265,10 +269,10 @@ UNLOCK TABLES;
 
 
 /* PC-104 Traffic Analytics requires new SQL tables. */
-/* These are also included separately in traffic_tables.sql */;
+/* These are also included separately in traffic_tables.sql */
 
 /* PC-104 Traffic Analytics requires new SQL tables. */
-/* These are also included in init.sql with the other tables. */;
+/* These are also included in init.sql with the other tables. */
 
 DROP TABLE IF EXISTS `traffic_dates`;
 CREATE TABLE `traffic_dates` (

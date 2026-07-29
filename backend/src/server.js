@@ -1,5 +1,5 @@
 // src/server.js
-import "dotenv/config";
+import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
@@ -20,7 +20,12 @@ import mailRoutes from "./routes/mailRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import { requireAuth } from "./middleware/requireAuth.js";
-import { ensureAdminTableAndSeed } from "./routes/auth.js";
+import { ensureDefaultAdmin } from "./routes/auth.js";
+import { validateDatabaseSchema } from "./db/validateSchema.js";
+
+if (process.env.NODE_ENV !== "test") {
+  dotenv.config();
+}
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -95,24 +100,27 @@ app.get("/", (req, res) => {
   res.send("Hi from server!");
 });
 
-async function startServer() {
-  try {
-    await ensureAdminTableAndSeed();
+export async function initializeApplicationDatabase() {
+  await validateDatabaseSchema();
+  await ensureDefaultAdmin();
+}
 
-    app.listen(process.env.PORT || 5000, () => {
-      console.log("Server running...");
-    });
-  } catch (err) {
-    console.error("Startup error:", err);
-  }
+export async function startServer() {
+  await initializeApplicationDatabase();
+  return app.listen(process.env.PORT || 5000, () => {
+    console.log("Server running...");
+  });
 }
 
 // added
 
 if (process.env.NODE_ENV !== "test") {
-  startServer();
+  startServer().catch((err) => {
+    console.error("Startup error:", err);
+    process.exitCode = 1;
+  });
 } else {
-  await ensureAdminTableAndSeed();
+  await initializeApplicationDatabase();
 }
 
 export default app;

@@ -93,8 +93,45 @@ CREATE DATABASE <db_name>;
 USE <db_name>;
 ```
 
-3. Click File -> Open SQL script and import .sql file and click lightning bolt icon
+3. For a clean installation, import `backend/db/schema.sql`. Optionally import
+   `backend/db/seed.sql` for sample content.
 4. See the section below to configure the .env file with the details of your database
+
+`schema.sql` is the only supported clean-install SQL file. The historical dump
+under `backend/tests/fixtures/legacy-init.sql` contains destructive `DROP TABLE`
+statements and is only for disposable integration tests.
+
+#### Versioned Migrations
+
+Existing databases must be upgraded through the explicit migration command.
+Migrations never run during normal application startup.
+The migration CLI deliberately does not load `backend/.env`; export the
+`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, and `DB_NAME` values intentionally
+for the approved target.
+
+```bash
+cd backend
+export MIGRATION_CONFIRM_TARGET="${DB_HOST}:${DB_PORT:-3306}/${DB_NAME}"
+npm run migrate:status
+npm run migrate
+```
+
+The runner prints the target host and database but never credentials. Remote
+targets additionally require the acknowledgement documented by the command.
+Do not point local or CI migration commands at RDS.
+
+Before an RDS migration:
+
+1. Review the migration status and source.
+2. Take an RDS snapshot.
+3. Restore and test the migrations against a staging copy.
+4. Verify authentication, menu, and About operations.
+5. Apply the migrations through the controlled deployment procedure.
+6. Confirm `npm run migrate:status` reports no pending migrations.
+7. Only then deploy the fail-fast startup validation change to EC2.
+
+Deploying the validation change first can intentionally prevent the API from
+starting when RDS is still on the previous schema.
 
 <br><br>
 
@@ -421,7 +458,10 @@ Pho city is deployed to AWS EC2
     5.3. Run SQL setup scripts from backend/db/
         - schema.sql
         - seed.sql (optional sample data)
-        - init.sql (legacy full dump if needed)
+
+        Existing databases use `npm run migrate`; do not apply schema.sql over
+        an existing database and never use the archived legacy fixture outside
+        disposable integration tests.
 
     5.4. Seed required starting data
         - Admin user account
