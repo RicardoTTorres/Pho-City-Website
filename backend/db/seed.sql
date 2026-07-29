@@ -57,15 +57,16 @@ INSERT INTO `ordering_links` (`platform_id`, `platform_name`, `platform_url`) VA
 ON DUPLICATE KEY UPDATE
   `platform_url` = VALUES(`platform_url`);
 
-INSERT INTO `menu_categories` (`category_id`, `category_name`) VALUES
-  (1, 'Pho'),
-  (2, 'Appetizers')
+INSERT INTO `menu_categories` (`category_id`, `category_name`, `position`) VALUES
+  (1, 'Pho', 0),
+  (2, 'Appetizers', 1)
 ON DUPLICATE KEY UPDATE
-  `category_name` = VALUES(`category_name`);
+  `category_name` = VALUES(`category_name`),
+  `position` = VALUES(`position`);
 
-INSERT INTO `menu_items` (`item_id`, `item_name`, `item_description`, `item_price`, `item_image_url`, `item_is_visible`, `category_id`, `is_featured`) VALUES
-  (1, 'Pho Tai', 'Beef noodle soup with rare steak', 15.00, NULL, 1, 1, 1),
-  (2, 'Goi Cuon', 'Fresh spring rolls', 9.00, NULL, 1, 2, 0)
+INSERT INTO `menu_items` (`item_id`, `item_name`, `item_description`, `item_price`, `item_image_url`, `item_is_visible`, `category_id`, `is_featured`, `is_popular`, `position`) VALUES
+  (1, 'Pho Tai', 'Beef noodle soup with rare steak', 15.00, NULL, 1, 1, 1, 0, 0),
+  (2, 'Goi Cuon', 'Fresh spring rolls', 9.00, NULL, 1, 2, 0, 0, 0)
 ON DUPLICATE KEY UPDATE
   `item_name` = VALUES(`item_name`),
   `item_description` = VALUES(`item_description`),
@@ -73,7 +74,9 @@ ON DUPLICATE KEY UPDATE
   `item_image_url` = VALUES(`item_image_url`),
   `item_is_visible` = VALUES(`item_is_visible`),
   `category_id` = VALUES(`category_id`),
-  `is_featured` = VALUES(`is_featured`);
+  `is_featured` = VALUES(`is_featured`),
+  `is_popular` = VALUES(`is_popular`),
+  `position` = VALUES(`position`);
 
 INSERT INTO `traffic_dates` (`date`, `date_views`) VALUES
   ('2025-11-10', 75),

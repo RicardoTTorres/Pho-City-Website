@@ -14,10 +14,17 @@ CREATE TABLE IF NOT EXISTS `about_page_content` (
   `hero_image_url`       VARCHAR(512) DEFAULT NULL,
   `beginning_title`      VARCHAR(150) DEFAULT NULL,
   `beginning_body`       TEXT,
+  `beginning_image_url`  VARCHAR(512) DEFAULT NULL,
+  `beginning_caption`    VARCHAR(255) DEFAULT NULL,
   `food_title`           VARCHAR(150) DEFAULT NULL,
   `food_body`            TEXT,
+  `food_image_url`       VARCHAR(512) DEFAULT NULL,
+  `food_caption`         VARCHAR(255) DEFAULT NULL,
+  `food_highlights`      TEXT,
   `commitment_title`     VARCHAR(150) DEFAULT NULL,
   `commitment_body`      TEXT,
+  `commitment_image_url` VARCHAR(512) DEFAULT NULL,
+  `commitment_caption`   VARCHAR(255) DEFAULT NULL,
   `closing_text`         TEXT,
   `preview_heading`      VARCHAR(150) DEFAULT NULL,
   `preview_body`         TEXT,
@@ -68,8 +75,10 @@ CREATE TABLE IF NOT EXISTS `hero_section` (
 CREATE TABLE IF NOT EXISTS `menu_categories` (
   `category_id` INT NOT NULL AUTO_INCREMENT,
   `category_name` VARCHAR(100) DEFAULT NULL,
+  `position` INT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`category_id`),
-  UNIQUE KEY `category_name` (`category_name`)
+  UNIQUE KEY `category_name` (`category_name`),
+  KEY `idx_menu_categories_position` (`position`, `category_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `menu_items` (
@@ -82,8 +91,12 @@ CREATE TABLE IF NOT EXISTS `menu_items` (
   `category_id` INT DEFAULT NULL,
   `is_featured` TINYINT(1) DEFAULT '0',
   `featured_position` TINYINT DEFAULT NULL,
+  `is_popular` TINYINT(1) NOT NULL DEFAULT 0,
+  `position` INT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`item_id`),
   KEY `category_id` (`category_id`),
+  KEY `idx_menu_items_category_position` (`category_id`, `position`, `item_id`),
+  KEY `idx_menu_items_featured_position` (`is_featured`, `item_is_visible`, `featured_position`),
   CONSTRAINT `menu_items_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `menu_categories` (`category_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -129,6 +142,20 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `admins_email_unique` (`email`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `token_blacklist` (
+  `jti` VARCHAR(36) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  PRIMARY KEY (`jti`),
+  KEY `idx_bl_expires` (`expires_at`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `email` VARCHAR(255) NOT NULL,
+  `code` VARCHAR(6) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `operating_hours` (
@@ -206,8 +233,7 @@ VALUES (
     )
   )
 ) ON DUPLICATE KEY UPDATE
-  `footer_json`   = VALUES(`footer_json`),
-  `settings_json` = VALUES(`settings_json`);
+  `id` = VALUES(`id`);
 
 CREATE TABLE IF NOT EXISTS `activity_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -251,7 +277,7 @@ CREATE TABLE IF NOT EXISTS `gmail_accounts` (
 CREATE TABLE IF NOT EXISTS `gmail_threads` (
   `email` VARCHAR(255) NOT NULL,
   `thread_id` VARCHAR(255) NOT NULL,
-  `history_id` INT,
+  `history_id` VARCHAR(32) DEFAULT NULL,
   PRIMARY KEY (`email`, `thread_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -259,7 +285,7 @@ CREATE TABLE IF NOT EXISTS `gmail_messages` (
   `email` VARCHAR(255) NOT NULL,
   `message_id` VARCHAR(255) NOT NULL,
   `thread_id` VARCHAR(255),
-  `history_id` INT,
+  `history_id` VARCHAR(32) DEFAULT NULL,
   `is_preview` BOOLEAN NOT NULL,
   `is_unread` BOOLEAN NOT NULL,
   `snippet` TEXT,
@@ -268,7 +294,8 @@ CREATE TABLE IF NOT EXISTS `gmail_messages` (
   `subject` TEXT,
   `from_name` TEXT,
   `from_email` VARCHAR(255),
-  PRIMARY KEY (`email`, `message_id`)
+  PRIMARY KEY (`email`, `message_id`),
+  KEY `idx_gmail_messages_thread_date` (`email`, `thread_id`, `date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `imap_accounts` (
   `email` VARCHAR(255) NOT NULL,
@@ -283,3 +310,21 @@ CREATE TABLE IF NOT EXISTS `imap_messages` (
   `body` TEXT,
   PRIMARY KEY (`email`, `message_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `schema_migrations` (
+  `version` VARCHAR(20) NOT NULL,
+  `name` VARCHAR(150) NOT NULL,
+  `checksum` CHAR(64) NOT NULL,
+  `applied_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`version`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+INSERT INTO `schema_migrations` (`version`, `name`, `checksum`) VALUES
+  ('001', 'content_and_contact', '76fb90ff186bf8562235cf7d78850c129e6efea1966af1a1bedf7753ef3d9319'),
+  ('002', 'menu_and_customization', 'ec4c7fbc2f31c0b281e91f6bba8c0ba61956d47927a60b9d05b8a728971a60c0'),
+  ('003', 'settings_activity_and_analytics', 'db0cd2171fd514bef4059bfc04c076ab12a1abd75469f2ec8040e0e10686b7fb'),
+  ('004', 'authentication', 'c63253760805b53d9d8d14b9becbebbd65432119923e6c50ab636e6029c70431'),
+  ('005', 'mail_cache', '4c44bff1ee62c66b3627e7178b64e7d039a72f10978882def3dfb2f1441fe2aa')
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `checksum` = VALUES(`checksum`);

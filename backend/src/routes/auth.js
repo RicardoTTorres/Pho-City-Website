@@ -32,32 +32,6 @@ const forgotPasswordLimiter = rateLimit({
 
 const router = express.Router();
 
-const ADMIN_TABLE_SQL = `
-CREATE TABLE IF NOT EXISTS admins (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL DEFAULT 'admin',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-`;
-
-const TOKEN_BLACKLIST_SQL = `
-CREATE TABLE IF NOT EXISTS token_blacklist (
-  jti VARCHAR(36) PRIMARY KEY,
-  expires_at DATETIME NOT NULL,
-  INDEX idx_bl_expires (expires_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-`;
-
-const PASSWORD_RESETS_SQL = `
-CREATE TABLE IF NOT EXISTS password_resets (
-  email VARCHAR(255) PRIMARY KEY,
-  code VARCHAR(6) NOT NULL,
-  expires_at DATETIME NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-`;
-
 const seedEmail = process.env.ADMIN_DEFAULT_EMAIL || "admin@phocity.com";
 const seedPassword = process.env.ADMIN_DEFAULT_PASSWORD || "changeme";
 
@@ -81,11 +55,25 @@ function signAccess(payload) {
   };
 }
 
-export async function ensureAdminTableAndSeed() {
-  // Ensure all auth-related tables exist
-  await pool.query(ADMIN_TABLE_SQL);
-  await pool.query(TOKEN_BLACKLIST_SQL);
-  await pool.query(PASSWORD_RESETS_SQL);
+export async function ensureDefaultAdmin() {
+  if (isProd) {
+    if (
+      !process.env.ADMIN_DEFAULT_EMAIL ||
+      !process.env.ADMIN_DEFAULT_PASSWORD
+    ) {
+      throw new Error(
+        "Production requires explicit ADMIN_DEFAULT_EMAIL and ADMIN_DEFAULT_PASSWORD values",
+      );
+    }
+    if (
+      seedPassword === "changeme" ||
+      seedPassword.length < 12
+    ) {
+      throw new Error(
+        "Production ADMIN_DEFAULT_PASSWORD must not be the insecure default and must be at least 12 characters",
+      );
+    }
+  }
 
   // Seed default admin if not present
   const [rows] = await pool.query(
@@ -99,17 +87,24 @@ export async function ensureAdminTableAndSeed() {
       "INSERT INTO admins (email, password_hash, role) VALUES (?, ?, 'admin')",
       [seedEmail, passwordHash],
     );
-    console.log(`Seeded default admin user: ${seedEmail}`);
+    console.log("Seeded configured default admin account.");
   }
 
-  // Warn loudly if the admin is still using the default password
-  const [adminRows] = await pool.query(
-    "SELECT password_hash FROM admins WHERE email = ? LIMIT 1",
-    [seedEmail],
-  );
-  if (adminRows.length > 0) {
-    const usingDefault = await bcrypt.compare("changeme", adminRows[0].password_hash);
-    if (usingDefault) {
+  // Never permit the known insecure default in production.
+  const [adminRows] = await pool.query("SELECT password_hash FROM admins");
+  let usingInsecureDefault = false;
+  for (const admin of adminRows) {
+    if (await bcrypt.compare("changeme", admin.password_hash)) {
+      usingInsecureDefault = true;
+      break;
+    }
+  }
+  if (usingInsecureDefault) {
+    if (isProd) {
+      throw new Error(
+        "Production startup refused because an admin account still uses the insecure default password",
+      );
+    } else {
       console.warn("\n" + "=".repeat(60));
       console.warn("  SECURITY WARNING");
       console.warn("  The admin account is still using the default password.");
@@ -244,7 +239,9 @@ router.post("/forgot-password", forgotPasswordLimiter, async (req, res) => {
     );
 
     // Log for dev environments without email configured
-    console.log(`[Password Reset] OTP for ${normalizedEmail}: ${code}`);
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[Password Reset] OTP for ${normalizedEmail}: ${code}`);
+    }
 
     if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
       const transporter = nodemailer.createTransport({
