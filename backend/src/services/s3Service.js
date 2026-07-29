@@ -11,6 +11,27 @@ const bucket = process.env.S3_BUCKET || "pho-city-images-prod";
 
 const s3 = new S3Client({ region });
 
+function decodeObjectKey(encodedKey) {
+  if (typeof encodedKey !== "string") return "";
+
+  try {
+    return decodeURIComponent(encodedKey);
+  } catch {
+    return encodedKey.replace(/(?:%[0-9a-fA-F]{2})+/g, (encodedRun) => {
+      try {
+        return decodeURIComponent(encodedRun);
+      } catch {
+        return encodedRun;
+      }
+    });
+  }
+}
+
+function buildPublicUrl(key) {
+  const encodedKey = key.split("/").map(encodeURIComponent).join("/");
+  return `https://${bucket}.s3.${region}.amazonaws.com/${encodedKey}`;
+}
+
 export async function uploadToS3(buffer, key, contentType) {
   await s3.send(
     new PutObjectCommand({
@@ -21,7 +42,7 @@ export async function uploadToS3(buffer, key, contentType) {
     }),
   );
 
-  return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+  return buildPublicUrl(key);
 }
 
 export async function listFromS3(prefix = "") {
@@ -29,17 +50,20 @@ export async function listFromS3(prefix = "") {
     Bucket: bucket,
     Prefix: prefix,
     MaxKeys: 500,
+    EncodingType: "url",
   });
 
   const response = await s3.send(command);
-  const baseUrl = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
-  return (response.Contents || []).map((obj) => ({
-    key: obj.Key,
-    url: `${baseUrl}${obj.Key}`,
-    size: obj.Size,
-    lastModified: obj.LastModified,
-  }));
+  return (response.Contents || []).map((obj) => {
+    const key = decodeObjectKey(obj.Key);
+    return {
+      key,
+      url: buildPublicUrl(key),
+      size: obj.Size,
+      lastModified: obj.LastModified,
+    };
+  });
 }
 
 export async function deleteFromS3(key) {
